@@ -1,4 +1,11 @@
 {
+  "name": "dubai-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "devDependencies": {
     "nx": "21.4.0"
   }
