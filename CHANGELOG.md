@@ -8,9 +8,13 @@
 ## [Unreleased]
 
 ### Removed
-- Удалены временные файлы (`project_structure_full.txt`).
-- Удалены локальные базы данных SQLite (`db.sqlite3`) из `apps/pfimport-main` и `apps/realty-main`, так как они не должны находиться в системе контроля версий.
-- Удалены устаревшие управляющие скрипты (`project-manager.ps1`, `project-manager.sh`, `reorganize-project.ps1`, `reorganize-project.sh`) из папки `scripts/` в пользу `Taskfile.yml` и `meta-manager.ps1`.
+- Удалены устаревшие и дублирующиеся скрипты запуска и управления (`start-*.ps1`, `start-*.bat`, `project-manager.*`, `simple-*.*`) в пользу единого `Taskfile.yml`.
+- Удалены старые Dockerfile (`apps/realty-main/Dockerfile.simple`, `apps/realty-main/deploy/Dockerfile.binary`), оставлены только актуальные.
+- Удален `docs/lint-docs.sh` (используется версия для PowerShell).
+
+### Added
+- Создан `CHANGELOG.md` для отслеживания истории изменений проекта.
 
 ### Changed
-- Упрощена структура управления проектом. Теперь для выполнения всех основных команд используется `Taskfile.yml`.
+- Скрипт `auto_import.sh` перенесен в `apps/realty-main/scripts/` для лучшей инкапсуляции.
+- Централизовано управление задачами проекта через `Taskfile.yml`.
