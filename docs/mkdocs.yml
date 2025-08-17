@@ -82,8 +82,7 @@ nav:
     - Обзор архитектуры: architecture/overview.md
   - Разработка:
     - Настройка окружения: development/setup.md
-  - Пользовательские руководства:
-    - AI агенты: user-guides/ai-agents.md
+    - "Интеграция с внешними сервисами": external-services-guide.md
   - Решение проблем:
     - Частые проблемы: troubleshooting/common-issues.md
 
