@@ -235,11 +235,6 @@ function Create-DockerComposeFiles {
             services = @("real-estate-api", "analytics-service", "data-processor")
             ports = @(8000, 8001, 8002)
         }
-        "ai" = @{
-            file = "infrastructure\docker\docker-compose.ai.yml"
-            services = @("memory-service", "agent-service", "ml-service")
-            ports = @(8081, 8082, 8083)
-        }
         "frontend" = @{
             file = "infrastructure\docker\docker-compose.frontend.yml"
             services = @("dxb-frontend", "frontend-api")
@@ -323,11 +318,6 @@ DB_PASSWORD=dubai_pass
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# AI Services
-AI_MEMORY_URL=http://localhost:8081
-AI_AGENTS_URL=http://localhost:8082
-AI_ML_URL=http://localhost:8083
-
 # Frontend
 FRONTEND_PORT=3000
 FRONTEND_API_URL=http://localhost:8000
@@ -353,11 +343,6 @@ DB_PASSWORD=dubai_pass
 # Redis
 REDIS_HOST=redis
 REDIS_PORT=6379
-
-# AI Services
-AI_MEMORY_URL=http://ai-memory-service:8081
-AI_AGENTS_URL=http://ai-agents-service:8082
-AI_ML_URL=http://ai-ml-service:8083
 
 # Frontend
 FRONTEND_PORT=3000

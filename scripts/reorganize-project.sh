@@ -206,7 +206,6 @@ create_docker_compose_files() {
     
     local compose_files=(
         "core:infrastructure/docker/docker-compose.core.yml:real-estate-api,analytics-service,data-processor:8000,8001,8002"
-        "ai:infrastructure/docker/docker-compose.ai.yml:memory-service,agent-service,ml-service:8081,8082,8083"
         "frontend:infrastructure/docker/docker-compose.frontend.yml:dxb-frontend,frontend-api:3000,3001"
         "infrastructure:infrastructure/docker/docker-compose.infrastructure.yml:postgres,redis,nginx:5432,6379,8080"
         "monitoring:infrastructure/docker/docker-compose.monitoring.yml:prometheus,grafana,elasticsearch,kibana:9090,3001,9200,5601"
@@ -273,11 +272,6 @@ DB_PASSWORD=dubai_pass
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# AI Services
-AI_MEMORY_URL=http://localhost:8081
-AI_AGENTS_URL=http://localhost:8082
-AI_ML_URL=http://localhost:8083
-
 # Frontend
 FRONTEND_PORT=3000
 FRONTEND_API_URL=http://localhost:8000
@@ -309,11 +303,6 @@ DB_PASSWORD=dubai_pass
 # Redis
 REDIS_HOST=redis
 REDIS_PORT=6379
-
-# AI Services
-AI_MEMORY_URL=http://ai-memory-service:8081
-AI_AGENTS_URL=http://ai-agents-service:8082
-AI_ML_URL=http://ai-ml-service:8083
 
 # Frontend
 FRONTEND_PORT=3000

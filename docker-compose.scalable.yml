@@ -41,46 +41,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Memory Service
-  memory-service-production:
-    build:
-      context: ./memory-service
-      dockerfile: Dockerfile.production
-    container_name: memory-llm-production
-    environment:
-      SPRING_PROFILES_ACTIVE: production
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-production:5432/memory_llm
-      SPRING_DATASOURCE_USERNAME: memoryuser
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      MEMORY_API_KEY: ${MEMORY_API_KEY}
-      MEMORY_ADMIN_KEY: ${MEMORY_ADMIN_KEY}
-      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
-      LIMITS_MAX_TEXT_LENGTH: ${LIMITS_MAX_TEXT_LENGTH}
-      LIMITS_MAX_BATCH_ITEMS: ${LIMITS_MAX_BATCH_ITEMS}
-      LIMITS_MAX_TOPK: ${LIMITS_MAX_TOPK}
-      LIMITS_COST_THRESHOLD: ${LIMITS_COST_THRESHOLD}
-      SPRING_FLYWAY_ENABLED: ${SPRING_FLYWAY_ENABLED}
-      SPRING_REDIS_HOST: redis-production
-      SPRING_REDIS_PORT: 6379
-    ports:
-      - "8081:8080"
-    depends_on:
-      postgres-production:
-        condition: service_healthy
-      redis-production:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 1G
-
   # Nginx
   nginx-production:
     image: nginx:alpine

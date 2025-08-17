@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "memory-llm": {
+      "command": "docker",
+      "args": ["run", "--rm", "-i", "-p", "3004:3004", "memory-mcp-server:latest"],
+      "env": {
+        "MEMORY_BASE_URL": "http://localhost:8081",
+        "MEMORY_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}

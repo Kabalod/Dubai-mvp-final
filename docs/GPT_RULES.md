@@ -113,7 +113,6 @@
 docker compose up -d
 
 ## Команда с объяснением
-docker logs memory-service --tail 100
 ```
 
 ## YAML конфигурация
