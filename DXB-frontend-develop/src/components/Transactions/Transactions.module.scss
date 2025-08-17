@@ -1,0 +1,58 @@
+@use "@/styles/typography" as *;
+
+.title {
+    @include title2semibold;
+    color: $textColorPrimary;
+}
+
+.subtitle {
+    @include body1regular;
+    color: $textColorSecondary;
+}
+
+.subtitleVal {
+    @include body1regular;
+    color: $textColorPrimary;
+}
+
+.tableContainer {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 16px;
+}
+.table {
+    .ant-table-tbody > tr > td {
+        @include body1semibold;
+        color: $textColorPrimary;
+    }
+    .ant-table {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .ant-table-thead > tr > th {
+        background-color: #f3f4f6;
+        font-weight: 600;
+        color: #6b7280;
+    }
+
+    .ant-table-tbody > tr {
+        transition: background 0.2s;
+    }
+
+    .ant-table-tbody > tr:nth-child(odd) {
+        background-color: #f9fafb;
+    }
+
+    .ant-table-tbody > tr:hover {
+        background-color: #eef2ff;
+    }
+
+    .detailsButton {
+        border-radius: 20px;
+        font-weight: 600;
+        padding: 6px 16px;
+    }
+}

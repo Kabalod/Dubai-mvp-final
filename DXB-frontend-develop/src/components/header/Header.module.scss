@@ -1,0 +1,28 @@
+@use "@/styles/typography" as *;
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.menu {
+    border-bottom: 0;
+
+    :global(.ant-menu-item) {
+        @include body1medium;
+        color: $textColorBlack;
+    }
+}
+
+.buttonBlock {
+    text-align: end;
+}
+
+.buttonStyle {
+    @include body2regular;
+    color: $textColorPrimary;
+    background-color: #f0f3ff;
+    border: 0 !important;
+}

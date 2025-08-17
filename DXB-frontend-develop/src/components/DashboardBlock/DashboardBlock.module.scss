@@ -1,0 +1,66 @@
+@use "@/styles/typography" as *;
+
+.container {
+    border-radius: 36px;
+    background-color: $bgColorGrey;
+}
+
+.title {
+    @include title4medium;
+    color: $textColorPrimary;
+}
+
+.mosaic {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.card {
+    border-radius: 24px;
+    padding: 16px;
+    background: $bgColorWhite;
+    box-shadow: 0px 1px 4px 0px #0000000a;
+    min-width: 250px;
+    max-width: 330px;
+
+    & :global(.ant-card-body) {
+        padding: 0 !important;
+    }
+}
+
+.substring {
+    @include body2regular;
+    color: $textColorSecondary;
+    display: flex;
+    justify-content: space-between;
+}
+
+.chevron {
+    width: 24px;
+    height: 24px;
+}
+
+.iconInfo {
+    height: 16px;
+    width: 16px;
+}
+
+.cardTitle {
+    @include body2regular;
+    color: $textColorSecondary;
+}
+
+.value {
+    @include title4medium;
+    color: $textColorPrimary;
+}
+
+.currency {
+    @include body2regular;
+    color: $textColorSecondary;
+}
+.cardRightSide {
+    display: flex;
+    justify-content: end;
+}

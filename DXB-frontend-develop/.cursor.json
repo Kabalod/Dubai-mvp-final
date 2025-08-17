@@ -1,0 +1,29 @@
+{
+  "project": {
+    "name": "Dubai Real Estate",
+    "description": "Frontend (React + Vite + Ant Design Pro), Backend (Django), Memory LLM (Java/Spring + pgvector)",
+    "languages": ["ts", "tsx", "py", "java"],
+    "frameworks": ["react", "vite", "antd", "spring-boot"],
+    "style": {
+      "typescript": {
+        "explicitAny": false,
+        "preferInterfaces": true
+      }
+    }
+  },
+  "tools": {
+    "mcp": {
+      "servers": [
+        {
+          "name": "memory",
+          "description": "Memory LLM server via MCP (search/add/health)",
+          "tools": [
+            { "name": "memory.search", "usage": "Поиск воспоминаний по тексту. input: { query, topK?, filters? }" },
+            { "name": "memory.add", "usage": "Добавить воспоминание. input: { text, type, age, category?, tags?, metadata? }" },
+            { "name": "memory.health", "usage": "Проверить здоровье Memory LLM" }
+          ]
+        }
+      ]
+    }
+  }
+}

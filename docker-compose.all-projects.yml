@@ -1,0 +1,212 @@
+# Переменные окружения загружены через PowerShell
+
+services:
+  # ========================================
+  # DXB Frontend (React)
+  # ========================================
+  dxb-frontend:
+    build:
+      context: ../DXB-frontend-develop
+      dockerfile: Dockerfile
+    container_name: dxb-frontend
+    ports:
+      - "${DXB_FRONTEND_PORT:-3000}:80"
+    volumes:
+      - ../DXB-frontend-develop:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ========================================
+  # Realty Main (Django Backend)
+  # ========================================
+  realty-main-web:
+    build:
+      context: ../realty-main
+      dockerfile: Dockerfile
+    container_name: realty-main-web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ../realty-main:/app
+    ports:
+      - "${REALTY_MAIN_WEB_PORT:-8000}:8000"
+    depends_on:
+      - realty-main-db
+    environment:
+      - DEBUG=1
+      - DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  realty-main-db:
+    image: postgres:16-alpine
+    container_name: realty-main-db
+    volumes:
+      - realty_main_postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=realty
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "${REALTY_MAIN_DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ========================================
+  # PfImport Service
+  # ========================================
+  pfimport:
+    build:
+      context: ../pfimport-main
+      dockerfile: Dockerfile
+    container_name: pfimport-service
+    ports:
+      - "${PFIMPORT_PORT:-8082}:8080"
+    volumes:
+      - ../pfimport-main:/app
+    environment:
+      - NODE_ENV=development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ========================================
+  # Memory LLM Production Stack
+  # ========================================
+  memory-postgres-production:
+    image: pgvector/pgvector:pg15
+    container_name: memory-postgres-production
+    environment:
+      POSTGRES_DB: memory_llm
+      POSTGRES_USER: memoryuser
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "${MEMORY_POSTGRES_PORT:-5433}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U memoryuser -d memory_llm"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  memory-redis-production:
+    image: redis:7-alpine
+    container_name: memory-redis-production
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    ports:
+      - "${MEMORY_REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  memory-service-production:
+    build:
+      context: ./Java_Memory_LLM-master/memory-service
+      dockerfile: Dockerfile.production
+    container_name: memory-llm-production
+    environment:
+      SPRING_PROFILES_ACTIVE: production
+      SPRING_DATASOURCE_URL: jdbc:postgresql://memory-postgres-production:5432/memory_llm
+      SPRING_DATASOURCE_USERNAME: memoryuser
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      MEMORY_API_KEY: ${MEMORY_API_KEY}
+      MEMORY_ADMIN_KEY: ${MEMORY_ADMIN_KEY}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      LIMITS_MAX_TEXT_LENGTH: ${LIMITS_MAX_TEXT_LENGTH}
+      LIMITS_MAX_BATCH_ITEMS: ${LIMITS_MAX_BATCH_ITEMS}
+      LIMITS_MAX_TOPK: ${LIMITS_MAX_TOPK}
+      LIMITS_COST_THRESHOLD: ${LIMITS_COST_THRESHOLD}
+      SPRING_FLYWAY_ENABLED: ${SPRING_FLYWAY_ENABLED}
+      SPRING_REDIS_HOST: memory-redis-production
+      SPRING_REDIS_PORT: 6379
+    ports:
+      - "${MEMORY_SERVICE_PORT:-8081}:8080"
+    depends_on:
+      memory-postgres-production:
+        condition: service_healthy
+      memory-redis-production:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  memory-nginx-production:
+    image: nginx:alpine
+    container_name: memory-nginx-production
+    volumes:
+      - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./configs/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+      - nginx_logs:/var/log/nginx
+    ports:
+      - "${MEMORY_NGINX_PORT:-8080}:80"
+    depends_on:
+      memory-service-production:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  memory-prometheus:
+    image: prom/prometheus:latest
+    container_name: memory-prometheus
+    volumes:
+      - ./configs/monitoring/prometheus:/etc/prometheus:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${MEMORY_PROMETHEUS_PORT:-9090}:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+
+  memory-grafana:
+    image: grafana/grafana:latest
+    container_name: memory-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./configs/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "${MEMORY_GRAFANA_PORT:-3003}:3000"
+    depends_on:
+      - memory-prometheus
+
+volumes:
+  # Memory LLM
+  postgres_data:
+  redis_data:
+  nginx_logs:
+  prometheus_data:
+  grafana_data:
+  
+  # Realty Main
+  realty_main_postgres_data:

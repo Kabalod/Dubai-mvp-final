@@ -1,0 +1,47 @@
+# Python services
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+venv/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+
+# Models / data (generated or large)
+*.pt
+*.pth
+*.onnx
+*.bin
+*.ckpt
+*.model
+*.vec
+*.h5
+*.npz
+*.npy
+
+# Logs / outputs
+*.log
+logs/
+output/
+checkpoints/
+runs/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Node bits if present
+node_modules/
+dist/
+build/
+
+# OS/IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

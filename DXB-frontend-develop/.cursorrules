@@ -1,0 +1,71 @@
+# Cursor AI Configuration for Dubai Real Estate Project
+
+## Project Overview
+This is a React + TypeScript + Ant Design project for Dubai Real Estate platform.
+The project uses modern React patterns, Pro components, and follows best practices.
+
+## Technology Stack
+- React 18+ with TypeScript
+- Ant Design Pro components (@ant-design/pro-components)
+- Vite for build tooling
+- React Router for navigation
+- Lingui for internationalization
+- Charts: @ant-design/charts and recharts
+
+## Code Style & Patterns
+- Use functional components with hooks
+- Prefer TypeScript interfaces over types
+- Use Ant Design Pro components when possible
+- Follow React best practices
+- Use proper error handling and loading states
+
+## Component Structure
+- Components should be in src/components/
+- Pages should be in src/pages/
+- Use proper TypeScript typing
+- Implement proper error boundaries
+- Use React.memo for performance when needed
+
+## Form Handling
+- Use ProForm components from @ant-design/pro-components
+- Implement proper validation with yup schemas
+- Use react-hook-form for complex forms
+- Handle form submission with proper error handling
+
+## API Integration
+- Use @tanstack/react-query for data fetching
+- Implement proper loading and error states
+- Use axios for HTTP requests
+- Handle authentication properly
+
+## Styling
+- Use Ant Design theme system
+- Prefer inline styles for component-specific styling
+- Use CSS modules when needed
+- Follow responsive design principles
+
+## File Naming
+- Use PascalCase for components: Dashboard.tsx
+- Use camelCase for utilities: utils.ts
+- Use kebab-case for CSS modules: Auth.module.scss
+
+## Common Patterns
+- Use destructuring for props
+- Implement proper loading states
+- Use React.Suspense for code splitting
+- Implement proper error boundaries
+- Use React.memo for performance optimization
+
+## Dependencies to Use
+- @ant-design/pro-components for advanced UI
+- @ant-design/charts for data visualization
+- react-hook-form for form management
+- yup for validation
+- @tanstack/react-query for data fetching
+
+## Avoid
+- Class components (use functional components)
+- Any type (use proper TypeScript types)
+- Inline event handlers (use proper handlers)
+- Direct DOM manipulation
+- Global CSS (use CSS modules or styled-components)

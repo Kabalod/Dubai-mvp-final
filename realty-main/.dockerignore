@@ -1,0 +1,14 @@
+*
+
+!realty/
+!deploy/
+!requirements*.txt
+!tailwind.config.js
+!package*.json
+!manage.py
+
+**/*~
+**/*.log
+**/.DS_Store
+**/Thumbs.db
+**/__pycache__/

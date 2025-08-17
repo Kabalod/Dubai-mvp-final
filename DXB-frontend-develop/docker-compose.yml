@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+    frontend:
+        build: .
+        container_name: estate_front
+        ports:
+            - "3000:80"
+        #env_file:
+        #    - .env
+        volumes:
+            - .:/app
+            - /app/node_modules
+        restart: unless-stopped
+        # depends_on:
+        #     - graphql-server
+
+    # graphql-server:
+    #     image: my-graphql-server-image:latest
+    #     container_name: estate_graphql
+    #     ports:
+    #         - "4000:4000"
