@@ -57,13 +57,14 @@ services:
       dockerfile: Dockerfile
     container_name: mvp-parser
     ports:
-      - "8002:8000"
+      - "${PARSER_PORT:-8002}:8000"
     volumes:
       - ./apps/pfimport-main:/app
       - ./shared-data:/shared-data  # Общая папка для JSON файлов
     environment:
       - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,parser-service
+      - SECRET_KEY=${SECRET_KEY:-mvp-secret-key-change-in-production}
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
@@ -79,12 +80,11 @@ services:
       context: ./apps/realty-main
       dockerfile: Dockerfile
     container_name: mvp-api
-    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./apps/realty-main:/app
       - ./shared-data:/shared-data  # Общая папка для JSON файлов
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,12 +92,14 @@ services:
         condition: service_healthy
     environment:
       - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,[::1]
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,[::1],api-service
       - DATABASE_URL=postgres://postgres:postgres@postgres:5432/dubai_realty
       - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-mvp-secret-key-change-in-production}
+      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:80
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
