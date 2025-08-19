@@ -56,6 +56,7 @@ urlpatterns = [
     # ),
     path("health/", login_not_required(MainView.as_view())),
     path("accounts/", include("allauth.urls")),
+    path("api/", include("realty.api.urls")),
     path(settings.ADMIN_URL, admin.site.urls),
     path("download-dbdump/<str:filename>/", download_db_dump, name="download-db-dump"),
     path("", include("realty.main.urls")),
