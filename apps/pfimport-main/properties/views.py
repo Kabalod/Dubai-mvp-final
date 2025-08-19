@@ -6,6 +6,8 @@ from django_tables2 import RequestConfig
 from .models import Property, Building, AREAS_WITH_PROPERTY
 from .tables import PropertyTable
 from django.conf import settings
+import datetime
+import json
 
 
 def property_list_tables2(request):
@@ -351,4 +353,148 @@ def api_areas(request):
         for area in areas if area
     ]
     
-    return JsonResponse({'results': results}) 
+    return JsonResponse({'results': results})
+
+
+# ========================================
+# MVP Views for Parser Service
+# ========================================
+
+def health_check(request):
+    """Health check endpoint for Docker and monitoring."""
+    try:
+        # Check database connectivity
+        property_count = Property.objects.count()
+        
+        # Check if recent data exists (last 24 hours)
+        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        recent_count = Property.objects.filter(created_at__gte=yesterday).count()
+        
+        return JsonResponse({
+            'status': 'healthy',
+            'timestamp': datetime.datetime.now().isoformat(),
+            'database': 'connected',
+            'total_properties': property_count,
+            'recent_properties_24h': recent_count,
+            'service': 'parser'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'unhealthy',
+            'timestamp': datetime.datetime.now().isoformat(),
+            'error': str(e),
+            'service': 'parser'
+        }, status=500)
+
+
+def index(request):
+    """Simple index page for parser service."""
+    try:
+        property_count = Property.objects.count()
+        building_count = Building.objects.count()
+        
+        # Recent statistics
+        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+        recent_count = Property.objects.filter(created_at__gte=yesterday).count()
+        
+        context = {
+            'service_name': 'PropertyFinder Parser',
+            'total_properties': property_count,
+            'total_buildings': building_count,
+            'recent_properties': recent_count,
+            'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        return render(request, 'properties/index.html', context)
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': 'Service error',
+            'message': str(e)
+        }, status=500)
+
+
+def properties_list(request):
+    """API endpoint to list properties for main service."""
+    try:
+        # Get query parameters
+        limit = int(request.GET.get('limit', 100))
+        offset = int(request.GET.get('offset', 0))
+        
+        # Get properties
+        properties = Property.objects.all().order_by('-created_at')[offset:offset+limit]
+        
+        # Convert to JSON format
+        properties_data = []
+        for prop in properties:
+            properties_data.append({
+                'id': prop.id,
+                'title': prop.title,
+                'price': float(prop.price) if prop.price else 0,
+                'bedrooms': prop.bedrooms,
+                'bathrooms': prop.bathrooms,
+                'display_address': prop.display_address,
+                'property_type': prop.property_type,
+                'created_at': prop.created_at.isoformat() if prop.created_at else None,
+            })
+        
+        return JsonResponse({
+            'count': len(properties_data),
+            'results': properties_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': 'Failed to fetch properties',
+            'message': str(e)
+        }, status=500)
+
+
+def export_view(request):
+    """Simple web interface to trigger export."""
+    if request.method == 'POST':
+        # In a real implementation, this would trigger the export command
+        return JsonResponse({
+            'status': 'export_triggered',
+            'message': 'Export to shared data initiated'
+        })
+    
+    return render(request, 'properties/export.html')
+
+
+def stats_view(request):
+    """Statistics API endpoint."""
+    try:
+        stats = {
+            'total_properties': Property.objects.count(),
+            'total_buildings': Building.objects.count(),
+            'by_property_type': {},
+            'by_bedrooms': {},
+            'recent_24h': Property.objects.filter(
+                created_at__gte=datetime.datetime.now() - datetime.timedelta(days=1)
+            ).count(),
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Properties by type
+        for prop_type in Property.objects.values_list('property_type', flat=True).distinct():
+            if prop_type:
+                stats['by_property_type'][prop_type] = Property.objects.filter(
+                    property_type=prop_type
+                ).count()
+        
+        # Properties by bedrooms
+        for bedrooms in Property.objects.values_list('bedrooms', flat=True).distinct():
+            if bedrooms is not None:
+                stats['by_bedrooms'][str(bedrooms)] = Property.objects.filter(
+                    bedrooms=bedrooms
+                ).count()
+        
+        return JsonResponse(stats)
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': 'Failed to generate stats',
+            'message': str(e)
+        }, status=500) 
