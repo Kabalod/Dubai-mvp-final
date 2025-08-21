@@ -7,9 +7,25 @@
 ## Основные сервисы
 
 ### Real Estate API
-- **Порт**: 8000
-- **Технология**: Django + GraphQL
+- **Порт (host:container)**: 8090:8000 (prod compose)
+- **Технология**: Django + DRF + GraphQL
 - **Описание**: Основной API для работы с недвижимостью
+- **Health**: `GET /api/health/` → 200 JSON (proxy в Nginx: `/health/api`)
+- **ENV**:
+  - `DJANGO_ALLOWED_HOSTS`: должен включать `localhost`, `127.0.0.1`, и прод-домен
+  - `CORS_ALLOWED_ORIGINS`: `http://localhost:3000`, `http://localhost`, и прод-домен
+  - `DATABASE_URL`, `REDIS_URL`, `SECRET_KEY`
+  - `SECURE_SSL_REDIRECT` (по умолчанию = `PROD`, можно переопределить)
+  
+Пример prod compose (фрагмент):
+```yaml
+api-service:
+  ports:
+    - "${API_PORT:-8090}:8000"
+  environment:
+    - DJANGO_ALLOWED_HOSTS=${API_ALLOWED_HOSTS:-api-service,localhost,127.0.0.1,yourdomain.com}
+    - CORS_ALLOWED_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost,https://yourdomain.com}
+```
 
 ### Analytics Service
 - **Порт**: 8001
@@ -58,6 +74,9 @@ DELETE /api/real-estate/{id}/     # Удаление объекта
 
 ## GraphQL endpoint
 POST   /graphql/                  # GraphQL API
+
+## Health
+GET    /api/health/               # 200 JSON (health/status)
 ```
 
 ### Analytics Service

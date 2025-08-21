@@ -61,7 +61,7 @@ npm run dev
 |--------|-----|----------|
 | **Project Launcher** | http://localhost:80 | 🆕 Управление проектами |
 | **DXB Frontend** | http://localhost:3000 | React приложение |
-| **Realty Backend** | http://localhost:8000 | Django API |
+| **Realty Backend** | http://localhost:8090 | Django API |
 | **Memory LLM** | http://localhost:8080 | AI сервис |
 | **Grafana** | http://localhost:3003 | Мониторинг |
 | **Prometheus** | http://localhost:9090 | Метрики |
@@ -91,6 +91,37 @@ DATABASE_URL=postgresql://launcher:launcher@localhost:5434/launcher
 
 ## Безопасность
 SECRET_KEY=your-secret-key-here
+```
+
+## ✅ Чек-лист прод-развертывания API
+
+- [ ] `DJANGO_ALLOWED_HOSTS` включает `localhost`, `127.0.0.1`, и прод-домен
+- [ ] `CORS_ALLOWED_ORIGINS` включает `http://localhost:3000`, `http://localhost`, и прод-домен
+- [ ] `SECRET_KEY` задан
+- [ ] `DATABASE_URL` и `REDIS_URL` корректны
+- [ ] Прокси-порт API выставлен: хост `8090` → контейнер `8000`
+
+### Применение миграций и сборка статики
+```bash
+docker compose -f docker-compose.prod.yml exec api-service \
+  python manage.py migrate --noinput
+
+docker compose -f docker-compose.prod.yml exec api-service \
+  python manage.py collectstatic --noinput
+```
+
+### Smoke-тесты
+```bash
+# Health endpoint
+curl -i http://localhost:8090/api/health/
+
+# Базовый API
+curl -I http://localhost:8090/api/
+```
+
+Ожидание: `200` на `/api/health/`. Если получаете `301`, возможно включён `SECURE_SSL_REDIRECT`; временно отключите:
+```env
+SECURE_SSL_REDIRECT=false
 ```
 
 ## 📊 Мониторинг и диагностика
