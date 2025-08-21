@@ -32,9 +32,16 @@ PROD = not DEBUG
 # -----------------------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/4.0/ref/settings/
 
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS", default=["*"] if DEBUG else ["localhost"], subcast=str
-)
+# Support both DJANGO_ALLOWED_HOSTS and ALLOWED_HOSTS; include sensible defaults
+# Note: Ports in Host header are ignored by Django matching
+_dj_allowed_hosts = env.list("DJANGO_ALLOWED_HOSTS", default=None, subcast=str)
+if _dj_allowed_hosts is None:
+    _dj_allowed_hosts = env.list(
+        "ALLOWED_HOSTS",
+        default=["*"] if DEBUG else ["localhost", "127.0.0.1"],
+        subcast=str,
+    )
+ALLOWED_HOSTS = _dj_allowed_hosts
 
 ASGI_APPLICATION = "realty.asgi.application"
 
@@ -383,9 +390,20 @@ DEBUG_TOOLBAR_CONFIG = {
     "ROOT_TAG_EXTRA_ATTRS": "hx-preserve",
 }
 
-# django-corshheaders
-# CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=["*"])
-CORS_ALLOW_ALL_ORIGINS = True  # TODO: in prod turn to false
+# django-corsheaders
+# Prefer explicit origins via env; fall back to a safe local set
+_cors_env = env.list("CORS_ALLOWED_ORIGINS", default=None)
+if _cors_env is not None:
+    CORS_ALLOWED_ORIGINS = _cors_env
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost",
+    ]
+
+# Allow all only during development; restrict in production
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 # django-litestream
 LITESTREAM = {
@@ -488,12 +506,6 @@ SIMPLE_JWT = {
 }
 
 # CORS Settings for Frontend
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React development server
-    "http://127.0.0.1:3000",
-    "http://localhost:80",    # Nginx
-]
-
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_HEADERS = [
