@@ -1,6 +1,6 @@
 Django==5.1.7
 psycopg2-binary==2.9.9
-psycopg-pool==3.2.6
+psycopg[binary,pool]==3.2.6
 strawberry-graphql==0.109.0
 strawberry-graphql-django==0.7.0
 sentry-sdk
@@ -33,3 +33,5 @@ whitenoise[brotli]
 crispy-tailwind>=1.0.3
 filelock
 boto3
+djangorestframework
+djangorestframework-simplejwt
