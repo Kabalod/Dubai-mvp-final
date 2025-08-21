@@ -348,3 +348,171 @@ docker version
 **Последнее обновление**: {{ date }}  
 **Статус**: Активная разработка
 
+## 🔴 Проблемы с API (Django Realty Backend)
+
+### 1) /api/health/ возвращает 301 (редирект на https)
+**Симптомы**: `HTTP/1.1 301 Moved Permanently`, `Location: https://localhost:8090/api/health/`
+
+**Причина**: В прод-режиме `SECURE_SSL_REDIRECT=True` принудительно перенаправляет HTTP на HTTPS.
+
+**Решения**:
+```bash
+# Локальный smoke без HTTPS (временно, только для диагностики)
+# В docker-compose для api-service установите:
+#   SECURE_SSL_REDIRECT=false
+
+# Либо тестируйте с учётом редиректа
+curl -i -L http://localhost:8090/api/health/
+
+# Или обращайтесь сразу по https через Nginx/сертификат
+curl -i https://<домен>/api/health/
+```
+
+### 2) ModuleNotFoundError: No module named 'rest_framework'
+**Причина**: Отсутствуют зависимости DRF.
+
+**Решение**:
+```text
+apps/realty-main/requirements.txt
+djangorestframework
+djangorestframework-simplejwt
+```
+Затем пересоберите образ и перезапустите сервис.
+
+### 3) ImproperlyConfigured: The SECRET_KEY setting must not be empty
+**Причина**: Не задан `SECRET_KEY` для Django.
+
+**Решение**:
+```bash
+# В docker compose используйте переменную окружения SECRET_KEY или API_SECRET_KEY
+# Пример (только для локалки):
+API_SECRET_KEY=mvp-secret-key-change-in-production
+```
+
+### 4) Error loading psycopg_pool module / Did you install psycopg[pool]?
+**Причина**: Не установлен пакет `psycopg` с extras.
+
+**Решение**:
+```text
+apps/realty-main/requirements.txt
+psycopg[binary,pool]==3.2.6
+```
+Пересоберите образ и перезапустите сервис.
+
+### 5) Bind for 0.0.0.0:8000 failed: port is already allocated
+**Причина**: Порт 8000 занят на хосте.
+
+**Решение**:
+```bash
+# Используйте другой внешний порт, например 8090 → 8000
+# В docker-compose:
+#   ports:
+#     - "${API_PORT:-8090}:8000"
+# И экспортируйте переменную окружения перед запуском (PowerShell)
+$env:API_PORT="8090"
+```
+
+### 6) Бесконечное ожидание базы / Database not ready
+**Причина**: База не доступна/нет пароля, либо ещё не прошла healthcheck.
+
+**Решение**:
+```bash
+# Убедитесь, что POSTGRES_PASSWORD задан, а depends_on использует healthcheck
+# Перезапустите после готовности БД
+```
+
+### 7) CORS 403 / ошибки CORS в браузере
+**Причина**: Отсутствуют нужные Origins/Hosts.
+
+**Решение**:
+```python
+# apps/realty-main/realty/settings.py (читается из ENV)
+DJANGO_ALLOWED_HOSTS = ["localhost","127.0.0.1","<домен>"]
+CORS_ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://localhost",
+  "https://<домен>"
+]
+```
+
+### 8) Smoke-тесты API
+```bash
+# Миграции и статика
+docker compose -f docker-compose.prod.yml exec api-service \
+  python manage.py migrate --noinput
+docker compose -f docker-compose.prod.yml exec api-service \
+  python manage.py collectstatic --noinput
+
+# Health (HTTP c редиректом)
+curl -i -L http://localhost:8090/api/health/
+
+# Health с CORS-проверкой
+curl -i -H "Origin: http://localhost:3000" \
+  http://localhost:8090/api/health/
+
+# Базовый список API (если реализован)
+curl -i http://localhost:8090/api/
+```
+
+### 9) Наличие health endpoint
+`/api/health/` реализован в `realty/api/views.py` и подключён в `realty/api/urls.py`. 
+
+### 10) PowerShell alias `curl` ломает команды
+**Симптомы**: Странные ошибки `Get-Content: The input object cannot be bound...` при использовании пайпов (`| cat`).
+
+**Решение**:
+```powershell
+# На Windows используйте системный curl.exe
+curl.exe -s -i http://localhost:8002/health/
+
+# Либо замените пайпы на простой вызов без перенаправления
+docker compose -f docker-compose.prod.yml exec parser-service python manage.py migrate --noinput
+```
+
+### 11) Parser export: AttributeError на полях `is_verified`/`size`
+**Симптомы**:
+- `AttributeError: 'Property' object has no attribute 'is_verified'`
+- `AttributeError: 'Property' object has no attribute 'size'`
+
+**Причина**: В модели поля называются иначе (`verified`, `area_sqm/area_sqft`).
+
+**Решение**: В `apps/pfimport-main/properties/management/commands/export_to_shared.py` использовать:
+```python
+verified = prop.verified
+# sizeMin:
+size_min = f"{prop.area_sqm} sqm" if prop.area_sqm else (f"{prop.area_sqft} sqft" if prop.area_sqft else "")
+```
+После правки пересобрать образ и повторить экспорт.
+
+### 12) Parser: `no such table: properties_property` при экспорте
+**Симптомы**: Ошибка при `export_to_shared` сразу после сборки контейнера.
+
+**Решение**:
+```bash
+docker compose -f docker-compose.prod.yml exec parser-service python manage.py migrate --noinput
+```
+
+### 13) Симлинк в shared-data на Windows
+**Симптомы**: Предупреждение про невозможность создать symlink `latest_export.json`.
+
+**Решение**: Это ожидаемо на Windows без привилегий. Используйте сам файл `exported_properties_*.json` вместо симлинка.
+
+### 14) API health: 404 на /api/health/
+**Симптомы**: `404 Page not found` по `http://localhost:8000/api/health/`.
+
+**Причина**: Health в проекте прокинут как `path("health/", MainView.as_view())` вне префикса `/api`.
+
+**Решение**:
+```bash
+curl -i http://localhost:8000/health/
+# либо через nginx
+curl -i http://localhost/health
+```
+
+### 15) Порты и ENV
+**Рекомендация**: придерживаться свободных портов с окончанием на `...90` и явно задавать переменные окружения перед запуском:
+```powershell
+$env:POSTGRES_PASSWORD="postgres"; $env:API_SECRET_KEY="dev"; $env:PARSER_SECRET_KEY="dev"
+docker compose -f docker-compose.prod.yml up -d postgres redis api-service parser-service
+```
+

@@ -148,6 +148,24 @@
 - ✅ **Pre-commit hooks интегрированы**
 - ✅ **GitHub Actions настроены**
 
+### API (Django Realty Backend) — результаты smoke
+- Health endpoint: `/api/health/` реализован (реагирует, возможен 301 на HTTPS в прод-режиме)
+- Миграции и сбор статики выполняются внутри entrypoint (и могут запускаться вручную)
+- CORS/Hosts читаются из ENV и могут быть заданы в compose
+
+Примеры команд:
+```bash
+# Миграции/статика
+docker compose -f docker-compose.prod.yml exec api-service python manage.py migrate --noinput
+docker compose -f docker-compose.prod.yml exec api-service python manage.py collectstatic --noinput
+
+# Health (с редиректом)
+curl -i -L http://localhost:8090/api/health/
+
+# CORS проверка
+curl -i -H "Origin: http://localhost:3000" http://localhost:8090/api/health/
+```
+
 ### Производительность
 - **Время выполнения**: 2-5 секунд для среднего проекта
 - **Память**: Минимальное потребление ресурсов
@@ -374,4 +392,44 @@ curl -I http://localhost:8090/api/health/
 curl -I http://localhost:8190/health/
 curl -I http://localhost:3000/
 ```
+
+### Логи проверки парсера и интеграции (21.08.2025)
+
+Ключевые выдержки:
+
+```
+# Health (parser)
+HTTP/1.1 200 OK
+{"status":"healthy","service":"parser",...}
+
+# Скрейп (1 страница)
+Starting to scrape 1 pages with 4 threads...
+[Page 1] Found 25 links
+Processing 25 properties...
+Processing complete. Output written to scraped_data/scrape_.../properties.json
+
+# Импорт в БД парсера
+Найдено 26 JSON файлов
+... создано 1, обновлено 0 объектов (множество строк)
+Импорт завершен успешно!
+
+# Экспорт
+✅ Exported N properties to /shared-data/exported_properties_YYYYMMDD_HHMMSS.json
+🔗 Created symlink: /shared-data/latest_export.json (или предупреждение на Windows)
+
+# API: доступ к shared-data
+ls -la /shared-data
+  exported_properties_YYYYMMDD_HHMMSS.json
+  latest_export.json -> exported_properties_...
+
+# Пробный импорт в API (dry-run)
+📄 Processing latest_export.json...
+📊 Found 0 properties in latest_export.json (если экспорт пуст)
+✅ Import completed successfully!
+```
+
+Причины пустого экспорта и рекомендации:
+- Недостаточно объектов в БД парсера → увеличить охват скрейпа.
+- Фильтрация по датам (`--recent-days`) → убрать флаг.
+- Несоответствие полей (`is_verified`, `size`) → использовать `verified`, конструировать `sizeMin` из `area_*`.
 
