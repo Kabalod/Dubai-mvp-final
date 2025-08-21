@@ -4,11 +4,11 @@ import {
     createHttpLink,
     makeVar,
 } from "@apollo/client";
+import { GRAPHQL_API_URL } from "@/config";
 import { setContext } from "@apollo/client/link/context";
 
 const httpLink = createHttpLink({
-    uri:
-        import.meta.env.VITE_GRAPHQL_API_URL || "http://localhost:8000/graphql",
+    uri: GRAPHQL_API_URL,
 });
 
 const authLink = setContext((_, { headers }) => {

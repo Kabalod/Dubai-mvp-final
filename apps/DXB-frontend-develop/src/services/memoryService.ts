@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { MEMORY_API_URL } from '@/config';
 
 // Интерфейсы для работы с Memory LLM
 export interface MemoryItem {
@@ -35,7 +36,7 @@ export interface MemoryStats {
 }
 
 // Конфигурация API
-const MEMORY_API_BASE = 'http://localhost:8080';
+const MEMORY_API_BASE = MEMORY_API_URL;
 const MEMORY_API_TIMEOUT = 30000; // 30 секунд для генерации эмбеддингов
 
 // Создаем axios инстанс с настройками

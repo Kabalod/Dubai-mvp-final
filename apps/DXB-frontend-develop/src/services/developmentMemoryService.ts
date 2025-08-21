@@ -1,4 +1,5 @@
 import { memoryService, MemoryItem } from './memoryService';
+import { MEMORY_API_URL } from '@/config';
 
 // Интерфейсы для технической документации
 export interface FileDocumentation {
@@ -215,7 +216,7 @@ class DevelopmentMemoryService {
                 age: 'permanent',
             },
             {
-                text: `Memory LLM API Endpoints: /memory/add (POST), /memory/search (GET), /memory/stats (GET), /memory/optimize (POST), /actuator/health (GET). Base URL: http://localhost:8080.`,
+                text: `Memory LLM API Endpoints: /memory/add (POST), /memory/search (GET), /memory/stats (GET), /memory/optimize (POST), /actuator/health (GET). Base URL: ${MEMORY_API_URL}.`,
                 type: 'system',
                 age: 'permanent',
             },

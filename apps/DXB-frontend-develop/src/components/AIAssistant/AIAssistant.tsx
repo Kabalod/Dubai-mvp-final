@@ -17,7 +17,7 @@ import {
     SendOutlined, 
     RobotOutlined, 
     UserOutlined, 
-    BrainOutlined,
+    BulbOutlined,
     ClearOutlined,
     HistoryOutlined,
     LightbulbOutlined,
@@ -390,7 +390,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         <ProCard
             title={
                 <Space>
-                    <BrainOutlined style={{ color: '#1890ff' }} />
+                    <BulbOutlined style={{ color: '#1890ff' }} />
                     <span>AI Ассистент по Недвижимости</span>
                 </Space>
             }

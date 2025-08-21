@@ -3,7 +3,7 @@ import { ProLayout } from '@ant-design/pro-components';
 import { Row, Col, Card, Statistic, Space, Tag, Alert } from 'antd';
 import { 
     DatabaseOutlined, 
-    BrainOutlined, 
+    BulbOutlined as BrainOutlined, 
     FileTextOutlined,
     CheckCircleOutlined,
     ClockCircleOutlined,

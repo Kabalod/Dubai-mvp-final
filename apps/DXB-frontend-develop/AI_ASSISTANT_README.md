@@ -113,7 +113,7 @@ import AIAssistant from '@/components/AIAssistant/AIAssistant';
 
 ## 🔍 API Endpoints
 
-### **Memory LLM API** (порт 8080)
+### **Memory LLM API**
 ```
 GET  /actuator/health          - Проверка здоровья сервиса
 POST /memory/add               - Добавление воспоминания
@@ -124,16 +124,19 @@ POST /memory/optimize          - Оптимизация памяти
 
 ### **Примеры запросов**
 ```bash
+# Базовый URL настраивается через VITE_MEMORY_API_URL или по умолчанию ${VITE_FRONTEND_API_URL}/memory
+MEMORY_API_URL=${VITE_MEMORY_API_URL:-http://localhost:8080}
+
 # Добавить воспоминание
-curl -X POST "http://localhost:8080/memory/add" \
+curl -X POST "$MEMORY_API_URL/memory/add" \
   -H "Content-Type: application/json" \
   -d '{"text":"Luxury villa in Palm Jumeirah costs 5M AED","type":"property","age":"month"}'
 
 # Поиск воспоминаний
-curl "http://localhost:8080/memory/search?query=Palm Jumeirah&topK=5"
+curl "$MEMORY_API_URL/memory/search?query=Palm Jumeirah&topK=5"
 
 # Статистика
-curl "http://localhost:8080/memory/stats"
+curl "$MEMORY_API_URL/memory/stats"
 ```
 
 ## 🚀 Запуск
@@ -190,7 +193,7 @@ npm run dev
 ### **Частые проблемы**
 
 #### **AI не отвечает**
-1. Проверьте статус Memory LLM: `http://localhost:8080/actuator/health`
+1. Проверьте статус Memory LLM: `${VITE_MEMORY_API_URL}/actuator/health` (или по умолчанию `http://localhost:8080/actuator/health`)
 2. Убедитесь, что Docker контейнеры запущены
 3. Проверьте логи в консоли браузера
 

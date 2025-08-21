@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { ConfigProvider } from 'antd';
 import enUS from 'antd/locale/en_US';
 import AppEnhanced from "./AppEnhanced";
+import { API_BASE_URL } from '@/config';
 
 // Global styles
 import 'antd/dist/reset.css';
@@ -86,10 +87,10 @@ root.render(
 // Development helpers
 // ========================================
 
-if (process.env.NODE_ENV === 'development') {
+if (import.meta.env && import.meta.env.DEV) {
     console.log('🚀 Dubai Platform MVP - Frontend Started');
-    console.log('API Base URL:', process.env.REACT_APP_API_URL || 'http://localhost:8000');
-    console.log('Environment:', process.env.NODE_ENV);
+    console.log('API Base URL:', API_BASE_URL);
+    console.log('Environment:', import.meta.env.MODE);
 }
 
 // Hot module replacement for development

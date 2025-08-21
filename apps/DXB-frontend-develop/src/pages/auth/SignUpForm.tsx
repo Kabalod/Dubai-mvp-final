@@ -3,6 +3,7 @@ import { ProForm, ProFormText, ProFormCheckbox, ProCard } from '@ant-design/pro-
 import { Button, message, Steps, Input, Form, Checkbox } from 'antd';
 import { UserOutlined, MailOutlined, LockOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '@/config';
 
 enum FormSteps {
     Join = 'join',
@@ -32,9 +33,9 @@ const SignUpForm: React.FC = () => {
             setEmail(values.email as string);
             console.log('Email set to state:', values.email);
             
-            console.log('About to send request to:', 'http://localhost:8000/accounts/login/');
+            console.log('About to send request to:', `${API_BASE_URL}/accounts/login/`);
             
-            const response = await fetch('http://localhost:8000/accounts/login/', {
+            const response = await fetch(`${API_BASE_URL}/accounts/login/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,7 +89,7 @@ const SignUpForm: React.FC = () => {
             
             console.log('About to send fetch request...');
             
-            const response = await fetch('http://localhost:8000/accounts/signup/', {
+            const response = await fetch(`${API_BASE_URL}/accounts/signup/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

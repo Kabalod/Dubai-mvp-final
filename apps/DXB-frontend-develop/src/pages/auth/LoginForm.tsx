@@ -3,6 +3,7 @@ import { Form, Input, Button, message } from "antd";
 import styles from "./Auth.module.scss";
 import { t } from "@lingui/macro";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "@/config";
 
 type LoginFormType = {
     name?: string;
@@ -30,7 +31,7 @@ const LoginForm: React.FC = () => {
             console.log("Login attempt with:", values);
             
             // Отправляем данные на Django бэкенд
-            const response = await fetch('http://localhost:8000/accounts/login/', {
+            const response = await fetch(`${API_BASE_URL}/accounts/login/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -75,7 +76,7 @@ const LoginForm: React.FC = () => {
             setEmail(values.email!);
             
             // Отправляем запрос на сброс пароля
-            const response = await fetch('http://localhost:8000/accounts/password/reset/', {
+            const response = await fetch(`${API_BASE_URL}/accounts/password/reset/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -108,7 +109,7 @@ const LoginForm: React.FC = () => {
     const handleReset = async (values: any) => {
         try {
             // Отправляем новый пароль
-            const response = await fetch('http://localhost:8000/accounts/password/reset/confirm/', {
+            const response = await fetch(`${API_BASE_URL}/accounts/password/reset/confirm/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ import { GoogleOutlined } from "@ant-design/icons";
 import styles from "./Auth.module.scss";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
+import { API_BASE_URL } from "@/config";
 
 const Auth: React.FC = () => {
     const [authType, setAuthType] = useState<string>("login");
@@ -11,7 +12,7 @@ const Auth: React.FC = () => {
     const handleGoogleLogin = () => {
         try {
             console.log('Attempting Google OAuth login...');
-            const googleUrl = 'http://localhost:8000/accounts/google/login/';
+            const googleUrl = `${API_BASE_URL}/accounts/google/login/`;
             console.log('Redirecting to:', googleUrl);
             window.location.href = googleUrl;
         } catch (error) {

@@ -1,17 +1,16 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { API_BASE_URL } from '@/config';
 
 // ========================================
-// API Configuration
+// API Configuration (base comes from env via src/config.ts)
 // ========================================
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 class ApiService {
     private api: AxiosInstance;
 
     constructor() {
         this.api = axios.create({
-            baseURL: `${API_BASE_URL}/api`,
+            baseURL: `${API_BASE_URL}`,
             timeout: 30000,
             headers: {
                 'Content-Type': 'application/json',

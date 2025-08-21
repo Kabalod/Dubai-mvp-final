@@ -40,8 +40,8 @@
         "codegen": "graphql-codegen --config codegen.ts",
         "mcp:build": "cd ../tools/memory-mcp-server && npm i && npm run build",
         "memsync:build": "cd ../tools/memory-sync && npm i && npm run build",
-        "memsync:dev": "cd ../tools/memory-sync && npm run dev -- --root ../DXB-frontend-develop/src --api http://localhost:8080 --tags frontend --category code:frontend",
-        "memsync:start": "set MEMORY_BASE_URL=https://memory-api.dubai-realestate.com&& cd ../tools/memory-sync && npm run start -- --root ../DXB-frontend-develop/src --api %MEMORY_BASE_URL% --tags frontend,prod --category code:frontend"
+        "memsync:dev": "cd ../tools/memory-sync && npm run dev -- --root ../DXB-frontend-develop/src --api %VITE_MEMORY_API_URL% --tags frontend --category code:frontend",
+        "memsync:start": "set MEMORY_BASE_URL=%VITE_MEMORY_API_URL%&& cd ../tools/memory-sync && npm run start -- --root ../DXB-frontend-develop/src --api %MEMORY_BASE_URL% --tags frontend,prod --category code:frontend"
     },
     "eslintConfig": {
         "extends": [
@@ -62,13 +62,13 @@
         ]
     },
     "devDependencies": {
-        "nx": "21.4.0",
         "@eslint/js": "^9.20.0",
         "@graphql-codegen/cli": "5.0.4",
         "@graphql-codegen/client-preset": "4.6.2",
         "@graphql-codegen/typescript": "^4.1.3",
         "@graphql-codegen/typescript-operations": "^4.4.1",
         "@graphql-codegen/typescript-react-apollo": "^4.3.2",
+        "@lingui/swc-plugin": "^5.2.0",
         "@lingui/vite-plugin": "^5.2.0",
         "@types/node": "^22.13.1",
         "@types/react-dom": "^19.0.3",
@@ -76,14 +76,16 @@
         "@typescript-eslint/eslint-plugin": "^8.23.0",
         "@typescript-eslint/parser": "^8.23.0",
         "@vitejs/plugin-react": "^4.3.4",
+        "babel-plugin-macros": "^3.1.0",
         "eslint": "^9.20.0",
         "eslint-config-prettier": "^10.0.1",
         "eslint-plugin-prettier": "^5.2.3",
         "eslint-plugin-react": "^7.37.4",
         "globals": "^15.14.0",
+        "nx": "21.4.0",
         "sass-embedded": "^1.83.4",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.23.0",
-        "vite": "^6.1.0"
+        "vite": "^5.4.10"
     }
 }

@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { MEMORY_API_URL } from '@/config';
 
 // Интерфейсы для расширенной работы с памятью
 export interface MemoryItem {
@@ -72,20 +73,20 @@ export interface BatchMemoryOperation {
     };
 }
 
-// Конфигурация для разных окружений
+// Конфигурация для разных окружений: базовый URL берется из env
 const ENV_CONFIG = {
     development: {
-        baseURL: 'http://localhost:8080',
+        baseURL: MEMORY_API_URL,
         timeout: 30000,
         retries: 3,
     },
     staging: {
-        baseURL: 'https://staging-memory-api.dubai-realestate.com',
+        baseURL: MEMORY_API_URL,
         timeout: 45000,
         retries: 5,
     },
     production: {
-        baseURL: 'https://memory-api.dubai-realestate.com',
+        baseURL: MEMORY_API_URL,
         timeout: 60000,
         retries: 7,
     }

@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { ProLayout } from '@ant-design/pro-components';
 import { Row, Col, Card, Statistic, Space, Tag, Button, message } from 'antd';
 import { 
-    BrainOutlined, 
+    BulbOutlined as BrainOutlined, 
     MessageOutlined, 
     DatabaseOutlined, 
-    LightbulbOutlined,
+    BulbOutlined,
     RobotOutlined,
     UserOutlined,
     PropertySafetyOutlined
 } from '@ant-design/icons';
 import AIAssistant from '@/components/AIAssistant';
 import { MemoryItem } from '@/services/memoryService';
-import { Text } from 'antd';
+import { Typography } from 'antd';
+const { Text } = Typography;
 
 const AIAssistantPage: React.FC = () => {
     const [totalConversations, setTotalConversations] = useState(0);
@@ -77,7 +78,7 @@ const AIAssistantPage: React.FC = () => {
                             <Statistic
                                 title="Активность"
                                 value="24/7"
-                                prefix={<LightbulbOutlined />}
+                                prefix={<BulbOutlined />}
                                 valueStyle={{ color: '#722ed1' }}
                             />
                         </Card>
@@ -119,7 +120,7 @@ const AIAssistantPage: React.FC = () => {
                                     <Text>Рыночные тренды, статистика</Text>
                                 </div>
                                 <div>
-                                    <Tag color="purple" icon={<LightbulbOutlined />}>
+                                    <Tag color="purple" icon={<BulbOutlined />}>
                                         Рекомендации
                                     </Tag>
                                     <Text>Персональные советы</Text>
@@ -230,7 +231,7 @@ const AIAssistantPage: React.FC = () => {
                                 </Col>
                                 <Col xs={24} md={8}>
                                     <div style={{ textAlign: 'center', padding: '16px' }}>
-                                        <LightbulbOutlined style={{ fontSize: '48px', color: '#faad14', marginBottom: '16px' }} />
+                                        <BulbOutlined style={{ fontSize: '48px', color: '#faad14', marginBottom: '16px' }} />
                                         <h4>Генерация ответа</h4>
                                         <p>AI формирует персонализированный ответ на основе найденных данных</p>
                                     </div>

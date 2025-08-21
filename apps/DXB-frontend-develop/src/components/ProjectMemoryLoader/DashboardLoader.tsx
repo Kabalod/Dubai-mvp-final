@@ -5,7 +5,7 @@ import {
     UploadOutlined, 
     CheckCircleOutlined,
     InfoCircleOutlined,
-    BrainOutlined
+    BulbOutlined
 } from '@ant-design/icons';
 import { memoryService, MemoryItem } from '@/services/memoryService';
 
@@ -161,7 +161,7 @@ const DashboardLoader: React.FC<DashboardLoaderProps> = ({
                 size="small"
                 title={
                     <Space>
-                        <BrainOutlined style={{ color: '#1890ff' }} />
+                        <BulbOutlined style={{ color: '#1890ff' }} />
                         <span>Project Memory</span>
                     </Space>
                 }
@@ -179,6 +179,7 @@ const DashboardLoader: React.FC<DashboardLoaderProps> = ({
                                 >
                                     Загрузить
                                 </Button>
+                            </Tooltip>
                         )}
                         {isLoaded && (
                             <Tag color="green" icon={<CheckCircleOutlined />}>
@@ -236,7 +237,7 @@ const DashboardLoader: React.FC<DashboardLoaderProps> = ({
         <Card
             title={
                 <Space>
-                    <BrainOutlined style={{ color: '#1890ff' }} />
+                    <BulbOutlined style={{ color: '#1890ff' }} />
                     <span>Project Memory Loader</span>
                 </Space>
             }

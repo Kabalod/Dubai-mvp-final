@@ -28,7 +28,7 @@ import {
 } from 'antd';
 import { 
     DatabaseOutlined, 
-    BrainOutlined, 
+    BulbOutlined as BrainOutlined, 
     FileTextOutlined,
     CheckCircleOutlined,
     ClockCircleOutlined,

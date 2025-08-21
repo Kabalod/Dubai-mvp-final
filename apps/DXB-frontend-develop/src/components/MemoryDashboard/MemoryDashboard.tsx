@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ProCard, ProTable } from '@ant-design/pro-components';
 import { Card, Row, Col, Button, Space, Tag, Statistic, Input, message, Modal, Form, Select, Tooltip } from 'antd';
 import { 
-    BrainOutlined, 
+    BulbOutlined as BrainOutlined, 
     SearchOutlined, 
     PlusOutlined, 
     DeleteOutlined,
