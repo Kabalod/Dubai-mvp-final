@@ -4,13 +4,15 @@
 
 ## ⚡ Сверхбыстрый запуск
 
+> Важно: некоторые упоминания (Project Launcher, docker-compose.all-projects.yml, monitoring) относятся к исторической конфигурации и не входят в текущий репозиторий. Используйте prod-стэк `docker-compose.prod.yml` из корня.
+
 ### 1. Клонирование и настройка
 ```bash
 git clone <repository-url>
 cd Dubai
 ```
 
-### 2. Запуск Project Launcher (новый способ)
+### 2. Запуск Project Launcher (историческая секция — вне текущего репозитория)
 ```bash
 cd services/project-launcher
 cp env.example .env
@@ -29,7 +31,7 @@ http://localhost:80
 
 ## 🔄 Традиционный запуск
 
-### Запуск всех проектов одновременно
+### Запуск всех проектов одновременно (историческая секция — вне текущего репозитория)
 ```bash
 ## Windows
 ./start-all-with-memory.bat
@@ -86,6 +88,17 @@ nano global-ports.env
 PROJECT_LAUNCHER_PORT=8000
 FRONTEND_PORT=3000
 
+## API (Django Realty Backend)
+# Внешний порт → внутренний 8000
+API_PORT=8090
+# Хосты и CORS
+API_ALLOWED_HOSTS=api-service,localhost,127.0.0.1,<домен>
+CORS_ORIGINS=http://localhost:3000,http://localhost,https://<домен>
+# Безопасность (только пример для локалки)
+API_SECRET_KEY=mvp-secret-key-change-in-production
+# Для локального smoke-теста по HTTP
+SECURE_SSL_REDIRECT=false
+
 ## База данных
 DATABASE_URL=postgresql://launcher:launcher@localhost:5434/launcher
 
@@ -122,6 +135,15 @@ curl -I http://localhost:8090/api/
 Ожидание: `200` на `/api/health/`. Если получаете `301`, возможно включён `SECURE_SSL_REDIRECT`; временно отключите:
 ```env
 SECURE_SSL_REDIRECT=false
+```
+
+### Диагностика API без curl (внутри контейнера)
+```bash
+docker compose -f docker-compose.prod.yml exec api-service \
+  python - << 'PY'
+import urllib.request as u
+print(u.urlopen('http://localhost:8000/api/health/').read())
+PY
 ```
 
 ## 📊 Мониторинг и диагностика
@@ -171,6 +193,20 @@ docker volume prune
 ```
 
 #### 3. Проблемы с базой данных
+#### 4. Smoke-тест API (health и CORS)
+```bash
+# Миграции и статика
+docker compose -f docker-compose.prod.yml exec api-service \
+  python manage.py migrate --noinput
+docker compose -f docker-compose.prod.yml exec api-service \
+  python manage.py collectstatic --noinput
+
+# Health (учитывая возможный редирект)
+curl -i -L http://localhost:8090/api/health/
+
+# CORS проверка
+curl -i -H "Origin: http://localhost:3000" http://localhost:8090/api/health/
+```
 ```bash
 ## Сброс базы данных
 docker volume rm realty_main_postgres_data
