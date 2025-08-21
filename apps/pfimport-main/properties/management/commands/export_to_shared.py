@@ -4,7 +4,7 @@ import datetime
 from pathlib import Path
 from django.core.management.base import BaseCommand
 from django.db.models import Q
-from properties.models import Property, RentProperty
+from properties.models import Property
 
 
 class Command(BaseCommand):
@@ -39,9 +39,9 @@ class Command(BaseCommand):
         
         self.stdout.write(self.style.SUCCESS("🚀 Starting export to shared data..."))
         
-        # Build querysets
-        sale_qs = Property.objects.all().order_by('-created_at')
-        rent_qs = RentProperty.objects.all().order_by('-created_at')
+        # Build querysets using single Property model
+        sale_qs = Property.objects.filter(price_duration='sell').order_by('-created_at')
+        rent_qs = Property.objects.filter(price_duration='rent').order_by('-created_at')
         
         # Filter by recent days if specified
         if recent_days:
@@ -141,11 +141,15 @@ class Command(BaseCommand):
             
             # Create latest symlink for easy access
             latest_link = output_dir / "latest_export.json"
-            if latest_link.exists():
-                latest_link.unlink()
-            latest_link.symlink_to(filepath.name)
-            
-            self.stdout.write(f"🔗 Created symlink: {latest_link}")
+            try:
+                if latest_link.exists() or latest_link.is_symlink():
+                    latest_link.unlink()
+                # Create relative symlink for easier portability; on some hosts (e.g., Windows bind mounts)
+                # symlink creation may be restricted — handle gracefully.
+                latest_link.symlink_to(filepath.name)
+                self.stdout.write(f"🔗 Created symlink: {latest_link}")
+            except Exception as link_err:
+                self.stdout.write(self.style.WARNING(f"⚠️ Could not create symlink: {link_err}"))
             
         except Exception as e:
             self.stdout.write(
