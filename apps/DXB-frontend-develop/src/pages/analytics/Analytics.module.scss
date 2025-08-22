@@ -82,6 +82,7 @@
     }
   }
   .priceCell { font-weight: 700; color: #1890ff; }
+  .volumeCell { font-weight: 700; color: var(--color-green); }
   .textGreenBold { font-weight: 700; color: var(--color-green); }
 
   .valueGreen :global(.ant-statistic-content-value) { color: var(--color-green) !important; }

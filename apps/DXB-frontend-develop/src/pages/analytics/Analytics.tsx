@@ -94,7 +94,7 @@ const Analytics: React.FC = () => {
             title: "Volume",
             dataIndex: "volume",
             key: "volume",
-            render: (text: string) => <span style={{ fontWeight: "bold", color: "#52c41a" }}>{text}</span>,
+            render: (text: string) => <span className={styles.volumeCell}>{text}</span>,
         },
         {
             title: "Status",
