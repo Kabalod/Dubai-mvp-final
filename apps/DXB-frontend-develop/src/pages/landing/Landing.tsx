@@ -7,11 +7,11 @@ const Landing = () => {
             <h1 className={styles.title}>🏠 Real Estate Analytics Platform</h1>
 
             <div className={styles.card}>
-                <h2 style={{ color: 'var(--color-green)', marginBottom: '20px' }}>
+                <h2 className={styles.statusTitle}>
                     ✅ Система успешно запущена!
                 </h2>
 
-                <p style={{ fontSize: '18px', marginBottom: '30px' }}>
+                <p className={styles.lead}>
                     Ваша платформа для анализа недвижимости Дубая готова к работе
                 </p>
 
