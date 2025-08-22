@@ -118,6 +118,9 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     # Email backend
     "anymail",
+    # Зависимости моделей
+    "django_tasks",
+    "django_tasks.backends.database",
 ]
 
 LOCAL_APPS = [
