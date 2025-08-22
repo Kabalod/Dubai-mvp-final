@@ -1,4 +1,4 @@
-# MVP Dockerfile для основного API сервиса
+# MVP Dockerfile для основного API сервиса (ASGI + Granian)
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -11,13 +11,10 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Копирование requirements и установка зависимостей
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
-# Копирование кода приложения
+# Копирование кода приложения и установка зависимостей из pyproject.toml
 COPY . .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir .
 
 # Создание необходимых директорий
 RUN mkdir -p /shared-data \
@@ -37,12 +34,14 @@ set -e\n\
 echo "🚀 Starting Django API service..."\n\
 \n\
 # Wait for database\n\
-echo "⏳ Waiting for database..."\n\
-while ! python -c "import psycopg2; psycopg2.connect(\"$DATABASE_URL\")" 2>/dev/null; do\n\
-    echo "Database not ready, waiting..."\n\
-    sleep 2\n\
-done\n\
-echo "✅ Database is ready"\n\
+if [ -n "${DATABASE_URL}" ]; then\n\
+  echo "⏳ Waiting for database..."\n\
+  while ! python -c "import psycopg; psycopg.connect(\"$DATABASE_URL\").close()" 2>/dev/null; do\n\
+      echo "Database not ready, waiting..."\n\
+      sleep 2\n\
+  done\n\
+  echo "✅ Database is ready"\n\
+fi\n\
 \n\
 # Run migrations\n\
 echo "📊 Running database migrations..."\n\
@@ -76,7 +75,7 @@ USER app
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8000/api/health/ || exit 1
 
-# Запуск приложения
+# Запуск приложения (Granian ASGI)
 EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["granian", "--interface", "asgi", "realty.asgi:application", "--host", "0.0.0.0", "--port", "8000"]
