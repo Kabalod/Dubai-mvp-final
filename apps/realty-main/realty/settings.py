@@ -121,6 +121,9 @@ THIRD_PARTY_APPS = [
     # Зависимости моделей
     "django_tasks",
     "django_tasks.backends.database",
+    # Django Allauth для аутентификации
+    "allauth",
+    "allauth.account",
 ]
 
 LOCAL_APPS = [
