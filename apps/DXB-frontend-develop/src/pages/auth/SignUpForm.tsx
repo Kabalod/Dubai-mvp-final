@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ProForm, ProFormText, ProFormCheckbox, ProCard } from '@ant-design/pro-components';
-import { message, Steps, Form, Checkbox, Button } from 'antd';
+import { message, Steps, Form, Checkbox, Button, Input } from 'antd';
 import CustomInput from '@/components/CustomInput/CustomInput';
 import CustomButton from '@/components/CustomButton/CustomButton';
 import styles from './SignUpForm.module.scss';
@@ -65,13 +65,10 @@ const SignUpForm: React.FC = () => {
         }
     };
 
-    const handleValidation = async (values: FieldType) => {
+    const handleValidation = async (values: any) => {
         try {
-            let otpCode = "";
-            for (let index = 0; index < otpLength; index++) {
-                const key = `otp${index}` as keyof FieldType;
-                otpCode += values[key];
-            }
+            // OTP код приходит как строка из компонента
+            const otpCode = values.otp || "";
             
             console.log('=== handleValidation CALLED ===');
             console.log('OTP Code:', otpCode);
@@ -134,17 +131,17 @@ const SignUpForm: React.FC = () => {
             
             console.log('About to send fetch request...');
             
-            const response = await fetch(`${API_BASE_URL}/accounts/signup/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken') || '',
                 },
                 body: JSON.stringify({
                     email: email,
-                    password1: values.password,
-                    password2: values.confirmPassword,
-                    name: values.name,
+                    password: values.password,
+                    username: email, // Используем email как username
+                    first_name: values.name.split(' ')[0] || '',
+                    last_name: values.name.split(' ').slice(1).join(' ') || '',
                 }),
             });
 
@@ -271,16 +268,21 @@ const SignUpForm: React.FC = () => {
                             <p className={styles.muted}>Enter the code to complete the registration</p>
                         </div>
                         
-                        <Form.Item
+                        <ProFormText
                             name="otp"
-                            rules={[{ required: true, message: 'Please enter the verification code!' }]}
-                        >
-                            <CustomInput.OTP 
-                                length={otpLength} 
-                                size="large"
-                                className={styles.otp}
-                            />
-                        </Form.Item>
+                            label="Verification Code"
+                            placeholder="Enter 6-digit code"
+                            rules={[
+                                { required: true, message: 'Please enter the verification code!' },
+                                { len: 6, message: 'Code must be 6 digits!' },
+                                { pattern: /^\d{6}$/, message: 'Code must contain only digits!' }
+                            ]}
+                            fieldProps={{
+                                size: 'large',
+                                maxLength: 6,
+                                style: { textAlign: 'center', fontSize: '18px', letterSpacing: '4px' }
+                            }}
+                        />
 
                         <div className={styles.centerBlock}>
                             <CustomButton type="link" onClick={resendCode}>

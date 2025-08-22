@@ -33,14 +33,13 @@ const LoginForm: React.FC = () => {
             console.log("Login attempt with:", values);
             
             // Отправляем данные на Django бэкенд
-            const response = await fetch(`${API_BASE_URL}/accounts/login/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken') || '',
                 },
                 body: JSON.stringify({
-                    email: values.email,
+                    username: values.email, // Backend ожидает username
                     password: values.password,
                 }),
             });
@@ -78,7 +77,7 @@ const LoginForm: React.FC = () => {
             setEmail(values.email!);
             
             // Отправляем запрос на сброс пароля
-            const response = await fetch(`${API_BASE_URL}/accounts/password/reset/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/password/reset/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -111,7 +110,7 @@ const LoginForm: React.FC = () => {
     const handleReset = async (values: any) => {
         try {
             // Отправляем новый пароль
-            const response = await fetch(`${API_BASE_URL}/accounts/password/reset/confirm/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/password/reset/confirm/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

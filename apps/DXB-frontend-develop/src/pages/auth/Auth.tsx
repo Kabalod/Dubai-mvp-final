@@ -13,7 +13,7 @@ const Auth: React.FC = () => {
     const handleGoogleLogin = () => {
         try {
             console.log('Attempting Google OAuth login...');
-            const googleUrl = `${API_BASE_URL}/accounts/google/login/`;
+            const googleUrl = `${API_BASE_URL}/api/auth/google/login/`;
             console.log('Redirecting to:', googleUrl);
             window.location.href = googleUrl;
         } catch (error) {
