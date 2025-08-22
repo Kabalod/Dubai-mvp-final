@@ -4,12 +4,19 @@ from pathlib import Path
 
 import sentry_sdk
 from environs import Env
-from falco.sentry import sentry_profiles_sampler
-from falco.sentry import sentry_traces_sampler
 from marshmallow.validate import Email
 from marshmallow.validate import OneOf
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
+
+# Fallback функции для sentry если falco недоступен
+try:
+    from falco.sentry import sentry_profiles_sampler, sentry_traces_sampler
+except ImportError:
+    def sentry_profiles_sampler(sampling_context):
+        return 0.1
+    def sentry_traces_sampler(sampling_context):
+        return 0.1
 
 # 0. Setup
 # --------------------------------------------------------------------------------------------
