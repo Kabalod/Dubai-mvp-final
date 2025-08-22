@@ -407,6 +407,7 @@ else:
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost",
+        "https://frontend-production-5c48.up.railway.app",
     ]
 
 # Allow all only during development; restrict in production
