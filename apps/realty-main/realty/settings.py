@@ -2,21 +2,8 @@ import sys
 from email.utils import parseaddr
 from pathlib import Path
 
-import sentry_sdk
 from environs import Env
 from marshmallow.validate import Email
-from marshmallow.validate import OneOf
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.logging import LoggingIntegration
-
-# Fallback функции для sentry если falco недоступен
-try:
-    from falco.sentry import sentry_profiles_sampler, sentry_traces_sampler
-except ImportError:
-    def sentry_profiles_sampler(sampling_context):
-        return 0.1
-    def sentry_traces_sampler(sampling_context):
-        return 0.1
 
 # 0. Setup
 # --------------------------------------------------------------------------------------------
@@ -411,23 +398,7 @@ TASKS = {
     }
 }
 
-# sentry
-if PROD and (SENTRY_DSN := env.url("SENTRY_DSN", default=None)):
-    sentry_sdk.init(
-        dsn=SENTRY_DSN.geturl(),
-        environment=env.str(
-            "SENTRY_ENV",
-            default="development",
-            validate=OneOf(["development", "production"]),
-        ),
-        integrations=[
-            DjangoIntegration(),
-            LoggingIntegration(event_level=None, level=None),
-        ],
-        traces_sampler=sentry_traces_sampler,
-        profiles_sampler=sentry_profiles_sampler,
-        send_default_pii=True,
-    )
+# Sentry отключен для минимальной конфигурации
 
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
