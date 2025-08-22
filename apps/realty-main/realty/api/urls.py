@@ -14,6 +14,10 @@ urlpatterns = [
     path('auth/logout/', views.logout, name='logout'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
+    # OTP Authentication
+    path('auth/send-otp/', views.send_otp_code, name='send_otp_code'),
+    path('auth/verify-otp/', views.verify_otp_code, name='verify_otp_code'),
+    
     # Properties
     path('properties/', views.properties_list, name='properties_list'),
     path('areas/', views.areas_list, name='areas_list'),

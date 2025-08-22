@@ -9,10 +9,14 @@ from django.db.models import Q, Avg, Count
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
 import datetime
 
 from realty.pfimport.models import PFListSale, PFListRent, Building, Area
 from realty.reports.models import BuildingReport
+from .models import OTPCode
 from .serializers import (
     PropertySerializer, PropertySearchSerializer, UserRegistrationSerializer, 
     UserLoginSerializer, AnalyticsSerializer, BuildingReportSerializer,
@@ -140,6 +144,145 @@ def logout(request):
     
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ========================================
+# OTP Authentication API
+# ========================================
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def send_otp_code(request):
+    """Отправка OTP кода на email."""
+    email = request.data.get('email')
+    
+    if not email:
+        return Response({
+            'error': 'Email is required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Очистка старых кодов
+        OTPCode.cleanup_expired()
+        
+        # Удаляем предыдущие неиспользованные коды для этого email
+        OTPCode.objects.filter(email=email, is_used=False).delete()
+        
+        # Создаём новый OTP код
+        otp = OTPCode.objects.create(email=email)
+        
+        # Отправляем email с кодом
+        subject = 'Ваш код подтверждения'
+        message = f'''
+Добро пожаловать в Dubai Real Estate!
+
+Ваш код подтверждения: {otp.code}
+
+Код действителен в течение 10 минут.
+Если вы не запрашивали этот код, просто проигнорируйте это письмо.
+
+С уважением,
+Команда Dubai Real Estate
+        '''
+        
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        
+        return Response({
+            'message': 'OTP code sent successfully',
+            'email': email,
+            'expires_in_minutes': 10
+        })
+        
+    except Exception as e:
+        return Response({
+            'error': f'Failed to send OTP: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def verify_otp_code(request):
+    """Проверка OTP кода."""
+    email = request.data.get('email')
+    code = request.data.get('code')
+    
+    if not email or not code:
+        return Response({
+            'error': 'Email and code are required'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Очистка старых кодов
+        OTPCode.cleanup_expired()
+        
+        # Ищем активный код
+        otp = OTPCode.objects.filter(
+            email=email,
+            code=code,
+            is_used=False
+        ).first()
+        
+        if not otp:
+            return Response({
+                'error': 'Invalid or expired OTP code'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Проверяем валидность
+        if not otp.is_valid():
+            return Response({
+                'error': 'OTP code has expired or exceeded maximum attempts'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Проверяем код
+        if otp.code == code:
+            # Код правильный
+            otp.mark_as_used()
+            
+            # Создаём или получаем пользователя
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email,
+                    'is_active': True,
+                }
+            )
+            
+            # Генерируем JWT токены
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'message': 'OTP verification successful',
+                'user_created': created,
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                },
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+            })
+        else:
+            # Код неправильный
+            otp.increment_attempts()
+            return Response({
+                'error': 'Invalid OTP code',
+                'attempts_left': max(0, 3 - otp.attempts)
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+    except Exception as e:
+        return Response({
+            'error': f'Verification failed: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # ========================================

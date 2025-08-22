@@ -36,13 +36,12 @@ const SignUpForm: React.FC = () => {
             setEmail(values.email as string);
             console.log('Email set to state:', values.email);
             
-            console.log('About to send request to:', `${API_BASE_URL}/accounts/login/`);
+            console.log('About to send OTP request to:', `${API_BASE_URL}/api/auth/send-otp/`);
             
-            const response = await fetch(`${API_BASE_URL}/accounts/login/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken') || '',
                 },
                 body: JSON.stringify({ email: values.email }),
             });
@@ -50,16 +49,19 @@ const SignUpForm: React.FC = () => {
             console.log('Response received:', response);
             console.log('Response status:', response.status);
             
-            const token = response.headers.get('Authorization')?.split(' ')[1];
-            if (token) {
-                localStorage.setItem("auth-token", token);
-                console.log('Token saved to localStorage');
-            }
+            const data = await response.json();
+            console.log('Response data:', data);
             
-            console.log('Moving to Confirm step');
-            setCurrentStep(FormSteps.Confirm);
+            if (response.ok) {
+                console.log('OTP sent successfully, moving to Confirm step');
+                setCurrentStep(FormSteps.Confirm);
+            } else {
+                console.error('Failed to send OTP:', data.error);
+                alert(`Ошибка отправки кода: ${data.error}`);
+            }
         } catch (err) {
             console.error('Error in handleSignUp:', err);
+            alert('Ошибка соединения с сервером');
         }
     };
 
@@ -70,9 +72,49 @@ const SignUpForm: React.FC = () => {
                 const key = `otp${index}` as keyof FieldType;
                 otpCode += values[key];
             }
-            setCurrentStep(FormSteps.Details);
+            
+            console.log('=== handleValidation CALLED ===');
+            console.log('OTP Code:', otpCode);
+            console.log('Email:', email);
+            
+            console.log('About to verify OTP:', `${API_BASE_URL}/api/auth/verify-otp/`);
+            
+            const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    email: email,
+                    code: otpCode 
+                }),
+            });
+            
+            console.log('Verification response:', response);
+            console.log('Response status:', response.status);
+            
+            const data = await response.json();
+            console.log('Verification data:', data);
+            
+            if (response.ok) {
+                console.log('OTP verified successfully');
+                
+                // Сохраняем токены
+                if (data.tokens) {
+                    localStorage.setItem("auth-token", data.tokens.access);
+                    localStorage.setItem("refresh-token", data.tokens.refresh);
+                    console.log('Tokens saved to localStorage');
+                }
+                
+                // Переходим к следующему шагу
+                setCurrentStep(FormSteps.Details);
+            } else {
+                console.error('OTP verification failed:', data.error);
+                alert(`Неверный код: ${data.error}`);
+            }
         } catch (err) {
-            console.error(err);
+            console.error('Error in handleValidation:', err);
+            alert('Ошибка проверки кода');
         }
     };
 
