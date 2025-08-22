@@ -1,13 +1,11 @@
 # MVP Dockerfile для основного API сервиса (ASGI + Granian)
-FROM python:3.12
+FROM python:3.12-slim
 
 WORKDIR /app
 
-# Установка системных зависимостей
+# Установка только необходимых зависимостей
 RUN apt-get update && apt-get install -y \
-    curl \
     gcc \
-    python3-dev \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -74,9 +72,9 @@ exec "$@"' > /app/entrypoint.sh \
 
 USER app
 
-# Health check
+# Health check (без curl)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health/ || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health/')" || exit 1
 
 # Запуск приложения (Granian ASGI)
 EXPOSE 8000
