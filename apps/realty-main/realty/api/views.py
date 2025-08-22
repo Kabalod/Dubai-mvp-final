@@ -14,8 +14,9 @@ from django.conf import settings
 from django.utils import timezone
 import datetime
 
-from realty.pfimport.models import PFListSale, PFListRent, Building, Area
-from realty.reports.models import BuildingReport
+# Убраны импорты для минимальной конфигурации
+# from realty.pfimport.models import PFListSale, PFListRent, Building, Area
+# from realty.reports.models import BuildingReport
 from .models import OTPCode
 from .serializers import (
     PropertySerializer, PropertySearchSerializer, UserRegistrationSerializer, 
@@ -31,28 +32,23 @@ from .serializers import (
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health_check(request):
-    """Health check endpoint for monitoring."""
+    """Simple health check endpoint for OTP system."""
     try:
         # Check database connectivity
-        sale_count = PFListSale.objects.count()
-        rent_count = PFListRent.objects.count()
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute("SELECT 1")
         
-        # Check recent data
-        yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
-        recent_sales = PFListSale.objects.filter(added_on__gte=yesterday).count()
-        recent_rents = PFListRent.objects.filter(added_on__gte=yesterday).count()
+        # Check OTP model
+        otp_count = OTPCode.objects.count()
         
         return Response({
-            'status': 'healthy',
-            'timestamp': datetime.datetime.now().isoformat(),
+            'status': 'ok',
+            'timestamp': timezone.now().isoformat(),
             'database': 'connected',
-            'service': 'realty-api',
-            'data': {
-                'total_sale_properties': sale_count,
-                'total_rent_properties': rent_count,
-                'recent_sales_24h': recent_sales,
-                'recent_rents_24h': recent_rents,
-            }
+            'service': 'otp-api',
+            'otp_codes_count': otp_count,
+            'message': 'OTP system is running'
         })
         
     except Exception as e:
