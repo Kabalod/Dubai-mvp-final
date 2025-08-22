@@ -1,32 +1,20 @@
-# MVP Dockerfile для основного API сервиса (простая версия)
+# Ультра-минимальный Dockerfile для Railway
 FROM python:3.11-slim
 
 WORKDIR /app
-
-# Копирование всего кода
 COPY . .
 
-# Установка зависимостей без системных пакетов
+# Только критически важные зависимости
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir psycopg[binary,pool] granian \
+    && pip install --no-cache-dir psycopg[binary] \
     && pip install --no-cache-dir django djangorestframework \
-    && pip install --no-cache-dir django-cors-headers environs dj-database-url \
-    && pip install --no-cache-dir sentry-sdk django-allauth \
-    && pip install --no-cache-dir whitenoise pillow django-extensions \
-    && pip install --no-cache-dir django-health-check falco-app \
-    && pip install --no-cache-dir crispy-tailwind django-lifecycle \
-    && pip install --no-cache-dir django-litestream django-tasks \
-    && pip install --no-cache-dir django-unique-user-email strawberry-graphql-django \
-    && pip install --no-cache-dir django-anymail beautifulsoup4 boto3 diskcache \
-    && pip install --no-cache-dir httpx lxml openpyxl pandas rapidfuzz requests scrapy \
-    && pip install --no-cache-dir djangorestframework-simplejwt sendgrid
+    && pip install --no-cache-dir django-cors-headers \
+    && pip install --no-cache-dir djangorestframework-simplejwt \
+    && pip install --no-cache-dir django-anymail \
+    && pip install --no-cache-dir environs
 
-# Создание необходимых директорий
-RUN mkdir -p /app/logs /app/media /app/static
-
-# Простой запуск без entrypoint
 ENV PYTHONPATH=/app
-
-# Запуск приложения
 EXPOSE 8000
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+
+# Простой запуск без миграций (пока)
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

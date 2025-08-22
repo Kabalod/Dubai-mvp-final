@@ -125,28 +125,12 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
     "corsheaders",
-    "crispy_forms",
-    "crispy_tailwind",
-    "django_extensions",
-    "django_litestream",
-    "django_tasks",
-    "django_tasks.backends.database",
-    "falco",
-    "health_check",
-    "health_check.cache",
-    "health_check.contrib.migrations",
-    "health_check.db",
-    "health_check.storage",
-    "strawberry_django",
-    "unique_user_email",
     # Django REST Framework for MVP API
     "rest_framework",
     "rest_framework_simplejwt",
+    # Email backend
+    "anymail",
 ]
 
 LOCAL_APPS = [
