@@ -15,7 +15,8 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir django-lifecycle django-tasks \
     && pip install --no-cache-dir requests python-dateutil \
     && pip install --no-cache-dir pillow whitenoise \
-    && pip install --no-cache-dir django-allauth diskcache
+    && pip install --no-cache-dir django-allauth diskcache \
+    && pip install --no-cache-dir falco-app
 
 ENV PYTHONPATH=/app
 EXPOSE 8000
