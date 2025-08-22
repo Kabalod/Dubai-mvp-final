@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir django-unique-user-email strawberry-graphql-django \
     && pip install --no-cache-dir django-anymail beautifulsoup4 boto3 diskcache \
     && pip install --no-cache-dir httpx lxml openpyxl pandas rapidfuzz requests scrapy \
-    && pip install --no-cache-dir djangorestframework-simplejwt
+    && pip install --no-cache-dir djangorestframework-simplejwt sendgrid
 
 # Создание необходимых директорий
 RUN mkdir -p /app/logs /app/media /app/static

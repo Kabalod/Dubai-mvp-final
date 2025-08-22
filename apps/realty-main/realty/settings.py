@@ -106,7 +106,7 @@ DEFAULT_FROM_EMAIL = env.str(
 )
 
 EMAIL_BACKEND = (
-    "anymail.backends.amazon_ses.EmailBackend"
+    "anymail.backends.sendgrid.EmailBackend"
     if PROD
     else "django.core.mail.backends.console.EmailBackend"
 )
@@ -379,11 +379,10 @@ SOCIALACCOUNT_PROVIDERS = {
 # django-anymail
 if PROD:
     ANYMAIL = {
-        "AMAZON_SES_CLIENT_PARAMS": {
-            "aws_access_key_id": env.str("AWS_ACCESS_KEY_ID", default=None),
-            "aws_secret_access_key": env.str("AWS_SECRET_ACCESS_KEY", default=None),
-            "region_name": env.str("AWS_S3_REGION_NAME", default=None),
-        }
+        "SENDGRID_API_KEY": env.str("SENDGRID_API_KEY", default=None),
+        "SENDGRID_GENERATE_MESSAGE_ID": True,
+        "SENDGRID_MERGE_FIELD_FORMAT": "-{}-",
+        "SENDGRID_API_URL": "https://api.sendgrid.com/v3/",
     }
 
 # django-debug-toolbar
