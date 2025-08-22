@@ -2,11 +2,11 @@
 FROM node:20-alpine AS build
 
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci \
-    && npm install -D @lingui/swc-plugin@^5.2.0
+COPY package.json yarn.lock ./
+RUN corepack enable \
+    && yarn install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN yarn build
 
 # 2. Продакшн-слой (Nginx)
 FROM nginx:stable-alpine
