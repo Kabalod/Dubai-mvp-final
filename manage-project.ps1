@@ -84,7 +84,7 @@ switch ($Action) {
     
     "watch" {
         Write-Host "👁️ Запуск режима мониторинга..." -ForegroundColor Cyan
-        & ".\scripts\auto-deploy-manager.ps1" -WatchMode -WaitSeconds 60
+        & ".\scripts\auto-deploy-manager.ps1" -WatchMode -WaitSeconds 40
     }
     
     "status" {

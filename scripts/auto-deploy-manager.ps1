@@ -105,14 +105,14 @@ function Deploy-Changes {
 }
 
 function Wait-ForDeployment {
-    param([int]$TimeoutMinutes = 5)
+    param([int]$TimeoutSeconds = 40)
     
-    Write-Status "⏳ Ожидание завершения деплоя ($TimeoutMinutes мин)..." "Yellow"
+    Write-Status "⏳ Ожидание завершения деплоя ($TimeoutSeconds сек)..." "Yellow"
     
-    $timeout = (Get-Date).AddMinutes($TimeoutMinutes)
+    $timeout = (Get-Date).AddSeconds($TimeoutSeconds)
     
     while ((Get-Date) -lt $timeout) {
-        Start-Sleep -Seconds 30
+        Start-Sleep -Seconds 10
         
         $health = Test-BackendHealth
         if ($health.Success) {
@@ -187,7 +187,7 @@ function Start-AutoDeployment {
     }
     
     # 5. Ожидание результата
-    $deploySuccess = Wait-ForDeployment -TimeoutMinutes 5
+    $deploySuccess = Wait-ForDeployment -TimeoutSeconds 40
     
     if ($deploySuccess) {
         Write-Status "🎉 Автоматический деплой успешен!" "Green"
