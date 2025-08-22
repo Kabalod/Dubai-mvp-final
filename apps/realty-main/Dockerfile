@@ -13,7 +13,12 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir django-cors-headers environs \
     && pip install --no-cache-dir sentry-sdk django-allauth \
     && pip install --no-cache-dir whitenoise pillow django-extensions \
-    && pip install --no-cache-dir django-health-check
+    && pip install --no-cache-dir django-health-check falco-app \
+    && pip install --no-cache-dir crispy-tailwind django-lifecycle \
+    && pip install --no-cache-dir django-litestream django-tasks \
+    && pip install --no-cache-dir django-unique-user-email strawberry-graphql-django \
+    && pip install --no-cache-dir django-anymail beautifulsoup4 boto3 diskcache \
+    && pip install --no-cache-dir httpx lxml openpyxl pandas rapidfuzz requests scrapy
 
 # Создание необходимых директорий
 RUN mkdir -p /app/logs /app/media /app/static
