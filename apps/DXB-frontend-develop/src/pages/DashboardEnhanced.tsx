@@ -11,6 +11,7 @@ import {
     ReloadOutlined
 } from '@ant-design/icons';
 import { Line, Bar, Pie } from '@ant-design/charts';
+import dv from '@/styles/dataviz.module.scss';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService, Analytics, Property } from '../services/apiService';
 
@@ -265,7 +266,7 @@ const DashboardEnhanced: React.FC = () => {
                                 title="Total Properties"
                                 value={analytics?.total_properties || 0}
                                 prefix={<HomeOutlined />}
-                                valueStyle={{ color: '#3f8600' }}
+                                className={`${dv.statistic} ${dv.statGreen}`}
                             />
                         </Card>
                     </Col>
@@ -275,7 +276,7 @@ const DashboardEnhanced: React.FC = () => {
                                 title="For Sale"
                                 value={analytics?.total_sale_properties || 0}
                                 prefix={<DollarOutlined />}
-                                valueStyle={{ color: '#1890ff' }}
+                                className={`${dv.statistic} ${dv.statBlue}`}
                             />
                         </Card>
                     </Col>
@@ -285,7 +286,7 @@ const DashboardEnhanced: React.FC = () => {
                                 title="For Rent"
                                 value={analytics?.total_rent_properties || 0}
                                 prefix={<BuildOutlined />}
-                                valueStyle={{ color: '#722ed1' }}
+                                className={`${dv.statistic} ${dv.statPurple}`}
                             />
                         </Card>
                     </Col>
@@ -295,7 +296,7 @@ const DashboardEnhanced: React.FC = () => {
                                 title="Areas"
                                 value={analytics?.total_areas || 0}
                                 prefix={<AreaChartOutlined />}
-                                valueStyle={{ color: '#fa8c16' }}
+                                className={`${dv.statistic} ${dv.statOrange}`}
                             />
                         </Card>
                     </Col>
@@ -328,24 +329,24 @@ const DashboardEnhanced: React.FC = () => {
                 {/* Charts */}
                 <Row gutter={[16, 16]} className="mb-6">
                     <Col xs={24} lg={8}>
-                        <ProCard title="Property Trends" bordered>
+                        <ProCard title="Property Trends" bordered className={`${dv.sectionCard} ${dv.proCard}`}>
                             {lineConfig && <Line {...lineConfig} height={250} />}
                         </ProCard>
                     </Col>
                     <Col xs={24} lg={8}>
-                        <ProCard title="Properties by Type" bordered>
+                        <ProCard title="Properties by Type" bordered className={`${dv.sectionCard} ${dv.proCard}`}>
                             {barConfig && <Bar {...barConfig} height={250} />}
                         </ProCard>
                     </Col>
                     <Col xs={24} lg={8}>
-                        <ProCard title="Properties by Bedrooms" bordered>
+                        <ProCard title="Properties by Bedrooms" bordered className={`${dv.sectionCard} ${dv.proCard}`}>
                             {pieConfig && <Pie {...pieConfig} height={250} />}
                         </ProCard>
                     </Col>
                 </Row>
 
                 {/* Recent Properties Table */}
-                <ProCard title="Recent Properties" bordered>
+                <ProCard title="Recent Properties" bordered className={`${dv.sectionCard} ${dv.proCard}`}>
                     <ProTable
                         columns={propertyColumns}
                         dataSource={properties}

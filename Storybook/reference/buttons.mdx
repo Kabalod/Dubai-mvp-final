@@ -1,0 +1,33 @@
+import { ButtonVariations } from "../components/design-system/button-variations";
+import Ref from "../png/page_001.png";
+
+export const meta = {
+  title: 'Reference/Buttons',
+};
+
+# Buttons — Reference PNG + Design Component
+
+<div style={{ display: 'grid', gap: 24 }}>
+  <div>
+    <h3>Reference (PNG)</h3>
+    <img src={Ref} alt="buttons reference" style={{ width: 960 }} />
+  </div>
+
+  <div>
+    <h3>Design System (Live)</h3>
+    <ButtonVariations />
+  </div>
+
+  <div>
+    <h3>Overlay (PNG under component)</h3>
+    <div style={{ position: 'relative' }}>
+      <img src={Ref} alt="overlay" style={{ position: 'absolute', inset: 0, width: '100%', opacity: 0.35, pointerEvents: 'none' }} />
+      <div style={{ position: 'relative' }}>
+        <ButtonVariations />
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

@@ -1,61 +1,30 @@
 import React from "react";
+import styles from "./NotFound.module.scss";
 
 function NotFound() {
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', textAlign: 'center' }}>
+        <div className={styles.root}>
             <h1>❌ 404 - Страница не найдена</h1>
             <h2>Запрашиваемая страница не существует</h2>
-            
-            <div style={{ margin: '40px 0' }}>
-                <p style={{ fontSize: '18px', color: '#666' }}>
+
+            <div className={styles.links}>
+                <p className={styles.lead}>
                     Возможно, вы перешли по неверной ссылке или страница была удалена.
                 </p>
             </div>
-            
-            <div style={{ margin: '40px 0' }}>
+
+            <div className={styles.links}>
                 <h3>🔗 Доступные страницы:</h3>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
-                    <a href="/" style={{ 
-                        padding: '10px 20px', 
-                        background: '#1890ff', 
-                        color: 'white', 
-                        textDecoration: 'none', 
-                        borderRadius: '4px' 
-                    }}>
-                        Главная
-                    </a>
-                    <a href="/dash" style={{ 
-                        padding: '10px 20px', 
-                        background: '#52c41a', 
-                        color: 'white', 
-                        textDecoration: 'none', 
-                        borderRadius: '4px' 
-                    }}>
-                        Dashboard
-                    </a>
-                    <a href="/analytics" style={{ 
-                        padding: '10px 20px', 
-                        background: '#722ed1', 
-                        color: 'white', 
-                        textDecoration: 'none', 
-                        borderRadius: '4px' 
-                    }}>
-                        Аналитика
-                    </a>
-                    <a href="/auth" style={{ 
-                        padding: '10px 20px', 
-                        background: '#fa8c16', 
-                        color: 'white', 
-                        textDecoration: 'none', 
-                        borderRadius: '4px' 
-                    }}>
-                        Авторизация
-                    </a>
+                <div className={styles.linkRow}>
+                    <a href="/" className={`${styles.btn} ${styles.btnHome}`}>Главная</a>
+                    <a href="/dash" className={`${styles.btn} ${styles.btnDash}`}>Dashboard</a>
+                    <a href="/analytics" className={`${styles.btn} ${styles.btnAnalytics}`}>Аналитика</a>
+                    <a href="/auth" className={`${styles.btn} ${styles.btnAuth}`}>Авторизация</a>
                 </div>
             </div>
-            
-            <div style={{ margin: '20px 0' }}>
-                <p>Или вернитесь на <a href="/" style={{ color: '#1890ff' }}>главную страницу</a></p>
+
+            <div className={styles.links}>
+                <p>Или вернитесь на <a href="/" className={styles.backLink}>главную страницу</a></p>
             </div>
         </div>
     );

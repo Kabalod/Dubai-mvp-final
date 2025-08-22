@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, Typography, Divider, List, Alert } from "antd";
+import styles from './Policy.module.scss';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -29,7 +30,7 @@ const Policy: React.FC = () => {
     ];
 
     return (
-        <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
+        <div className={styles.root}>
             <Card>
                 <Title level={1}>📋 Privacy Policy & Terms of Service</Title>
                 <Paragraph>
@@ -45,7 +46,7 @@ const Policy: React.FC = () => {
                     and the General Data Protection Regulation (GDPR).
                 </Paragraph>
 
-                <Card title="Information We Collect" style={{ marginBottom: "20px" }}>
+                <Card title="Information We Collect" className={styles.cardMb}>
                     <List
                         dataSource={privacyItems}
                         renderItem={(item) => (
@@ -56,7 +57,7 @@ const Policy: React.FC = () => {
                     />
                 </Card>
 
-                <Card title="How We Use Your Data" style={{ marginBottom: "20px" }}>
+                <Card title="How We Use Your Data" className={styles.cardMb}>
                     <List
                         dataSource={usageItems}
                         renderItem={(item) => (
@@ -75,7 +76,7 @@ const Policy: React.FC = () => {
                     description="We implement industry-standard security measures including encryption, secure servers, and regular security audits to protect your data."
                     type="info"
                     showIcon
-                    style={{ marginBottom: "20px" }}
+                    className={styles.alertMb}
                 />
 
                 <Paragraph>
@@ -86,7 +87,7 @@ const Policy: React.FC = () => {
                 <Divider />
 
                 <Title level={2}>👤 Your Rights</Title>
-                <Card title="Data Subject Rights" style={{ marginBottom: "20px" }}>
+                <Card title="Data Subject Rights" className={styles.cardMb}>
                     <List
                         dataSource={rightsItems}
                         renderItem={(item) => (

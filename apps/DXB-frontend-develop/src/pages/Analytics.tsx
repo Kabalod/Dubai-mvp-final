@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ProLayout, ProCard, ProTable, ProDescriptions } from '@ant-design/pro-components';
-import { Card, Row, Col, Button, Space, Tag, Statistic, Select, DatePicker } from 'antd';
+import { Card, Row, Col, Space, Tag, Statistic, DatePicker } from 'antd';
 import { 
     BarChartOutlined, 
     LineChartOutlined, 
@@ -10,6 +10,9 @@ import {
     ReloadOutlined
 } from '@ant-design/icons';
 import { Line, Bar, Pie, Column, DualAxes } from '@ant-design/charts';
+import CustomButton from '@/components/CustomButton/CustomButton';
+import CustomSelect from '@/components/CustomSelect/CustomSelect';
+import dv from '@/styles/dataviz.module.scss';
 
 const { RangePicker } = DatePicker;
 
@@ -92,7 +95,7 @@ const Analytics: React.FC = () => {
             title: 'Property',
             dataIndex: 'property',
             key: 'property',
-            render: (text: string) => <a style={{ fontWeight: 'bold' }}>{text}</a>,
+            render: (text: string) => <a className={dv.bold}>{text}</a>,
         },
         {
             title: 'Location',
@@ -107,7 +110,7 @@ const Analytics: React.FC = () => {
             dataIndex: 'price',
             key: 'price',
             render: (price: number) => (
-                <span style={{ fontWeight: 'bold', color: '#1890ff' }}>
+                <span className={`${dv.bold} ${dv.textBlue}`}>
                     {price.toLocaleString()}
                 </span>
             ),
@@ -118,7 +121,7 @@ const Analytics: React.FC = () => {
             dataIndex: 'views',
             key: 'views',
             render: (views: number) => (
-                <span style={{ color: '#52c41a' }}>{views}</span>
+                <span className={dv.textGreen}>{views}</span>
             ),
             sorter: (a: any, b: any) => a.views - b.views,
         },
@@ -127,7 +130,7 @@ const Analytics: React.FC = () => {
             dataIndex: 'inquiries',
             key: 'inquiries',
             render: (inquiries: number) => (
-                <span style={{ color: '#faad14' }}>{inquiries}</span>
+                <span className={dv.textOrange}>{inquiries}</span>
             ),
             sorter: (a: any, b: any) => a.inquiries - b.inquiries,
         },
@@ -150,8 +153,8 @@ const Analytics: React.FC = () => {
             key: 'actions',
             render: () => (
                 <Space size="middle">
-                    <Button type="link" size="small">View Details</Button>
-                    <Button type="link" size="small">Edit</Button>
+                    <CustomButton type="link" size="small">View Details</CustomButton>
+                    <CustomButton type="link" size="small">Edit</CustomButton>
                 </Space>
             ),
         },
@@ -182,19 +185,17 @@ const Analytics: React.FC = () => {
         <ProLayout
             title="Dubai Real Estate Analytics"
             logo="📊"
-            menuItemRender={(item, dom) => (
-                <div style={{ color: '#1890ff' }}>{dom}</div>
-            )}
+            menuItemRender={(item, dom) => (<div>{dom}</div>)}
         >
-            <div style={{ padding: '24px', background: '#f0f2f5' }}>
+            <div className={dv.pageContainer}>
                 {/* Заголовок и фильтры */}
                 <ProCard
                     title="Analytics Dashboard"
                     extra={
                         <Space>
-                            <Select
+                            <CustomSelect
+                                className={dv.selectSm}
                                 defaultValue="30d"
-                                style={{ width: 120 }}
                                 onChange={handlePeriodChange}
                                 options={[
                                     { value: '7d', label: 'Last 7 days' },
@@ -203,9 +204,9 @@ const Analytics: React.FC = () => {
                                     { value: '1y', label: 'Last year' },
                                 ]}
                             />
-                            <Select
+                            <CustomSelect
+                                className={dv.selectMd}
                                 defaultValue="all"
-                                style={{ width: 150 }}
                                 onChange={handleLocationChange}
                                 options={[
                                     { value: 'all', label: 'All Locations' },
@@ -215,15 +216,11 @@ const Analytics: React.FC = () => {
                                     { value: 'business-bay', label: 'Business Bay' },
                                 ]}
                             />
-                            <Button icon={<DownloadOutlined />} onClick={handleExport}>
-                                Export
-                            </Button>
-                            <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
-                                Refresh
-                            </Button>
+                            <CustomButton variant="secondary" icon={<DownloadOutlined />}>Export</CustomButton>
+                            <CustomButton variant="primary" icon={<ReloadOutlined />}>Refresh</CustomButton>
                         </Space>
                     }
-                    style={{ marginBottom: '24px' }}
+                    className={`${dv.sectionCard} ${dv.proCard} ${dv.mb24}`}
                 >
                     <Row gutter={[16, 16]}>
                         <Col xs={24} sm={12} lg={6}>
@@ -231,7 +228,7 @@ const Analytics: React.FC = () => {
                                 title="Total Properties"
                                 value={1128}
                                 prefix={<BarChartOutlined />}
-                                valueStyle={{ color: '#3f8600' }}
+                                className={`${dv.statistic} ${dv.statGreen}`}
                             />
                         </Col>
                         <Col xs={24} sm={12} lg={6}>
@@ -239,7 +236,7 @@ const Analytics: React.FC = () => {
                                 title="Active Deals"
                                 value={93}
                                 prefix={<LineChartOutlined />}
-                                valueStyle={{ color: '#1890ff' }}
+                                className={`${dv.statistic} ${dv.statBlue}`}
                             />
                         </Col>
                         <Col xs={24} sm={12} lg={6}>
@@ -248,7 +245,7 @@ const Analytics: React.FC = () => {
                                 value={1.85}
                                 suffix="M AED"
                                 prefix={<PieChartOutlined />}
-                                valueStyle={{ color: '#cf1322' }}
+                                className={`${dv.statistic} ${dv.statRed}`}
                             />
                         </Col>
                         <Col xs={24} sm={12} lg={6}>
@@ -256,34 +253,34 @@ const Analytics: React.FC = () => {
                                 title="ROI %"
                                 value={7.8}
                                 suffix="%"
-                                valueStyle={{ color: '#722ed1' }}
+                                className={`${dv.statistic} ${dv.statPurple}`}
                             />
                         </Col>
                     </Row>
                 </ProCard>
 
                 {/* Графики аналитики */}
-                <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+                <Row gutter={[16, 16]} className={dv.mb24}>
                     <Col xs={24} lg={12}>
-                        <ProCard title="Market Trends" headerStyle={{ background: '#fafafa' }}>
+                        <ProCard title="Market Trends" className={`${dv.sectionCard} ${dv.proCard}`}>
                             <Line {...marketTrendsConfig} height={300} />
                         </ProCard>
                     </Col>
                     <Col xs={24} lg={12}>
-                        <ProCard title="Property Type Distribution" headerStyle={{ background: '#fafafa' }}>
+                        <ProCard title="Property Type Distribution" className={`${dv.sectionCard} ${dv.proCard}`}>
                             <Bar {...propertyTypeDistributionConfig} height={300} />
                         </ProCard>
                     </Col>
                 </Row>
 
-                <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+                <Row gutter={[16, 16]} className={dv.mb24}>
                     <Col xs={24} lg={12}>
-                        <ProCard title="Location Performance" headerStyle={{ background: '#fafafa' }}>
+                        <ProCard title="Location Performance" className={`${dv.sectionCard} ${dv.proCard}`}>
                             <Column {...locationPerformanceConfig} height={300} />
                         </ProCard>
                     </Col>
                     <Col xs={24} lg={12}>
-                        <ProCard title="ROI Trends vs Market Growth" headerStyle={{ background: '#fafafa' }}>
+                        <ProCard title="ROI Trends vs Market Growth" className={`${dv.sectionCard} ${dv.proCard}`}>
                             <DualAxes
                                 data={[roiTrendsConfig.data, roiTrendsConfig.data]}
                                 xField="month"
@@ -299,7 +296,7 @@ const Analytics: React.FC = () => {
                 </Row>
 
                 {/* Детальная аналитика */}
-                <ProCard title="Property Analytics" headerStyle={{ background: '#fafafa' }}>
+                <ProCard title="Property Analytics" className={`${dv.sectionCard} ${dv.proCard}`}>
                     <ProTable
                         columns={analyticsColumns}
                         dataSource={mockAnalyticsData}
@@ -313,9 +310,7 @@ const Analytics: React.FC = () => {
                             showQuickJumper: true,
                         }}
                         toolBarRender={() => [
-                            <Button key="add" type="primary">
-                                Add Property
-                            </Button>,
+                            <CustomButton key="add" variant="primary">Add Property</CustomButton>,
                         ]}
                         rowKey="id"
                     />

@@ -1,5 +1,5 @@
 import styles from "./MainFilters.module.scss";
-import { Button, Flex, Row, Segmented, Select } from "antd";
+import { Flex, Row, Segmented } from "antd";
 import { useEffect, useState } from "react";
 import { Ordering, TransactionTypeEnum } from "@/api/schema";
 import { Trans } from "@lingui/react/macro";
@@ -14,6 +14,9 @@ import {
 } from "./typings";
 import DropdownMenu, { MoreDropdown } from "../DropdownMenu/DropdownMenu";
 import AutocompleteBuilding from "../autocomplete/AutocompleteBuilding";
+import CustomSelect from "@/components/CustomSelect/CustomSelect";
+import CustomButton from "@/components/CustomButton/CustomButton";
+import "@/styles/custom-buttons.scss";
 
 const propertyComponentsOptions: Array<PropertyComponentsOption> = [
     { value: "Studio", label: "Studio" },
@@ -109,8 +112,7 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                         }
                     />
                     <AutocompleteBuilding onValueChange={handleSearchValue} />
-                    <Select
-                        style={{ minWidth: 120 }}
+                    <CustomSelect
                         allowClear
                         onChange={handlePropertyComponentsChange}
                         mode="multiple"
@@ -127,33 +129,32 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                             />
                         }
                     />
-                    <Button
+                    <CustomButton
                         shape="round"
-                        type="primary"
                         onClick={handleSearch}
                         className={styles.searchButton}
+                        variant="primary"
                     >
                         <Trans id="filters.search">SEARCH</Trans>
-                    </Button>
+                    </CustomButton>
                 </Flex>
             </Row>
             <Row className={styles.lastRow}>
                 <Flex gap={"small"}>
                     {periodOptions.map((period, index) => (
-                        <Button
+                        <CustomButton
                             shape="round"
                             className={styles.periodButton}
                             onClick={() => handlePeriodChange(period.value)}
-                            color={
-                                period.value == filtersState.periods
+                            variant={
+                                period.value === filtersState.periods
                                     ? "primary"
-                                    : "default"
+                                    : "outline"
                             }
-                            variant="outlined"
                             key={index}
                         >
                             {period.label}
-                        </Button>
+                        </CustomButton>
                     ))}
                 </Flex>
             </Row>

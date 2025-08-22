@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Form, Input, Button, message } from "antd";
+import { Form, message } from "antd";
 import styles from "./Auth.module.scss";
+import CustomInput from "@/components/CustomInput/CustomInput";
+import CustomButton from "@/components/CustomButton/CustomButton";
 import { t } from "@lingui/macro";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "@/config";
@@ -151,7 +153,7 @@ const LoginForm: React.FC = () => {
                                 { required: true, message: "Enter your email" },
                             ]}
                         >
-                            <Input
+                            <CustomInput
                                 size="large"
                                 placeholder="Email"
                                 className={styles.input}
@@ -167,7 +169,7 @@ const LoginForm: React.FC = () => {
                                 },
                             ]}
                         >
-                            <Input.Password
+                            <CustomInput.Password
                                 size="large"
                                 placeholder="Password"
                                 className={styles.input}
@@ -175,7 +177,7 @@ const LoginForm: React.FC = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button
+                            <CustomButton
                                 type="primary"
                                 block
                                 size="large"
@@ -183,7 +185,7 @@ const LoginForm: React.FC = () => {
                                 className={styles.confirmButton}
                             >
                                 {t`LOG IN`}
-                            </Button>
+                            </CustomButton>
                         </Form.Item>
                         <div className={styles.resendCodeWrapper}>
                             <a
@@ -208,14 +210,14 @@ const LoginForm: React.FC = () => {
                                 { required: true, message: "Enter your email" },
                             ]}
                         >
-                            <Input
+                            <CustomInput
                                 size="large"
                                 placeholder="Email"
                                 className={styles.input}
                             />
                         </Form.Item>
                         <Form.Item>
-                            <Button
+                            <CustomButton
                                 type="primary"
                                 block
                                 size="large"
@@ -223,7 +225,7 @@ const LoginForm: React.FC = () => {
                                 className={styles.confirmButton}
                             >
                                 {t`NEXT`}
-                            </Button>
+                            </CustomButton>
                         </Form.Item>
                     </Form>
                 </>
@@ -236,7 +238,7 @@ const LoginForm: React.FC = () => {
                     </h2>
                     <Form onFinish={handleResend} className={styles.form}>
                         <Form.Item>
-                            <Button
+                            <CustomButton
                                 type="primary"
                                 block
                                 size="large"
@@ -244,7 +246,7 @@ const LoginForm: React.FC = () => {
                                 className={styles.confirmButton}
                             >
                                 {t`RESEND`}
-                            </Button>
+                            </CustomButton>
                         </Form.Item>
                         <div className={styles.resendCodeWrapper}>
                             <a
@@ -274,7 +276,7 @@ const LoginForm: React.FC = () => {
                                 },
                             ]}
                         >
-                            <Input.Password
+                            <CustomInput.Password
                                 size="large"
                                 placeholder="Password"
                                 className={styles.input}
@@ -289,7 +291,7 @@ const LoginForm: React.FC = () => {
                                 },
                             ]}
                         >
-                            <Input.Password
+                            <CustomInput.Password
                                 size="large"
                                 placeholder="Repeat password"
                                 className={styles.input}
@@ -297,7 +299,7 @@ const LoginForm: React.FC = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button
+                            <CustomButton
                                 type="primary"
                                 block
                                 size="large"
@@ -305,7 +307,7 @@ const LoginForm: React.FC = () => {
                                 className={styles.confirmButton}
                             >
                                 {t`CHANGE PASSWORD`}
-                            </Button>
+                            </CustomButton>
                         </Form.Item>
                     </Form>
                 </>
@@ -325,7 +327,7 @@ const LoginForm: React.FC = () => {
                                 { required: true, message: "Enter your email" },
                             ]}
                         >
-                            <Input
+                            <CustomInput
                                 size="large"
                                 placeholder="Email"
                                 className={styles.input}
@@ -341,7 +343,7 @@ const LoginForm: React.FC = () => {
                                 },
                             ]}
                         >
-                            <Input.Password
+                            <CustomInput.Password
                                 size="large"
                                 placeholder="Password"
                                 className={styles.input}
@@ -349,7 +351,7 @@ const LoginForm: React.FC = () => {
                         </Form.Item>
 
                         <Form.Item>
-                            <Button
+                            <CustomButton
                                 type="primary"
                                 block
                                 size="large"
@@ -357,7 +359,7 @@ const LoginForm: React.FC = () => {
                                 className={styles.confirmButton}
                             >
                                 {t`LOG IN`}
-                            </Button>
+                            </CustomButton>
                         </Form.Item>
                     </Form>
                 </>

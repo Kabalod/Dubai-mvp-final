@@ -248,7 +248,7 @@ class DevelopmentMemoryService {
     async addRoutingMemory(): Promise<void> {
         const routingMemories: MemoryItem[] = [
             {
-                text: `Application Routes: / (Dashboard), /analytics (Analytics page), /memory (Memory LLM dashboard), /ai-assistant (AI Assistant page), /auth/signup (Sign up form), /auth/login (Login form).`,
+                text: `Application Routes: / (Dashboard), /analytics (Analytics page), /auth (Auth page), /policy (Policy page), /landing (Landing).`,
                 type: 'system',
                 age: 'permanent',
             },

@@ -1,0 +1,36 @@
+import Basic from "../../png/card/basic.png";
+import Highlighted from "../../png/card/highlighted.png";
+import Secondary from "../../png/card/secondary.png";
+import DataAvg from "../../png/card/data-avg.png";
+import DataMedian from "../../png/card/data-median.png";
+
+export const meta = {
+  title: 'Reference/Cards',
+};
+
+# Cards — PNG эталоны
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+  <div>
+    <h3>Basic</h3>
+    <img src={Basic} alt="card basic" style={{ width: 420 }} />
+  </div>
+  <div>
+    <h3>Highlighted</h3>
+    <img src={Highlighted} alt="card highlighted" style={{ width: 420 }} />
+  </div>
+  <div>
+    <h3>Secondary</h3>
+    <img src={Secondary} alt="card secondary" style={{ width: 420 }} />
+  </div>
+  <div>
+    <h3>Data — Average</h3>
+    <img src={DataAvg} alt="card data avg" style={{ width: 420 }} />
+  </div>
+  <div>
+    <h3>Data — Median</h3>
+    <img src={DataMedian} alt="card data median" style={{ width: 420 }} />
+  </div>
+</div>
+
+

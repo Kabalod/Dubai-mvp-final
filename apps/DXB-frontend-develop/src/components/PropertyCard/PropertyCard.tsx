@@ -1,14 +1,9 @@
 import React from 'react';
-import { Card, Tag, Button, Space, Statistic, Row, Col, Avatar, Tooltip } from 'antd';
-import { 
-    HomeOutlined, 
-    EnvironmentOutlined, 
-    DollarOutlined, 
-    EyeOutlined, 
-    HeartOutlined,
-    ShareAltOutlined,
-    PhoneOutlined
-} from '@ant-design/icons';
+import classNames from 'classnames';
+import { Card, Tag, Space, Statistic, Row, Col, Avatar, Tooltip } from 'antd';
+import { EnvironmentOutlined, DollarOutlined, EyeOutlined, HeartOutlined, ShareAltOutlined, PhoneOutlined } from '@ant-design/icons';
+import CustomButton from "@/components/CustomButton/CustomButton";
+import styles from "./PropertyCard.module.scss";
 
 export interface PropertyData {
     id: string | number;
@@ -123,59 +118,24 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         onContact?.(data.id);
     };
 
-    const cardSize = {
-        small: { width: 280, imageHeight: 160 },
-        default: { width: 320, imageHeight: 200 },
-        large: { width: 400, imageHeight: 250 },
-    };
-
-    const { width, imageHeight } = cardSize[size];
+    const cardWidthClass = size === 'small' ? styles.card_small : size === 'large' ? styles.card_large : styles.card_default;
+    const imgHeightClass = size === 'small' ? styles.img_small : size === 'large' ? styles.img_large : styles.img_default;
 
     return (
         <Card
             hoverable
-            style={{ 
-                width, 
-                marginBottom: 16,
-                borderRadius: 12,
-                overflow: 'hidden',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
+            className={classNames(styles.card, cardWidthClass)}
             cover={
-                <div style={{ position: 'relative' }}>
+                <div className={styles.cover}>
                     <img
                         alt={data.title}
                         src={data.images[0] || 'https://via.placeholder.com/400x250?text=Property+Image'}
-                        style={{ 
-                            height: imageHeight, 
-                            width: '100%', 
-                            objectFit: 'cover' 
-                        }}
+                        className={classNames(styles.img, imgHeightClass)}
                     />
                     {data.featured && (
-                        <Tag
-                            color="gold"
-                            style={{
-                                position: 'absolute',
-                                top: 8,
-                                left: 8,
-                                margin: 0,
-                                fontWeight: 'bold',
-                            }}
-                        >
-                            ⭐ Featured
-                        </Tag>
+                        <Tag color="gold" className={styles.featuredTag}>⭐ Featured</Tag>
                     )}
-                    <Tag
-                        color={getStatusColor(data.status)}
-                        style={{
-                            position: 'absolute',
-                            top: 8,
-                            right: 8,
-                            margin: 0,
-                            fontWeight: 'bold',
-                        }}
-                    >
+                    <Tag color={getStatusColor(data.status)} className={styles.statusTag}>
                         {data.status}
                     </Tag>
                 </div>
@@ -183,198 +143,109 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             actions={
                 showActions ? [
                     <Tooltip title="View Details">
-                        <Button 
-                            type="text" 
-                            icon={<EyeOutlined />} 
-                            onClick={handleView}
-                        />
+                        <CustomButton variant="link" icon={<EyeOutlined />} onClick={handleView} />
                     </Tooltip>,
                     <Tooltip title="Add to Favorites">
-                        <Button 
-                            type="text" 
-                            icon={<HeartOutlined />} 
-                            onClick={handleFavorite}
-                        />
+                        <CustomButton variant="link" icon={<HeartOutlined />} onClick={handleFavorite} />
                     </Tooltip>,
                     <Tooltip title="Share">
-                        <Button 
-                            type="text" 
-                            icon={<ShareAltOutlined />} 
-                            onClick={handleShare}
-                        />
+                        <CustomButton variant="link" icon={<ShareAltOutlined />} onClick={handleShare} />
                     </Tooltip>,
                     <Tooltip title="Contact Agent">
-                        <Button 
-                            type="text" 
-                            icon={<PhoneOutlined />} 
-                            onClick={handleContact}
-                        />
+                        <CustomButton variant="link" icon={<PhoneOutlined />} onClick={handleContact} />
                     </Tooltip>,
                 ] : undefined
             }
         >
-            <div style={{ padding: '0 4px' }}>
-                {/* Заголовок и тип */}
-                <div style={{ marginBottom: 12 }}>
-                    <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'space-between',
-                        marginBottom: 8
-                    }}>
+            <div className={styles.body}>
+                <div className={styles.topRow}>
+                    <div className={styles.topMeta}>
                         <Tag color={getTypeColor(data.type)} icon={<span>{getTypeIcon(data.type)}</span>}>
                             {data.type}
                         </Tag>
-                        <span style={{ fontSize: '12px', color: '#666' }}>
-                            ID: {data.id}
-                        </span>
+                        <span className={styles.id}>ID: {data.id}</span>
                     </div>
-                    <h3 style={{ 
-                        margin: 0, 
-                        fontSize: size === 'large' ? '18px' : '16px',
-                        fontWeight: 'bold',
-                        lineHeight: 1.4,
-                        color: '#262626'
-                    }}>
-                        {data.title}
-                    </h3>
+                    <h3 className={styles.title}>{data.title}</h3>
                 </div>
 
-                {/* Локация */}
-                <div style={{ marginBottom: 12 }}>
+                <div className={styles.location}>
                     <Space>
-                        <EnvironmentOutlined style={{ color: '#1890ff' }} />
-                        <span style={{ color: '#666', fontSize: '14px' }}>
-                            {data.location}
-                        </span>
+                        <EnvironmentOutlined className={styles.locationIcon} />
+                        <span className={styles.locationText}>{data.location}</span>
                     </Space>
                 </div>
 
-                {/* Цена */}
-                <div style={{ marginBottom: 16 }}>
+                <div className={styles.price}>
                     <Statistic
                         value={data.price}
                         prefix={<DollarOutlined />}
                         suffix="AED"
-                        valueStyle={{ 
-                            color: '#1890ff', 
-                            fontSize: size === 'large' ? '20px' : '18px',
-                            fontWeight: 'bold'
-                        }}
+                        className={styles.statPrimary}
                     />
                 </div>
 
-                {/* Характеристики */}
-                <Row gutter={16} style={{ marginBottom: 16 }}>
+                <Row gutter={16} className={styles.features}>
                     {data.bedrooms && (
                         <Col span={8}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#1890ff' }}>
-                                    {data.bedrooms}
-                                </div>
-                                <div style={{ fontSize: '12px', color: '#666' }}>Bedrooms</div>
+                            <div className={styles.featureBox}>
+                                <div className={styles.featureValue}>{data.bedrooms}</div>
+                                <div className={styles.featureLabel}>Bedrooms</div>
                             </div>
                         </Col>
                     )}
                     {data.bathrooms && (
                         <Col span={8}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#52c41a' }}>
-                                    {data.bathrooms}
-                                </div>
-                                <div style={{ fontSize: '12px', color: '#666' }}>Bathrooms</div>
+                            <div className={styles.featureBox}>
+                                <div className={classNames(styles.featureValue, styles.featureValueAlt)}>{data.bathrooms}</div>
+                                <div className={styles.featureLabel}>Bathrooms</div>
                             </div>
                         </Col>
                     )}
                     <Col span={data.bedrooms ? 8 : 12}>
-                        <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#faad14' }}>
-                                {formatArea(data.area, data.areaUnit)}
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#666' }}>Area</div>
+                        <div className={styles.featureBox}>
+                            <div className={styles.featureValue}>{formatArea(data.area, data.areaUnit)}</div>
+                            <div className={styles.featureLabel}>Area</div>
                         </div>
                     </Col>
                 </Row>
 
-                {/* Статистика */}
                 {showStats && (
-                    <Row gutter={16} style={{ marginBottom: 16 }}>
+                    <Row gutter={16} className={styles.stats}>
                         <Col span={12}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#52c41a' }}>
-                                    {data.views}
-                                </div>
-                                <div style={{ fontSize: '11px', color: '#666' }}>Views</div>
+                            <div className={styles.statBlock}>
+                                <div className={styles.statNumber}>{data.views}</div>
+                                <div className={styles.statLabel}>Views</div>
                             </div>
                         </Col>
                         <Col span={12}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#faad14' }}>
-                                    {data.inquiries}
-                                </div>
-                                <div style={{ fontSize: '11px', color: '#666' }}>Inquiries</div>
+                            <div className={styles.statBlock}>
+                                <div className={classNames(styles.statNumber, styles.statNumberAlt)}>{data.inquiries}</div>
+                                <div className={styles.statLabel}>Inquiries</div>
                             </div>
                         </Col>
                     </Row>
                 )}
 
-                {/* Агент */}
                 {showAgent && data.agent && (
-                    <div style={{ 
-                        borderTop: '1px solid #f0f0f0', 
-                        paddingTop: 12,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Avatar 
-                                src={data.agent.avatar} 
-                                size={32}
-                                style={{ marginRight: 8 }}
-                            />
+                    <div className={styles.agent}>
+                        <div className={styles.agentInfo}>
+                            <Avatar src={data.agent.avatar} size={32} className={styles.agentAvatar} />
                             <div>
-                                <div style={{ fontSize: '14px', fontWeight: 'bold' }}>
-                                    {data.agent.name}
-                                </div>
-                                <div style={{ fontSize: '12px', color: '#666' }}>
-                                    ⭐ {data.agent.rating}/5
-                                </div>
+                                <div className={styles.agentName}>{data.agent.name}</div>
+                                <div className={styles.agentRating}>⭐ {data.agent.rating}/5</div>
                             </div>
                         </div>
-                        <Button 
-                            type="primary" 
-                            size="small"
-                            onClick={handleContact}
-                        >
-                            Contact
-                        </Button>
+                        <CustomButton size="small" onClick={handleContact}>Contact</CustomButton>
                     </div>
                 )}
 
-                {/* Действия */}
                 {showActions && (
-                    <div style={{ 
-                        borderTop: '1px solid #f0f0f0', 
-                        paddingTop: 12,
-                        display: 'flex',
-                        gap: 8
-                    }}>
-                        <Button 
-                            type="primary" 
-                            block 
-                            onClick={handleView}
-                            size={size === 'small' ? 'small' : 'middle'}
-                        >
+                    <div className={styles.actions}>
+                        <CustomButton type="primary" block onClick={handleView}>
                             View Details
-                        </Button>
+                        </CustomButton>
                         {onEdit && (
-                            <Button 
-                                onClick={handleEdit}
-                                size={size === 'small' ? 'small' : 'middle'}
-                            >
-                                Edit
-                            </Button>
+                            <CustomButton onClick={handleEdit}>Edit</CustomButton>
                         )}
                     </div>
                 )}

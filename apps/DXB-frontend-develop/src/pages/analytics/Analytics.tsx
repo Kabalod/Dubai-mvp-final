@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { Card, Select, Button, Table, Collapse, Segmented, DatePicker, Input, Progress, Statistic, Row, Col, Tabs, Tag, Space, Tooltip } from "antd";
+import { Card, Table, Collapse, Segmented, DatePicker, Progress, Statistic, Row, Col, Tag, Space, Tooltip } from "antd";
+import CustomButton from "@/components/CustomButton/CustomButton";
+import CustomSelect from "@/components/CustomSelect/CustomSelect";
+import CustomTabs from "@/components/CustomTabs/CustomTabs";
+import CustomInput from "@/components/CustomInput/CustomInput";
 import { SearchOutlined, FilterOutlined, DownloadOutlined, EyeOutlined, BarChartOutlined, LineChartOutlined, PieChartOutlined } from "@ant-design/icons";
 import styles from "./Analytics.module.scss";
 
-const { Option } = Select;
+// replaced Select with CustomSelect; Option not used
 const { Panel } = Collapse;
 const { RangePicker } = DatePicker;
 
@@ -73,7 +77,7 @@ const Analytics: React.FC = () => {
             title: "Price",
             dataIndex: "price",
             key: "price",
-            render: (text: string) => <span style={{ fontWeight: "bold", color: "#1890ff" }}>{text}</span>,
+            render: (text: string) => <span className={styles.priceCell}>{text}</span>,
         },
         {
             title: "Deals",
@@ -105,13 +109,13 @@ const Analytics: React.FC = () => {
         {
             title: "Actions",
             key: "actions",
-            render: (_: any, record: any) => (
+            render: () => (
                 <Space>
                     <Tooltip title="View Details">
-                        <Button type="text" icon={<EyeOutlined />} size="small" />
+                        <CustomButton variant="link" icon={<EyeOutlined />} size="small" />
                     </Tooltip>
                     <Tooltip title="Download Report">
-                        <Button type="text" icon={<DownloadOutlined />} size="small" />
+                        <CustomButton variant="link" icon={<DownloadOutlined />} size="small" />
                     </Tooltip>
                 </Space>
             ),
@@ -128,23 +132,23 @@ const Analytics: React.FC = () => {
 
     return (
         <div className={styles.analyticsContainer}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
+            <div className={styles.headerBar}>
                 <div>
                     <h1>📊 Analytics Dashboard</h1>
                     <p>Comprehensive real estate market analysis for Dubai</p>
                 </div>
                 <Space>
-                    <Button icon={<DownloadOutlined />} onClick={handleExportData}>
+                    <CustomButton icon={<DownloadOutlined />} onClick={handleExportData}>
                         Export Data
-                    </Button>
-                    <Button type="primary" icon={<BarChartOutlined />}>
+                    </CustomButton>
+                    <CustomButton type="primary" icon={<BarChartOutlined />}>
                         Generate Report
-                </Button>
+                    </CustomButton>
                 </Space>
             </div>
 
             {/* Advanced Filters Section */}
-            <Card title={<><FilterOutlined /> Advanced Filters</>} style={{ marginBottom: "24px" }}>
+            <Card title={<><FilterOutlined /> Advanced Filters</>} className={styles.filtersCard}>
                 <Row gutter={[16, 16]} align="middle">
                     <Col span={6}>
                         <Segmented
@@ -160,51 +164,47 @@ const Analytics: React.FC = () => {
                         />
                     </Col>
                     <Col span={6}>
-                        <Select
+                        <CustomSelect
                             className={styles.select}
                             placeholder="Select Project"
                             value={selectedProject}
                             onChange={setSelectedProject}
                             showSearch
-                            filterOption={(input, option) =>
-                                (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-                            }
-                        >
-                            <Option value="all">All Projects</Option>
-                            <Option value="burj">Burj Khalifa</Option>
-                            <Option value="palm">Palm Tower</Option>
-                            <Option value="marina">Marina Heights</Option>
-                        </Select>
+                            options={[
+                                { value: "all", label: "All Projects" },
+                                { value: "burj", label: "Burj Khalifa" },
+                                { value: "palm", label: "Palm Tower" },
+                                { value: "marina", label: "Marina Heights" },
+                            ]}
+                        />
                     </Col>
                     <Col span={6}>
-                        <Select
+                        <CustomSelect
                             className={styles.select}
                             placeholder="Select Building"
                             value={selectedBuilding}
                             onChange={setSelectedBuilding}
                             showSearch
-                            filterOption={(input, option) =>
-                                (option?.children as unknown as string)?.toLowerCase().includes(input.toLowerCase())
-                            }
-                        >
-                            <Option value="all">All Buildings</Option>
-                            <Option value="tower-a">Tower A</Option>
-                            <Option value="tower-b">Tower B</Option>
-                            <Option value="tower-c">Tower C</Option>
-                        </Select>
+                            options={[
+                                { value: "all", label: "All Buildings" },
+                                { value: "tower-a", label: "Tower A" },
+                                { value: "tower-b", label: "Tower B" },
+                                { value: "tower-c", label: "Tower C" },
+                            ]}
+                        />
                     </Col>
                     <Col span={6}>
                         <RangePicker
                             value={dateRange}
                             onChange={setDateRange}
-                            style={{ width: "100%" }}
+                            className={styles.rangePicker}
                             placeholder={["Start Date", "End Date"]}
                         />
                     </Col>
                 </Row>
-                <Row gutter={[16, 16]} style={{ marginTop: "16px" }}>
+                <Row gutter={[16, 16]} className={styles.filtersFooter}>
                     <Col span={12}>
-                        <Input
+                        <CustomInput
                             placeholder="Search properties, projects, or areas..."
                             prefix={<SearchOutlined />}
                             value={searchText}
@@ -214,10 +214,10 @@ const Analytics: React.FC = () => {
                     </Col>
                     <Col span={12}>
                         <Space>
-                            <Button type="primary" onClick={handleFilterApply}>
+                            <CustomButton type="primary" onClick={handleFilterApply}>
                                 Apply Filters
-                            </Button>
-                            <Button onClick={() => {
+                            </CustomButton>
+                            <CustomButton onClick={() => {
                                 setSelectedArea("all");
                                 setSelectedProject("all");
                                 setSelectedBuilding("all");
@@ -225,24 +225,24 @@ const Analytics: React.FC = () => {
                                 setSearchText("");
                             }}>
                                 Clear All
-                            </Button>
+                            </CustomButton>
                         </Space>
                     </Col>
                 </Row>
             </Card>
 
             {/* Tabs for different views */}
-            <Tabs 
+            <CustomTabs 
                 activeKey={activeTab} 
                 onChange={setActiveTab} 
-                style={{ marginBottom: "24px" }}
+                className={styles.tabs}
                 items={[
                     {
                         key: "overview",
                         label: <span><BarChartOutlined />Overview</span>,
                         children: (
                             /* Market Overview Cards */
-                            <Row gutter={[16, 16]} style={{ marginBottom: "24px" }}>
+                            <Row gutter={[16, 16]} className={styles.cardsRow}>
                                 <Col span={6}>
                                     <Card className={styles.card}>
                                         <Statistic

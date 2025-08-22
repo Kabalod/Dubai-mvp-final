@@ -13,6 +13,14 @@ export default [
   {
     rules: {
       "react/react-in-jsx-scope": "off",
+      "no-restricted-imports": ["error", {
+        paths: [
+          { name: "antd", importNames: ["Button"], message: "Use CustomButton from '@/components/CustomButton/CustomButton'" },
+          { name: "antd", importNames: ["Tabs"], message: "Use CustomTabs from '@/components/CustomTabs/CustomTabs'" },
+          { name: "antd", importNames: ["Input"], message: "Use CustomInput from '@/components/CustomInput/CustomInput'" },
+          { name: "antd", importNames: ["Select"], message: "Use CustomSelect from '@/components/CustomSelect/CustomSelect'" }
+        ]
+      }]
     },
     settings: {
       react: {

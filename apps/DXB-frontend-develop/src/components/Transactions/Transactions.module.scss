@@ -1,4 +1,5 @@
 @use "@/styles/typography" as *;
+@use "@/styles/tokens" as *;
 
 .title {
     @include title2semibold;
@@ -17,42 +18,70 @@
 
 .tableContainer {
     width: 100%;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05);
+    background: var(--color-bg);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
     padding: 16px;
+    position: relative;
+
+    /* скролл-тени */
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 12px;
+        pointer-events: none;
+        z-index: 1;
+    }
+    &::before {
+        top: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.06), rgba(0,0,0,0));
+        border-top-left-radius: var(--radius-xl);
+        border-top-right-radius: var(--radius-xl);
+    }
+    &::after {
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.06), rgba(0,0,0,0));
+        border-bottom-left-radius: var(--radius-xl);
+        border-bottom-right-radius: var(--radius-xl);
+    }
 }
 .table {
-    .ant-table-tbody > tr > td {
-        @include body1semibold;
-        color: $textColorPrimary;
-    }
     .ant-table {
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         overflow: hidden;
     }
 
     .ant-table-thead > tr > th {
-        background-color: #f3f4f6;
-        font-weight: 600;
-        color: #6b7280;
+        @include body2semibold;
+        color: $textColorSecondary;
+        background-color: #f5f6f7;
+        padding: 10px 12px; /* плотность */
+        text-align: left; /* выравнивание */
+    }
+
+    .ant-table-tbody > tr > td {
+        @include body1regular;
+        color: $textColorPrimary;
+        padding: 12px;
     }
 
     .ant-table-tbody > tr {
         transition: background 0.2s;
     }
 
-    .ant-table-tbody > tr:nth-child(odd) {
-        background-color: #f9fafb;
+    .ant-table-tbody > tr:hover > td {
+        background-color: #f8fafc;
     }
 
-    .ant-table-tbody > tr:hover {
-        background-color: #eef2ff;
+    .detailsLink {
+        @include body1semibold;
     }
+}
 
-    .detailsButton {
-        border-radius: 20px;
-        font-weight: 600;
-        padding: 6px 16px;
-    }
+.cellPre {
+    white-space: pre-line;
+    @include body2medium;
 }

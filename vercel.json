@@ -1,0 +1,23 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "apps/DXB-frontend-develop/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    },
+    {
+      "src": "apps/realty-main/api/index.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9"
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "apps/realty-main/api/index.py" },
+    { "src": "/(.*)", "dest": "apps/DXB-frontend-develop/$1" }
+  ]
+}

@@ -248,7 +248,8 @@ SECURE_HSTS_SECONDS = 0 if DEBUG else env.int("SECURE_HSTS_SECONDS", default=60 
 # https://noumenal.es/notes/til/django/csrf-trusted-origins/
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-SECURE_SSL_REDIRECT = PROD
+# Для локального smoke-теста отключаем редирект на HTTPS
+SECURE_SSL_REDIRECT = False
 
 SERVER_EMAIL = env.str(
     "SERVER_EMAIL",

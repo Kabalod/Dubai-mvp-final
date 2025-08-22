@@ -1,19 +1,27 @@
 @use "@/styles/typography" as *;
+@use "@/styles/tokens" as *;
+
+.container {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 20px;
+}
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0;
+    height: 64px;
 }
+
+.nav { flex: 1; display: flex; justify-content: center; }
 
 .menu {
     border-bottom: 0;
-
-    :global(.ant-menu-item) {
-        @include body1medium;
-        color: $textColorBlack;
-    }
+    background: transparent;
 }
 
 .buttonBlock {
@@ -23,6 +31,16 @@
 .buttonStyle {
     @include body2regular;
     color: $textColorPrimary;
-    background-color: #f0f3ff;
+    background-color: var(--color-bg);
     border: 0 !important;
 }
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+.rightSection { display: flex; align-items: center; gap: 10px; }
+
+.signInButton { border-radius: var(--radius-md); }

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Segmented, Button, Divider, message } from "antd";
+import { Segmented, Divider, message } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import styles from "./Auth.module.scss";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 import { API_BASE_URL } from "@/config";
+import CustomButton from "@/components/CustomButton/CustomButton";
 
 const Auth: React.FC = () => {
     const [authType, setAuthType] = useState<string>("login");
@@ -38,21 +39,16 @@ const Auth: React.FC = () => {
                 </div>
 
                 {/* Google Login Button */}
-                <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-                    <Button 
-                        type="default" 
-                        size="large" 
+                <div className={styles.googleWrapper}>
+                    <CustomButton
+                        type="default"
+                        size="large"
                         icon={<GoogleOutlined />}
                         onClick={handleGoogleLogin}
-                        style={{ 
-                            width: '100%', 
-                            height: '40px',
-                            border: '1px solid #d9d9d9',
-                            borderRadius: '6px'
-                        }}
+                        className={styles.googleButton}
                     >
                         Continue with Google
-                    </Button>
+                    </CustomButton>
                 </div>
 
                 <Divider>or</Divider>

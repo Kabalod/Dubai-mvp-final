@@ -1,0 +1,46 @@
+import TabsDefault from "../../png/tabs/default.png";
+import TabsActive from "../../png/tabs/active.png";
+import TabsHover from "../../png/tabs/hover.png";
+import InputDefault from "../../png/inputs/input-default.png";
+import InputFocused from "../../png/inputs/input-focused.png";
+import SelectDefault from "../../png/inputs/select-default.png";
+import SelectOpen from "../../png/inputs/select-open.png";
+
+export const meta = {
+  title: 'Reference/Filters',
+};
+
+# Filters — PNG эталоны
+
+<div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+  <div>
+    <h3>Tabs — Default</h3>
+    <img src={TabsDefault} alt="tabs default" style={{ width: 640 }} />
+  </div>
+  <div>
+    <h3>Tabs — Active</h3>
+    <img src={TabsActive} alt="tabs active" style={{ width: 640 }} />
+  </div>
+  <div>
+    <h3>Tabs — Hover</h3>
+    <img src={TabsHover} alt="tabs hover" style={{ width: 640 }} />
+  </div>
+  <div>
+    <h3>Input — Default</h3>
+    <img src={InputDefault} alt="input default" style={{ width: 420 }} />
+  </div>
+  <div>
+    <h3>Input — Focused</h3>
+    <img src={InputFocused} alt="input focused" style={{ width: 420 }} />
+  </div>
+  <div>
+    <h3>Select — Default</h3>
+    <img src={SelectDefault} alt="select default" style={{ width: 420 }} />
+  </div>
+  <div>
+    <h3>Select — Open</h3>
+    <img src={SelectOpen} alt="select open" style={{ width: 420 }} />
+  </div>
+</div>
+
+

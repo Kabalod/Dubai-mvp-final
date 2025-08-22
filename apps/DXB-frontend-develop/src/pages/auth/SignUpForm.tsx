@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { ProForm, ProFormText, ProFormCheckbox, ProCard } from '@ant-design/pro-components';
-import { Button, message, Steps, Input, Form, Checkbox } from 'antd';
+import { message, Steps, Form, Checkbox } from 'antd';
+import CustomInput from '@/components/CustomInput/CustomInput';
+import CustomButton from '@/components/CustomButton/CustomButton';
+import styles from './SignUpForm.module.scss';
 import { UserOutlined, MailOutlined, LockOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '@/config';
@@ -153,23 +156,11 @@ const SignUpForm: React.FC = () => {
     ];
 
     return (
-        <div style={{ 
-            minHeight: '100vh', 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px'
-        }}>
+        <div className={styles.pageRoot}>
             <ProCard
-                style={{ 
-                    width: '100%', 
-                    maxWidth: '500px',
-                    borderRadius: '16px',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
-                }}
+                className={styles.card}
                 title={
-                    <div style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold' }}>
+                    <div className={styles.cardTitle}>
                         Welcome!
                     </div>
                 }
@@ -177,7 +168,7 @@ const SignUpForm: React.FC = () => {
                 <Steps
                     current={Object.values(FormSteps).indexOf(currentStep)}
                     items={steps}
-                    style={{ marginBottom: '32px' }}
+                    className={styles.steps}
                 />
 
                 {currentStep === FormSteps.Join && (
@@ -185,16 +176,16 @@ const SignUpForm: React.FC = () => {
                         onFinish={handleSignUp}
                         submitter={{
                             render: () => (
-                                <Button
+                                <CustomButton
                                     type="primary"
                                     size="large"
                                     htmlType="submit"
                                     block
                                     icon={<MailOutlined />}
-                                    style={{ height: '48px', fontSize: '16px' }}
+                                    className={styles.primaryButton}
                                 >
                                     SIGN UP
-                                </Button>
+                                </CustomButton>
                             ),
                         }}
                     >
@@ -232,27 +223,27 @@ const SignUpForm: React.FC = () => {
                             ),
                         }}
                     >
-                        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-                            <CheckCircleOutlined style={{ fontSize: '48px', color: '#52c41a', marginBottom: '16px' }} />
+                        <div className={styles.centerBlock}>
+                            <CheckCircleOutlined className={styles.bigIcon} />
                             <h3>We have sent the code to {email}</h3>
-                            <p style={{ color: '#666' }}>Enter the code to complete the registration</p>
+                            <p className={styles.muted}>Enter the code to complete the registration</p>
                         </div>
                         
                         <Form.Item
                             name="otp"
                             rules={[{ required: true, message: 'Please enter the verification code!' }]}
                         >
-                            <Input.OTP 
+                            <CustomInput.OTP 
                                 length={otpLength} 
                                 size="large"
-                                style={{ justifyContent: 'center' }}
+                                className={styles.otp}
                             />
                         </Form.Item>
 
-                        <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                            <Button type="link" onClick={resendCode}>
+                        <div className={styles.centerBlock}>
+                            <CustomButton type="link" onClick={resendCode}>
                                 Send the code again
-                            </Button>
+                            </CustomButton>
                         </div>
                     </ProForm>
                 )}
@@ -262,16 +253,16 @@ const SignUpForm: React.FC = () => {
                         onFinish={handelFinishRegister}
                         submitter={{
                             render: () => (
-                                <Button
+                                <CustomButton
                                     type="primary"
                                     size="large"
                                     htmlType="submit"
                                     block
                                     icon={<UserOutlined />}
-                                    style={{ height: '48px', fontSize: '16px' }}
+                                    className={styles.primaryButton}
                                 >
                                     CREATE ACCOUNT
-                                </Button>
+                                </CustomButton>
                             ),
                         }}
                     >

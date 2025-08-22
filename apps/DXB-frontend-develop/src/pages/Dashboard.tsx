@@ -1,6 +1,6 @@
 import React from 'react';
-import { ProLayout, ProTable, ProCard, ProDescriptions } from '@ant-design/pro-components';
-import { Card, Statistic, Row, Col, Button, Space, Tag } from 'antd';
+import { ProLayout, ProTable, ProCard } from '@ant-design/pro-components';
+import { Card, Statistic, Row, Col, Space, Tag } from 'antd';
 import { 
     HomeOutlined, 
     BuildOutlined, 
@@ -10,8 +10,10 @@ import {
     AreaChartOutlined
 } from '@ant-design/icons';
 import { Line, Bar, Pie } from '@ant-design/charts';
-import DashboardAssistant from '@/components/AIAssistant/DashboardAssistant';
-import { DashboardLoader } from '@/components/ProjectMemoryLoader';
+import dv from '@/styles/dataviz.module.scss';
+import CustomButton from '@/components/CustomButton/CustomButton';
+import '@/styles/custom-buttons.scss';
+import styles from '@/components/Dashboard/Dashboard.module.scss';
 
 // Моковые данные для демонстрации
 const mockProperties = [
@@ -75,7 +77,7 @@ const Dashboard: React.FC = () => {
             dataIndex: 'price',
             key: 'price',
             render: (dom: any, entity: any) => (
-                <span style={{ fontWeight: 'bold', color: '#1890ff' }}>
+                <span className={`${dv.bold} ${dv.textBlue}`}>
                     {entity.price.toLocaleString()}
                 </span>
             ),
@@ -107,108 +109,102 @@ const Dashboard: React.FC = () => {
             key: 'actions',
             render: () => (
                 <Space size="middle">
-                    <Button type="link" size="small">View</Button>
-                    <Button type="link" size="small">Edit</Button>
+                    <CustomButton variant="link" size="small">View</CustomButton>
+                    <CustomButton variant="link" size="small">Edit</CustomButton>
                 </Space>
             ),
         },
     ];
 
     return (
-        <ProLayout
-            title="Dubai Real Estate"
-            logo="🏠"
-            menuItemRender={(item, dom) => (
-                <div style={{ color: '#1890ff' }}>{dom}</div>
-            )}
-        >
-            <div style={{ padding: '24px', background: '#f0f2f5' }}>
+        <ProLayout title="Dubai Real Estate" logo="🏠">
+            <div className={styles.container}>
                 {/* Статистика */}
-                <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+                <Row gutter={[16, 16]} className={styles.dashRow}>
                     <Col xs={24} sm={12} lg={6}>
-                        <Card>
+                        <Card className={styles.card}>
                             <Statistic
                                 title="Total Properties"
                                 value={1128}
                                 prefix={<HomeOutlined />}
-                                valueStyle={{ color: '#3f8600' }}
+                                className={`${dv.statistic} ${dv.statGreen}`}
                             />
                         </Card>
                     </Col>
                     <Col xs={24} sm={12} lg={6}>
-                        <Card>
+                        <Card className={styles.card}>
                             <Statistic
                                 title="Active Deals"
                                 value={93}
                                 prefix={<BuildOutlined />}
-                                valueStyle={{ color: '#1890ff' }}
+                                className={`${dv.statistic} ${dv.statBlue}`}
                             />
                         </Card>
                     </Col>
                     <Col xs={24} sm={12} lg={6}>
-                        <Card>
+                        <Card className={styles.card}>
                             <Statistic
                                 title="Total Value"
                                 value={2.8}
                                 prefix={<DollarOutlined />}
                                 suffix="B AED"
-                                valueStyle={{ color: '#cf1322' }}
+                                className={`${dv.statistic} ${dv.statRed}`}
                             />
                         </Card>
                     </Col>
                     <Col xs={24} sm={12} lg={6}>
-                        <Card>
+                        <Card className={styles.card}>
                             <Statistic
                                 title="Active Users"
                                 value={156}
                                 prefix={<UserOutlined />}
-                                valueStyle={{ color: '#722ed1' }}
+                                className={`${dv.statistic} ${dv.statPurple}`}
                             />
                         </Card>
                     </Col>
                 </Row>
 
                 {/* Графики и AI ассистент */}
-                <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+                <Row gutter={[16, 16]} className={styles.dashRow}>
                     <Col xs={24} lg={12}>
-                        <ProCard title="Market Trends" headStyle={{ background: '#fafafa' }}>
+                        <ProCard title="Market Trends" className={`${dv.sectionCard} ${dv.proCard}`}>
                             <Line {...lineConfig} height={300} />
                         </ProCard>
                     </Col>
                     <Col xs={24} lg={12}>
-                        <ProCard title="Property Distribution" headStyle={{ background: '#fafafa' }}>
+                        <ProCard title="Property Distribution" className={`${dv.sectionCard} ${dv.proCard}`}>
                             <Bar {...barConfig} height={300} />
                         </ProCard>
                     </Col>
                 </Row>
 
-                <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+                <Row gutter={[16, 16]} className={styles.dashRow}>
                     <Col xs={24} lg={12}>
-                        <ProCard title="Deal Status" headStyle={{ background: '#fafafa' }}>
+                        <ProCard title="Deal Status" className={`${dv.sectionCard} ${dv.proCard}`}>
                             <Pie {...pieConfig} height={300} />
                         </ProCard>
                     </Col>
                     <Col xs={24} lg={12}>
-                        <ProCard title="Quick Actions" headStyle={{ background: '#fafafa' }}>
-                            <Space direction="vertical" style={{ width: '100%' }}>
-                                <Button type="primary" icon={<RiseOutlined />} block>
+                        <ProCard title="Quick Actions" className={`${dv.sectionCard} ${dv.proCard}`}>
+                            <Space direction="vertical" className={dv.fullWidth}>
+                                <CustomButton variant="primary" icon={<RiseOutlined />} block>
                                     Add New Property
-                                </Button>
-                                <Button icon={<AreaChartOutlined />} block>
+                                </CustomButton>
+                                <CustomButton variant="secondary" icon={<AreaChartOutlined />} block>
                                     Generate Report
-                                </Button>
-                                <Button icon={<UserOutlined />} block>
+                                </CustomButton>
+                                <CustomButton variant="outline" icon={<UserOutlined />} block>
                                     Manage Users
-                                </Button>
+                                </CustomButton>
                             </Space>
                         </ProCard>
                     </Col>
                 </Row>
 
-                {/* Project Memory и AI ассистент */}
-                <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-                    <Col xs={24} lg={12}>
-                        <ProCard title="Recent Properties" headStyle={{ background: '#fafafa' }}>
+                {/* Recent Properties */}
+                <Row gutter={[16, 16]} className={styles.dashRow}>
+                    <Col xs={24}>
+                        <ProCard title="Recent Properties">
                             <ProTable
                                 columns={columns}
                                 dataSource={mockProperties}
@@ -219,28 +215,12 @@ const Dashboard: React.FC = () => {
                                     showQuickJumper: true,
                                 }}
                                 toolBarRender={() => [
-                                    <Button key="add" type="primary">
+                                    <CustomButton key="add" variant="primary">
                                         Add Property
-                                    </Button>,
+                                    </CustomButton>,
                                 ]}
                             />
                         </ProCard>
-                    </Col>
-                    <Col xs={24} lg={6}>
-                        <DashboardLoader 
-                            compact={true}
-                            onMemoryLoaded={(count) => {
-                                console.log(`Project memory loaded: ${count} items`);
-                            }}
-                        />
-                    </Col>
-                    <Col xs={24} lg={6}>
-                        <DashboardAssistant 
-                            compact={true}
-                            onMemoryAdd={(memory) => {
-                                console.log('New memory added:', memory);
-                            }}
-                        />
                     </Col>
                 </Row>
             </div>

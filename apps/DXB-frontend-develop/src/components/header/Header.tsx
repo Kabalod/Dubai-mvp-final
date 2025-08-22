@@ -1,7 +1,10 @@
 import React from "react";
-import { Menu, Button, Space } from "antd";
+import { Menu } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
+import CustomButton from "@/components/CustomButton/CustomButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import "@/styles/custom-buttons.scss";
+import styles from "./Header.module.scss";
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -10,82 +13,55 @@ const Header: React.FC = () => {
     const menuItems = [
         {
             key: "/",
-            label: "Dashboard",
+            label: "Main",
         },
         {
             key: "/analytics",
             label: "Analytics",
         },
         {
-            key: "/ai-assistant",
-            label: "AI Assistant",
+            key: "/reports",
+            label: "Reports",
         },
         {
-            key: "/project-memory",
-            label: "Project Memory",
-        },
-        {
-            key: "/production-memory",
-            label: "Production Memory",
-        },
-        {
-            key: "/auth",
-            label: "Auth",
-        },
-        {
-            key: "/policy",
-            label: "Policy",
+            key: "/payments",
+            label: "Payments",
         },
     ];
 
     const handleMenuClick = ({ key }: { key: string }) => {
-        console.log("Navigating to:", key); // Добавляем логирование
         navigate(key);
     };
 
     return (
-        <div style={{ 
-            background: '#fff', 
-            borderBottom: '1px solid #f0f0f0', 
-            padding: '0 20px',
-            position: 'sticky',
-            top: 0,
-            zIndex: 1000
-        }}>
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                height: '64px'
-            }}>
+        <div className={styles.container}>
+            <div className={styles.header}>
                 {/* Logo */}
-                <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#1890ff' }}>
-                    Dubai Real Estate
+                <div className={styles.logo}>
+                    LOGO
                 </div>
 
                 {/* Navigation Menu */}
-                <Menu
-                    mode="horizontal"
-                    selectedKeys={[location.pathname]}
-                    items={menuItems}
-                    onClick={handleMenuClick}
-                    style={{ 
-                        flex: 1, 
-                        justifyContent: 'center',
-                        border: 'none',
-                        background: 'transparent'
-                    }}
-                />
+                <div className={styles.nav}>
+                    <Menu
+                        mode="horizontal"
+                        selectedKeys={[location.pathname]}
+                        items={menuItems}
+                        onClick={handleMenuClick}
+                        className={styles.menu}
+                    />
+                </div>
 
-                {/* Right side - Language Switcher */}
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <Button size="small" onClick={() => navigate("/")}>Dashboard</Button>
-                    <Button size="small" onClick={() => navigate("/analytics")}>Analytics</Button>
-                    <Button size="small" onClick={() => navigate("/ai-assistant")}>AI</Button>
-                    <Button size="small" onClick={() => navigate("/project-memory")}>Memory</Button>
-                    <Button size="small" onClick={() => navigate("/production-memory")}>Prod</Button>
-                    <Button size="small" onClick={() => navigate("/auth")}>Auth</Button>
-                    <LanguageSwitcher />
+                {/* Right side - Auth Button */}
+                <div className={styles.rightSection}>
+                    <CustomButton 
+                        variant="outline" 
+                        size="small" 
+                        onClick={() => navigate("/auth")}
+                        className={styles.signInButton}
+                    >
+                        Sign in
+                    </CustomButton>
                 </div>
             </div>
         </div>

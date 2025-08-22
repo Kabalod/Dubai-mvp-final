@@ -1,6 +1,7 @@
 import React from "react";
-import { Button, Flex, TablePaginationConfig, TableProps } from "antd";
+import { Flex, TablePaginationConfig, TableProps } from "antd";
 import { Table } from "antd";
+import CustomButton from "@/components/CustomButton/CustomButton";
 import {
     MergedTransactionType,
     MergedTransactionTypeOffsetPaginated,
@@ -71,34 +72,14 @@ const Transactions: React.FC<TransactionsProps> = ({
             title: "Location",
             dataIndex: "areaNameEn",
             key: "areaNameEn",
-            render: (text) => (
-                <span
-                    style={{
-                        whiteSpace: "pre-line",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                    }}
-                >
-                    {text}
-                </span>
-            ),
+            render: (text) => <span className={styles.cellPre}>{text}</span>,
             // sorter: (a, b) => randomShitSorter(a, b, "areaNameEn"),
         },
         {
             title: "Building",
             dataIndex: "buildingName",
             key: "buildingName",
-            render: (text) => (
-                <span
-                    style={{
-                        whiteSpace: "pre-line",
-                        fontSize: "14px",
-                        fontWeight: "500",
-                    }}
-                >
-                    {text}
-                </span>
-            ),
+            render: (text) => <span className={styles.cellPre}>{text}</span>,
             // sorter: (a, b) => randomShitSorter(a, b, "buildingName"),
         },
         {
@@ -129,10 +110,10 @@ const Transactions: React.FC<TransactionsProps> = ({
         {
             title: "",
             key: "action",
-            render: (_, record, index) => (
-                <Button type={"default"} className={styles.detailsButton}>
+            render: () => (
+                <CustomButton variant="link" className={styles.detailsLink}>
                     Details
-                </Button>
+                </CustomButton>
             ),
         },
     ];

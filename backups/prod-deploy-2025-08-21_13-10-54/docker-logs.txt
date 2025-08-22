@@ -1,0 +1,98 @@
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2025-08-21 10:10:46.543 UTC [1] LOG:  starting PostgreSQL 16.10 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit
+2025-08-21 10:10:46.543 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2025-08-21 10:10:46.543 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2025-08-21 10:10:46.547 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2025-08-21 10:10:46.551 UTC [29] LOG:  database system was shut down at 2025-08-21 10:10:45 UTC
+2025-08-21 10:10:46.556 UTC [1] LOG:  database system is ready to accept connections
+1:C 21 Aug 2025 10:10:22.533 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 21 Aug 2025 10:10:22.533 * Redis version=7.4.5, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 21 Aug 2025 10:10:22.533 * Configuration loaded
+1:M 21 Aug 2025 10:10:22.533 * monotonic clock: POSIX clock_gettime
+1:M 21 Aug 2025 10:10:22.534 * Running mode=standalone, port=6379.
+1:M 21 Aug 2025 10:10:22.534 * Server initialized
+1:M 21 Aug 2025 10:10:22.534 * Reading RDB base file on AOF loading...
+1:M 21 Aug 2025 10:10:22.534 * Loading RDB produced by version 7.4.5
+1:M 21 Aug 2025 10:10:22.534 * RDB age 1045 seconds
+1:M 21 Aug 2025 10:10:22.535 * RDB memory usage when created 0.90 Mb
+1:M 21 Aug 2025 10:10:22.535 * RDB is base AOF
+1:M 21 Aug 2025 10:10:22.535 * Done loading RDB, keys loaded: 0, keys expired: 0.
+1:M 21 Aug 2025 10:10:22.535 * DB loaded from base file appendonly.aof.1.base.rdb: 0.001 seconds
+System check identified some issues:
+1:M 21 Aug 2025 10:10:22.535 * DB loaded from append only file: 0.001 seconds
+1:M 21 Aug 2025 10:10:22.535 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+1:M 21 Aug 2025 10:10:22.535 * Ready to accept connections tcp
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/app/static' in the STATICFILES_DIRS setting does not exist.
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, properties, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying properties.0001_initial... OK
+  Applying properties.0002_propertymetrics... OK
+  Applying sessions.0001_initial... OK
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/app/static' in the STATICFILES_DIRS setting does not exist.
+Traceback (most recent call last):
+  File "/app/manage.py", line 22, in <module>
+    main() 
+    ^^^^^^
+  File "/app/manage.py", line 18, in main
+    execute_from_command_line(sys.argv)
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/base.py", line 412, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/base.py", line 458, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/contrib/staticfiles/management/commands/collectstatic.py", line 209, in handle
+    collected = self.collect()
+                ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/contrib/staticfiles/management/commands/collectstatic.py", line 135, in collect
+    handler(path, prefixed_path, storage)
+  File "/usr/local/lib/python3.12/site-packages/django/contrib/staticfiles/management/commands/collectstatic.py", line 368, in copy_file
+    if not self.delete_file(path, prefixed_path, source_storage):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/contrib/staticfiles/management/commands/collectstatic.py", line 278, in delete_file
+    if self.storage.exists(prefixed_path):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/core/files/storage/filesystem.py", line 165, in exists
+    return os.path.lexists(self.path(name))
+                           ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/django/contrib/staticfiles/storage.py", line 39, in path
+    raise ImproperlyConfigured(
+django.core.exceptions.ImproperlyConfigured: You're using the staticfiles app without having set the STATIC_ROOT setting to a filesystem path.
+Watching for file changes with StatReloader
+System check identified some issues:
+
+WARNINGS:
+?: (staticfiles.W004) The directory '/app/static' in the STATICFILES_DIRS setting does not exist.
+
+System check identified 1 issue (0 silenced).
+/usr/local/lib/python3.12/site-packages/django/db/models/fields/__init__.py:1595: RuntimeWarning: DateTimeField Property.created_at received a naive datetime (2025-08-20 10:10:27.582887) while time zone support is active.
+  warnings.warn(
+[21/Aug/2025 10:10:27] "GET /health/ HTTP/1.1" 200 161

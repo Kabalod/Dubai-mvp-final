@@ -1,0 +1,4 @@
+NAME            IMAGE                      COMMAND                  SERVICE          CREATED          STATUS                            PORTS
+prod-parser     dubai_mvp-parser-service   "/app/entrypoint.sh тАж"   parser-service   44 seconds ago   Up 32 seconds (healthy)           0.0.0.0:8190->8000/tcp, [::]:8190->8000/tcp
+prod-postgres   postgres:16-alpine         "docker-entrypoint.sтАж"   postgres         9 seconds ago    Up 7 seconds (health: starting)   0.0.0.0:5590->5432/tcp, [::]:5590->5432/tcp
+prod-redis      redis:7-alpine             "docker-entrypoint.sтАж"   redis            44 seconds ago   Up 32 seconds (healthy)           0.0.0.0:6390->6379/tcp, [::]:6390->6379/tcp

@@ -1,0 +1,27 @@
+import RefFilters from "../png/page_004.png";
+
+export const meta = {
+  title: 'Reference/Filters',
+};
+
+# Filters — Reference PNG
+
+<div style={{ display: 'grid', gap: 24 }}>
+  <div>
+    <h3>Reference (PNG)</h3>
+    <img src={RefFilters} alt="filters reference" style={{ width: 960 }} />
+  </div>
+
+  <div>
+    <h3>Overlay (use on demand)</h3>
+    <div style={{ position: 'relative' }}>
+      <img src={RefFilters} alt="overlay" style={{ position: 'absolute', inset: 0, width: '100%', opacity: 0.35, pointerEvents: 'none' }} />
+      <div style={{ position: 'relative', padding: 16, background: 'transparent' }}>
+        {/* Place live filter component from the app here for pixel check */}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
