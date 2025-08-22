@@ -10,7 +10,10 @@ COPY . .
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir psycopg[binary] granian \
     && pip install --no-cache-dir django djangorestframework \
-    && pip install --no-cache-dir django-cors-headers environs
+    && pip install --no-cache-dir django-cors-headers environs \
+    && pip install --no-cache-dir sentry-sdk django-allauth \
+    && pip install --no-cache-dir whitenoise pillow django-extensions \
+    && pip install --no-cache-dir django-health-check
 
 # Создание необходимых директорий
 RUN mkdir -p /app/logs /app/media /app/static
