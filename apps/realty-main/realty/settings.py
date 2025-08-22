@@ -411,7 +411,8 @@ else:
     ]
 
 # Allow all only during development; restrict in production
-CORS_ALLOW_ALL_ORIGINS = DEBUG
+# Временно разрешить все origins для тестирования
+CORS_ALLOW_ALL_ORIGINS = True
 
 # django-litestream
 LITESTREAM = {
