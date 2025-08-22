@@ -8,7 +8,7 @@ COPY . .
 
 # Установка зависимостей без системных пакетов
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir psycopg[binary] granian \
+    && pip install --no-cache-dir psycopg[binary,pool] granian \
     && pip install --no-cache-dir django djangorestframework \
     && pip install --no-cache-dir django-cors-headers environs dj-database-url \
     && pip install --no-cache-dir sentry-sdk django-allauth \
