@@ -13,10 +13,15 @@ const CustomInput: React.FC<CustomInputProps> = ({ variant = "default", classNam
 };
 
 // Attach common subcomponents to keep API parity with antd
-// Password input
-(CustomInput as any).Password = Input.Password;
-// OTP input (available in antd v5)
-(CustomInput as any).OTP = (Input as any).OTP;
+// Wrap to preserve styling classes
+const attachClass = (Cls: any) =>
+  React.forwardRef<any, any>(({ className, variant = "default", ...rest }, ref) => {
+    const rootClass = classNames(styles.customInput, styles[variant], className);
+    return <Cls ref={ref} className={rootClass} {...rest} />;
+  });
+
+(CustomInput as any).Password = attachClass(Input.Password);
+(CustomInput as any).OTP = attachClass((Input as any).OTP);
 
 export type { InputProps };
 export default CustomInput;

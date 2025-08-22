@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ProForm, ProFormText, ProFormCheckbox, ProCard } from '@ant-design/pro-components';
-import { message, Steps, Form, Checkbox } from 'antd';
+import { message, Steps, Form, Checkbox, Button } from 'antd';
 import CustomInput from '@/components/CustomInput/CustomInput';
 import CustomButton from '@/components/CustomButton/CustomButton';
 import styles from './SignUpForm.module.scss';
@@ -210,16 +210,16 @@ const SignUpForm: React.FC = () => {
                         onFinish={handleValidation}
                         submitter={{
                             render: () => (
-                                <Button
+                                <CustomButton
                                     type="primary"
                                     size="large"
                                     htmlType="submit"
                                     block
                                     icon={<CheckCircleOutlined />}
-                                    style={{ height: '48px', fontSize: '16px' }}
+                                    className={styles.primaryButton}
                                 >
                                     CONFIRM
-                                </Button>
+                                </CustomButton>
                             ),
                         }}
                     >

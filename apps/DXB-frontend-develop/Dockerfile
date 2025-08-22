@@ -3,7 +3,7 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install --frozen-lockfile \
+RUN npm ci \
     && npm install -D @lingui/swc-plugin@^5.2.0
 COPY . .
 RUN npm run build

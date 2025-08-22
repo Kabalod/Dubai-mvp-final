@@ -248,8 +248,8 @@ const Analytics: React.FC = () => {
                                         <Statistic
                                             title="Total Properties"
                                             value={15432}
-                                            valueStyle={{ color: "#1890ff" }}
-                                            suffix={<span style={{ fontSize: "14px", color: "#52c41a" }}>↑ +12.5%</span>}
+                                            className={styles.valueBlue}
+                                            suffix={<span className={styles.suffixUpGreen}>↑ +12.5%</span>}
                                         />
                                     </Card>
                                 </Col>
@@ -259,7 +259,7 @@ const Analytics: React.FC = () => {
                                             title="Average Price"
                                             value={2850}
                                             precision={0}
-                                            valueStyle={{ color: "#1890ff" }}
+                                            className={styles.valueBlue}
                                             prefix="$"
                                             suffix="/m² ↑ +8.3%"
                                         />
@@ -270,8 +270,8 @@ const Analytics: React.FC = () => {
                                         <Statistic
                                             title="Total Deals"
                                             value={2156}
-                                            valueStyle={{ color: "#1890ff" }}
-                                            suffix={<span style={{ fontSize: "14px", color: "#52c41a" }}>↑ +18.5%</span>}
+                                            className={styles.valueBlue}
+                                            suffix={<span className={styles.suffixUpGreen}>↑ +18.5%</span>}
                                         />
                                     </Card>
                                 </Col>
@@ -281,7 +281,7 @@ const Analytics: React.FC = () => {
                                             title="Market Volume"
                                             value={82.5}
                                             precision={1}
-                                            valueStyle={{ color: "#1890ff" }}
+                                            className={styles.valueBlue}
                                             prefix="$"
                                             suffix="M ↑ +20.7%"
                                         />
@@ -326,7 +326,7 @@ const Analytics: React.FC = () => {
                                     <Row gutter={[16, 16]}>
                                         <Col span={12}>
                                             <Card title="Market Performance by Area">
-                                                <div style={{ padding: "16px" }}>
+                                                <div className={styles.p16}>
                                                     <h4>Key Market Insights:</h4>
                                                     <ul>
                                                         <li>Downtown Dubai continues to lead in property values</li>
@@ -339,8 +339,8 @@ const Analytics: React.FC = () => {
                                         </Col>
                                         <Col span={12}>
                                             <Card title="Growth Metrics">
-                                                <div style={{ padding: "16px" }}>
-                                                    <Space direction="vertical" style={{ width: "100%" }}>
+                                                <div className={styles.p16}>
+                                                    <Space direction="vertical" className={styles.w100}>
                                                         <div>
                                                             <span>Price Growth: </span>
                                                             <Progress percent={75} status="active" />

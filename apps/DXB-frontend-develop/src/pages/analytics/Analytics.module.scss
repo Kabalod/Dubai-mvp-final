@@ -82,6 +82,18 @@
     }
   }
   .priceCell { font-weight: 700; color: #1890ff; }
+  .textGreenBold { font-weight: 700; color: var(--color-green); }
+
+  .valueGreen :global(.ant-statistic-content-value) { color: var(--color-green) !important; }
+  .valueBlue :global(.ant-statistic-content-value) { color: var(--color-blue) !important; }
+  .valueRed :global(.ant-statistic-content-value) { color: var(--color-red) !important; }
+  .valuePurple :global(.ant-statistic-content-value) { color: var(--color-purple) !important; }
+
+  .suffixUpGreen { font-size: 14px; color: var(--color-green); }
+
+  .p16 { padding: 16px; }
+  .w100 :global(.ant-space) { width: 100%; }
+  .w100 { width: 100%; }
   
   .showMore {
     display: flex;
