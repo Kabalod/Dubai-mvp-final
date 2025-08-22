@@ -1,4 +1,4 @@
-@use "@/styles/typography" as *;
+// типографика подключена глобально через global.scss, удалён локальный @use
 
 .container {
     width: 100%;

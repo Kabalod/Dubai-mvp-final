@@ -11,10 +11,13 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Копирование кода приложения и установка зависимостей из pyproject.toml
-COPY . .
+# Копирование pyproject.toml и установка зависимостей
+COPY pyproject.toml uv.lock ./
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir .
+    && pip install --no-cache-dir -e .
+
+# Копирование остального кода
+COPY . .
 
 # Создание необходимых директорий
 RUN mkdir -p /shared-data \

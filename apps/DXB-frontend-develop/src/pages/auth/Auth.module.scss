@@ -1,4 +1,4 @@
-@use "@/styles/typography" as *;
+// типографика и токены подключены через global.scss, лишний @use удалён
 
 .container {
     display: flex;
@@ -67,6 +67,11 @@
             }
         }
     }
+}
+
+// Алиас для совместимости с разметкой
+.authSegmented {
+    @extend .segments;
 }
 
 .checkbox {

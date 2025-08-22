@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tabs, Form, Input, Button, message, Alert, Spin } from 'antd';
+import { Card, Form, message, Alert, Spin } from 'antd';
+import CustomTabs from '@/components/CustomTabs/CustomTabs';
+import CustomInput from '@/components/CustomInput/CustomInput';
+import CustomButton from '@/components/CustomButton/CustomButton';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-
-const { TabPane } = Tabs;
+import styles from './AuthEnhanced.module.scss';
 
 // ========================================
 // Enhanced Auth Component with API Integration
@@ -62,38 +64,35 @@ const AuthEnhanced: React.FC = () => {
     // Show loading spinner during auth check
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className={styles.loading}>
                 <Spin size="large" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-            <div className="w-full max-w-md">
+        <div className={styles.container}>
+            <div className={styles.wrapper}>
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                <div className={styles.header}>
+                    <h1 className={styles.title}>
                         🏢 Dubai Platform
                     </h1>
-                    <p className="text-gray-600">
+                    <p className={styles.subtitle}>
                         Real Estate Analytics Platform
                     </p>
                 </div>
 
                 {/* Auth Card */}
-                <Card 
-                    className="shadow-xl border-0"
-                    style={{ borderRadius: '12px' }}
-                >
-                    <Tabs 
+                <Card className={styles.card}>
+                    <CustomTabs 
                         activeKey={activeTab} 
-                        onChange={setActiveTab}
-                        centered
-                        size="large"
-                    >
-                        {/* Login Tab */}
-                        <TabPane tab="Sign In" key="login">
+                        onChange={(key) => setActiveTab(key as string)}
+                        items={[
+                            {
+                                key: 'login',
+                                label: 'Sign In',
+                                children: (
                             <Form
                                 form={loginForm}
                                 name="login"
@@ -107,7 +106,7 @@ const AuthEnhanced: React.FC = () => {
                                         { required: true, message: 'Please enter your username!' }
                                     ]}
                                 >
-                                    <Input 
+                                    <CustomInput 
                                         prefix={<UserOutlined />} 
                                         placeholder="Username"
                                         autoComplete="username"
@@ -120,7 +119,7 @@ const AuthEnhanced: React.FC = () => {
                                         { required: true, message: 'Please enter your password!' }
                                     ]}
                                 >
-                                    <Input.Password 
+                                    <CustomInput.Password 
                                         prefix={<LockOutlined />} 
                                         placeholder="Password"
                                         autoComplete="current-password"
@@ -128,29 +127,23 @@ const AuthEnhanced: React.FC = () => {
                                 </Form.Item>
 
                                 <Form.Item>
-                                    <Button 
-                                        type="primary" 
-                                        htmlType="submit" 
-                                        className="w-full h-12"
-                                        loading={isLoading}
-                                    >
+                                    <CustomButton type="primary" htmlType="submit" block loading={isLoading}>
                                         Sign In
-                                    </Button>
+                                    </CustomButton>
                                 </Form.Item>
                             </Form>
 
-                            <div className="text-center">
-                                <Button 
-                                    type="link" 
-                                    onClick={() => setActiveTab('register')}
-                                >
+                            <div className={styles.linkRow}>
+                                <CustomButton type="link" onClick={() => setActiveTab('register')}>
                                     Don't have an account? Sign up
-                                </Button>
+                                </CustomButton>
                             </div>
-                        </TabPane>
-
-                        {/* Register Tab */}
-                        <TabPane tab="Sign Up" key="register">
+                                )
+                            },
+                            {
+                                key: 'register',
+                                label: 'Sign Up',
+                                children: (
                             <Form
                                 form={registerForm}
                                 name="register"
@@ -165,7 +158,7 @@ const AuthEnhanced: React.FC = () => {
                                         { min: 3, message: 'Username must be at least 3 characters!' }
                                     ]}
                                 >
-                                    <Input 
+                                    <CustomInput 
                                         prefix={<UserOutlined />} 
                                         placeholder="Username"
                                         autoComplete="username"
@@ -179,7 +172,7 @@ const AuthEnhanced: React.FC = () => {
                                         { type: 'email', message: 'Please enter a valid email!' }
                                     ]}
                                 >
-                                    <Input 
+                                    <CustomInput 
                                         prefix={<MailOutlined />} 
                                         placeholder="Email"
                                         autoComplete="email"
@@ -189,7 +182,7 @@ const AuthEnhanced: React.FC = () => {
                                 <Form.Item
                                     name="first_name"
                                 >
-                                    <Input 
+                                    <CustomInput 
                                         placeholder="First Name (optional)"
                                         autoComplete="given-name"
                                     />
@@ -198,7 +191,7 @@ const AuthEnhanced: React.FC = () => {
                                 <Form.Item
                                     name="last_name"
                                 >
-                                    <Input 
+                                    <CustomInput 
                                         placeholder="Last Name (optional)"
                                         autoComplete="family-name"
                                     />
@@ -211,7 +204,7 @@ const AuthEnhanced: React.FC = () => {
                                         { min: 8, message: 'Password must be at least 8 characters!' }
                                     ]}
                                 >
-                                    <Input.Password 
+                                    <CustomInput.Password 
                                         prefix={<LockOutlined />} 
                                         placeholder="Password"
                                         autoComplete="new-password"
@@ -233,7 +226,7 @@ const AuthEnhanced: React.FC = () => {
                                         }),
                                     ]}
                                 >
-                                    <Input.Password 
+                                    <CustomInput.Password 
                                         prefix={<LockOutlined />} 
                                         placeholder="Confirm Password"
                                         autoComplete="new-password"
@@ -241,37 +234,30 @@ const AuthEnhanced: React.FC = () => {
                                 </Form.Item>
 
                                 <Form.Item>
-                                    <Button 
-                                        type="primary" 
-                                        htmlType="submit" 
-                                        className="w-full h-12"
-                                        loading={isLoading}
-                                    >
+                                    <CustomButton type="primary" htmlType="submit" block loading={isLoading}>
                                         Create Account
-                                    </Button>
+                                    </CustomButton>
                                 </Form.Item>
                             </Form>
-
-                            <div className="text-center">
-                                <Button 
-                                    type="link" 
-                                    onClick={() => setActiveTab('login')}
-                                >
+                            <div className={styles.linkRow}>
+                                <CustomButton type="link" onClick={() => setActiveTab('login')}>
                                     Already have an account? Sign in
-                                </Button>
+                                </CustomButton>
                             </div>
-                        </TabPane>
-                    </Tabs>
+                                )
+                            }
+                        ]}
+                    />
                 </Card>
 
                 {/* Demo Notice */}
-                <div className="mt-6">
+                <div className={styles.notice}>
                     <Alert
                         message="MVP Demo"
                         description="This is a demo version. Your data is for testing purposes only."
                         type="info"
                         showIcon
-                        className="text-center"
+                        className={styles.alert}
                     />
                 </div>
             </div>
