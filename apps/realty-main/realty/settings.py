@@ -118,20 +118,10 @@ THIRD_PARTY_APPS = [
     "rest_framework_simplejwt",
     # Email backend
     "anymail",
-    # Зависимости моделей
-    "django_tasks",
-    "django_tasks.backends.database",
-    # Django Allauth для аутентификации
-    "allauth",
-    "allauth.account",
 ]
 
 LOCAL_APPS = [
-    "realty.core",
-    "realty.main",
-    "realty.pfimport",
-    "realty.building_reports",
-    "realty.reports",
+    # Только API для OTP системы
     "realty.api",  # MVP REST API
 ]
 

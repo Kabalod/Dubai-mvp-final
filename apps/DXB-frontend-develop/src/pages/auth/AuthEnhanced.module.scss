@@ -1,5 +1,4 @@
-@use "@/styles/typography" as *;
-@use "@/styles/tokens" as *;
+// типографика и токены уже глобально подключены через global.scss
 
 .loading {
   min-height: 100vh;
