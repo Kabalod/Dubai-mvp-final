@@ -199,6 +199,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Отключено для MVP (убрали allauth urls)
     # "allauth.account.middleware.AccountMiddleware",
+    # Метрики HTTP для API
+    "realty.api.middleware.MetricsMiddleware",
 ]
 if DEBUG:
     MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
@@ -310,7 +312,9 @@ STATIC_ROOT = APPS_DIR / "staticfiles"
 
 STATIC_URL = "/static/"
 
-STATICFILES_DIRS = [APPS_DIR / "static"]
+# Добавляем каталог со статикой только если он существует, чтобы избежать предупреждений
+_project_static_dir = APPS_DIR / "static"
+STATICFILES_DIRS = [_project_static_dir] if _project_static_dir.exists() else []
 
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -344,7 +348,6 @@ SOCIALACCOUNT_PROVIDERS = {
         "SCOPE": ["profile", "email"],
     }
 }
-
 
 # django-anymail
 if PROD:
