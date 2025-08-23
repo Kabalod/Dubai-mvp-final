@@ -37,6 +37,8 @@ RUN pip install --no-cache-dir --upgrade pip==25.2 \
         djangorestframework==3.15.2 \
         # Authentication
         djangorestframework-simplejwt==5.3.0 \
+        # Validation (required by settings.py)
+        marshmallow==3.21.3 \
         # CORS & Security
         django-cors-headers==4.6.0 \
         # Email
@@ -49,6 +51,8 @@ RUN pip install --no-cache-dir --upgrade pip==25.2 \
         whitenoise==6.8.2 \
         # Cache backend (для PROD совместимости)
         diskcache==5.6.3 \
+        # Monitoring
+        prometheus-client==0.20.0 \
     && pip cache purge
 
 # Копирование кода приложения
@@ -74,5 +78,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/api/health/ || exit 1
 
-# Команда запуска
-CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py runserver 0.0.0.0:8000"]
+# Команда запуска: миграции + сбор статики + запуск
+CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
