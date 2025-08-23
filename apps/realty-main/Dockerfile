@@ -48,6 +48,11 @@ RUN pip install --no-cache-dir --upgrade pip==25.2 \
         python-dateutil==2.9.0.post0 \
         pillow==11.1.0 \
         whitenoise==6.8.2 \
+        # Missing packages detected by comprehensive check
+        django-lifecycle==1.2.3 \
+        django-tasks==0.0.0 \
+        falco-app==0.3.2 \
+        strawberry-graphql-django==0.50.0 \
     && pip cache purge
 
 # Копирование кода приложения

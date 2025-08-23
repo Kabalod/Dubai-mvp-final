@@ -82,7 +82,8 @@ if PROD:
         DATABASES["default"]["OPTIONS"] = {"pool": True}
         DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
-# DATABASE_ROUTERS = ["falco.db_routers.DBTaskRouter"]  # Отключено для MVP
+# Полностью отключено роутирование через falco для MVP
+DATABASE_ROUTERS = []
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
