@@ -52,9 +52,7 @@ RUN apk add --no-cache \
     curl \
     tzdata
 
-# Создание пользователя nginx
-RUN addgroup -g 101 -S nginx \
-    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx
+# Пользователь nginx уже существует в образе nginx:alpine
 
 # Копирование собранного приложения
 COPY --from=builder --chown=nginx:nginx /app/dist /usr/share/nginx/html
