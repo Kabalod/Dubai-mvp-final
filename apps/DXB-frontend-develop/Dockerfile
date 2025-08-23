@@ -110,3 +110,9 @@ EXPOSE 3000
 
 # Команда для разработки
 CMD ["yarn", "dev", "--host", "0.0.0.0"]
+
+# ================================
+# Stage 4: Final (default build target for PaaS)
+# Ensure platforms that build the LAST stage use production image with Nginx
+# ================================
+FROM production AS final
