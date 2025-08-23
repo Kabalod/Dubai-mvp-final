@@ -5,6 +5,7 @@ import CustomButton from "@/components/CustomButton/CustomButton";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import "@/styles/custom-buttons.scss";
 import styles from "./Header.module.scss";
+import apiService from "@/services/apiService";
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -52,16 +53,25 @@ const Header: React.FC = () => {
                     />
                 </div>
 
-                {/* Right side - Auth Button */}
+                {/* Right side - Auth/Profile */}
                 <div className={styles.rightSection}>
-                    <CustomButton 
-                        variant="outline" 
-                        size="small" 
-                        onClick={() => navigate("/auth")}
-                        className={styles.signInButton}
-                    >
-                        Sign in
-                    </CustomButton>
+                    {apiService.isAuthenticated() ? (
+                        <div className={styles.userMenu}>
+                            <span className={styles.userEmail}>{JSON.parse(localStorage.getItem('user') || '{}')?.email || 'User'}</span>
+                            <span className={styles.userRole}>{JSON.parse(localStorage.getItem('user') || '{}')?.role || 'free'}</span>
+                            <CustomButton variant="outline" size="small" onClick={() => navigate('/profile')}>Profile</CustomButton>
+                            <CustomButton variant="primary" size="small" onClick={async()=>{ await apiService.logout(); navigate('/auth'); }}>Logout</CustomButton>
+                        </div>
+                    ) : (
+                        <CustomButton 
+                            variant="outline" 
+                            size="small" 
+                            onClick={() => navigate("/auth")}
+                            className={styles.signInButton}
+                        >
+                            Sign in
+                        </CustomButton>
+                    )}
                 </div>
             </div>
         </div>

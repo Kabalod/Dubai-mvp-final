@@ -20,6 +20,8 @@ urlpatterns = [
     # OTP Authentication
     path('auth/send-otp/', views.send_otp_code, name='send_otp_code'),
     path('auth/verify-otp/', views.verify_otp_code, name='verify_otp_code'),
+    # Profile
+    # path('auth/profile/', views.profile_me, name='profile_me'),
     
     # Properties
     path('properties/', views.properties_list, name='properties_list'),

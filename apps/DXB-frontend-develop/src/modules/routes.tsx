@@ -5,6 +5,7 @@ import NotFound from "@/pages/NotFound";
 import { Landing } from "@/pages/landing";
 import Analytics from "@/pages/analytics/Analytics";
 import Policy from "@/pages/Policy/Policy";
+import Profile from "@/pages/Profile";
 
 export default function AppRoutes() {
     return (
@@ -13,6 +14,7 @@ export default function AppRoutes() {
             <Route path="/landing" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/analytics" element={<Analytics />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/policy" element={<Policy />} />
             <Route path="*" element={<NotFound />} />
         </Routes>

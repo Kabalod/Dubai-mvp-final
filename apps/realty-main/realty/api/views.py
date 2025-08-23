@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import IsPaidUser, IsAdminUserStrict
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -20,10 +21,23 @@ import os
 import base64
 
 # Импорты только для OTP системы (MVP)
-from .models import OTPCode
+from .models import OTPCode, UserProfile
 
 # Сериализаторы для MVP (только базовые)
 from rest_framework import serializers
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile_me(request):
+    user = request.user
+    profile = getattr(user, 'profile', None)
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'role': getattr(profile, 'role', UserProfile.ROLE_FREE),
+    })
 
 class UserRegistrationSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
@@ -119,6 +133,8 @@ def register(request):
     user.save()
 
     refresh = RefreshToken.for_user(user)
+    # Embed role claim into JWT
+    refresh['role'] = getattr(user.profile, 'role', UserProfile.ROLE_FREE)
 
     return Response({
         'message': 'User created successfully' if created else 'User updated successfully',
@@ -128,6 +144,7 @@ def register(request):
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
+            'role': getattr(user.profile, 'role', UserProfile.ROLE_FREE),
         },
         'tokens': {
             'refresh': str(refresh),
@@ -211,6 +228,7 @@ def google_callback(request):
         username=email, defaults={'email': email, 'first_name': given_name, 'last_name': family_name, 'is_active': True}
     )
     refresh = RefreshToken.for_user(user)
+    refresh['role'] = getattr(user.profile, 'role', UserProfile.ROLE_FREE)
     # Если задан URL фронтенда, делаем редирект с токенами в hash-параметрах
     frontend_url = os.environ.get('FRONTEND_CALLBACK_URL') or os.environ.get('FRONTEND_URL')
     if frontend_url:
@@ -231,6 +249,7 @@ def google_callback(request):
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
+            'role': getattr(user.profile, 'role', UserProfile.ROLE_FREE),
         },
         'tokens': {'refresh': str(refresh), 'access': str(refresh.access_token)},
     })
@@ -248,6 +267,7 @@ def login(request):
         user = authenticate(username=username, password=password)
         if user:
             refresh = RefreshToken.for_user(user)
+            refresh['role'] = getattr(user.profile, 'role', UserProfile.ROLE_FREE)
             
             return Response({
                 'message': 'Login successful',
@@ -257,6 +277,7 @@ def login(request):
                     'email': user.email,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
+                    'role': getattr(user.profile, 'role', UserProfile.ROLE_FREE),
                 },
                 'tokens': {
                     'refresh': str(refresh),
@@ -396,6 +417,7 @@ def verify_otp_code(request):
             
             # Генерируем JWT токены
             refresh = RefreshToken.for_user(user)
+            refresh['role'] = getattr(user.profile, 'role', UserProfile.ROLE_FREE)
             
             return Response({
                 'message': 'OTP verification successful',
@@ -406,6 +428,7 @@ def verify_otp_code(request):
                     'email': user.email,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
+                    'role': getattr(user.profile, 'role', UserProfile.ROLE_FREE),
                 },
                 'tokens': {
                     'refresh': str(refresh),
@@ -461,7 +484,7 @@ def buildings_list(request):
     })
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsPaidUser])
 def analytics_summary(request):
     """MVP: Basic analytics with OTP stats."""
     otp_count = OTPCode.objects.count()
@@ -476,7 +499,7 @@ def analytics_summary(request):
     })
 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAdminUserStrict])
 def building_reports(request):
     """MVP: Placeholder for building reports."""
     return Response({
