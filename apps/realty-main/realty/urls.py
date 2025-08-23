@@ -10,7 +10,11 @@ from django.http import HttpResponse
 from django.urls import include
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
-from falco.urls import errors_urlpatterns
+try:
+    # Используем только в DEBUG; в проде отсутствует
+    from falco.urls import errors_urlpatterns
+except Exception:
+    errors_urlpatterns = []
 from health_check.views import MainView
 # from realty.main.schema import schema
 # from strawberry.django.views import GraphQLView

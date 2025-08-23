@@ -390,7 +390,8 @@ LITESTREAM = {
 # django-tasks
 TASKS = {
     "default": {
-        "BACKEND": "django_tasks.backends.database.DatabaseBackend",
+        # Отключаем django_tasks для MVP, чтобы не тянуть лишние зависимости
+        # "BACKEND": "django_tasks.backends.database.DatabaseBackend",
         "OPTIONS": {"database": "tasks_db"},
     }
 }

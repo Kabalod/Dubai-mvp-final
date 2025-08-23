@@ -67,10 +67,10 @@ services:
   frontend:
     build:
       context: ./apps/DXB-frontend-develop
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.optimized
       target: development
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000
+      - VITE_FRONTEND_API_URL=http://localhost:8000
     ports:
       - "3000:3000"
     volumes:
