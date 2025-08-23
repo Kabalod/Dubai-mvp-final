@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ('processed_at', models.DateTimeField(blank=True, null=True)),
                 ('attempt_count', models.PositiveIntegerField(default=0)),
                 ('error', models.TextField(blank=True, null=True)),
-                ('payment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='api.payment')),
+                ('payment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='api.Payment')),
             ],
             options={'db_table': 'api_payment_event_audit'},
         ),
@@ -42,5 +42,3 @@ class Migration(migrations.Migration):
             constraint=models.UniqueConstraint(fields=('provider', 'event_id'), name='uniq_provider_event'),
         ),
     ]
-
-
