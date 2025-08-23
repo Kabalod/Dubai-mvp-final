@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.conf import settings
 import datetime
 import json
@@ -578,10 +579,32 @@ def analytics_summary(request):
     })
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdminUserStrict])
 def reports_list(request):
-    """User reports list with pagination (owned by current user)."""
-    qs = Report.objects.filter(user=request.user).order_by('-created_at')
+    """Admin reports list with pagination and optional filters."""
+    qs = Report.objects.all().order_by('-created_at')
+
+    # Optional filters
+    user_id = request.query_params.get('user_id')
+    if user_id:
+        qs = qs.filter(user_id=user_id)
+
+    status_param = request.query_params.get('status')
+    if status_param:
+        qs = qs.filter(status=status_param)
+
+    created_from = request.query_params.get('created_from')
+    if created_from:
+        dt_from = parse_datetime(created_from)
+        if dt_from:
+            qs = qs.filter(created_at__gte=dt_from)
+
+    created_to = request.query_params.get('created_to')
+    if created_to:
+        dt_to = parse_datetime(created_to)
+        if dt_to:
+            qs = qs.filter(created_at__lte=dt_to)
+
     limit = int(request.query_params.get('limit', 20))
     offset = int(request.query_params.get('offset', 0))
     total = qs.count()
@@ -619,7 +642,7 @@ def billing_webhook(request, provider: str):
     provider_impl = get_provider(provider, secret)
 
     if not provider_impl.verify_signature(raw_body, headers):
-        return Response({'error': 'invalid signature'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'error': 'invalid signature'}, status=status.HTTP_400_BAD_REQUEST)
 
     event_type, event_id, normalized = provider_impl.parse_event(raw_body, headers)
     idempotency_key = headers.get('x-idempotency-key')
@@ -640,7 +663,7 @@ def billing_webhook(request, provider: str):
 
     if not created:
         # Уже обрабатывали — безопасно вернуть 200 (идемпотентность)
-        return Response({'status': 'duplicate', 'event_id': event_id})
+        return Response({'status': 'ok', 'idempotent': True, 'event_id': event_id})
 
     # Обработка событий без изменения публичного API
     try:

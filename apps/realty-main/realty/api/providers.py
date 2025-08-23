@@ -43,7 +43,12 @@ class MockProvider:
         return mac.hexdigest()
 
     def verify_signature(self, raw_body: bytes, headers: Dict[str, str]) -> bool:
-        sent = headers.get('x-mock-signature') or headers.get('X-Mock-Signature')
+        sent = (
+            headers.get('x-mock-signature')
+            or headers.get('X-Mock-Signature')
+            or headers.get('x-provider-signature')
+            or headers.get('X-Provider-Signature')
+        )
         if not sent:
             return False
         expected = self._compute_signature(raw_body)

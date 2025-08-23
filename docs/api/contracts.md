@@ -38,7 +38,7 @@ POST `/api/billing/webhook/{provider}/`
 
 - Для mock: `{provider} = mock`
 - Заголовки:
-  - `X-Mock-Signature`: hex(HMAC_SHA256(secret, raw_body)) — обязателен
+  - `X-Mock-Signature` или `X-Provider-Signature`: hex(HMAC_SHA256(secret, raw_body)) — обязателен
   - `X-Mock-Event-Id`: уникальный ID события (рекомендуется)
   - `X-Idempotency-Key`: опционально
 - Тело (пример):
@@ -57,8 +57,9 @@ POST `/api/billing/webhook/{provider}/`
 
 - Ответы:
   - 200 `{ "status": "ok", "event_id": "..." }`
-  - 200 `{ "status": "duplicate", "event_id": "..." }`
-  - 401 `{ "error": "invalid signature" }`
+  - 200 `{ "status": "ok", "idempotent": true, "event_id": "..." }`
+  - 400 `{ "error": "invalid signature" }`
+  - 422 `{ "error": "invalid payload" }`
   - 500 `{ "error": "processing failed" }`
 
 - События → статусы `Payment.status`:
@@ -75,7 +76,7 @@ POST `/api/billing/webhook/{provider}/`
 
 Доступ: только для роли admin (IsAdminUserStrict).
 
-GET `/api/reports?limit=20&offset=0`
+GET `/api/reports?limit=20&offset=0&user_id=&status=&created_from=&created_to=`
 
 Response
 
