@@ -47,6 +47,8 @@ RUN pip install --no-cache-dir --upgrade pip==25.2 \
         python-dateutil==2.9.0.post0 \
         pillow==11.1.0 \
         whitenoise==6.8.2 \
+        # Cache backend (для PROD совместимости)
+        diskcache==5.6.3 \
     && pip cache purge
 
 # Копирование кода приложения

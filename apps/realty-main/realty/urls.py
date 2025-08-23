@@ -4,7 +4,7 @@ import os
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth.decorators import login_not_required
+# login_not_required отсутствует в Django 4.2 — используем прямой view без декоратора
 from django.http import FileResponse
 from django.http import HttpResponse
 from django.urls import include
@@ -15,7 +15,11 @@ try:
     from falco.urls import errors_urlpatterns
 except Exception:
     errors_urlpatterns = []
-from health_check.views import MainView
+# Health check через отдельный пакет не обязателен в MVP
+try:
+    from health_check.views import MainView  # type: ignore
+except Exception:  # pragma: no cover
+    MainView = None
 # from realty.main.schema import schema
 # from strawberry.django.views import GraphQLView
 from django.views.generic import RedirectView
@@ -49,24 +53,26 @@ urlpatterns = [
     # path(".well-known/security.txt", falco_views.security_txt),
     # path("robots.txt", falco_views.robots_txt),
     # path("", include(favicon_urlpatterns)),
-    path(
-        "home/",
-        RedirectView.as_view(url=reverse_lazy("rental_transactions_list")),
-        name="home",
-    ),
+    # path(
+    #     "home/",
+    #     RedirectView.as_view(url=reverse_lazy("rental_transactions_list")),
+    #     name="home",
+    # ),
     # path(
     #     "graphql/",
     #     csrf_exempt(GraphQLView.as_view(schema=schema, graphiql=True)),
     # ),
-    path("health/", login_not_required(MainView.as_view())),
-    path("accounts/", include("allauth.urls")),
+    # Локальный health-check пакетом optional
+    *([path("health/", MainView.as_view())] if MainView else []),
+    # Отключено для MVP: allauth не используется
+    # path("accounts/", include("allauth.urls")),
     path("api/", include("realty.api.urls")),
     path(settings.ADMIN_URL, admin.site.urls),
-    path("download-dbdump/<str:filename>/", download_db_dump, name="download-db-dump"),
-    path("", include("realty.main.urls")),
-    path("experiments/", include("realty.pfimport.urls")),
-    path("", include("realty.building_reports.urls")),
-    path("r2d2/", include("realty.reports.urls", namespace="reports")),
+    # path("download-dbdump/<str:filename>/", download_db_dump, name="download-db-dump")),
+    # path("", include("realty.main.urls")),
+    # path("experiments/", include("realty.pfimport.urls")),
+    # path("", include("realty.building_reports.urls")),
+    # path("r2d2/", include("realty.reports.urls", namespace="reports")),
 ]
 
 # DEBUG

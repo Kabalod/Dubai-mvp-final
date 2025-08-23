@@ -35,7 +35,7 @@ services:
       context: ./apps/realty-main
       dockerfile: Dockerfile
     environment:
-      - DEBUG=1
+      - DEBUG=0
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/dubai_mvp
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=dev-secret-key-change-in-production
@@ -43,6 +43,7 @@ services:
       - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
       - DEFAULT_FROM_EMAIL=dev@localhost
       - SENDGRID_API_KEY=${SENDGRID_API_KEY:-}
+      - SECURE_SSL_REDIRECT=false
     ports:
       - "8000:8000"
     depends_on:

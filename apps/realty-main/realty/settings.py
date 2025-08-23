@@ -44,7 +44,8 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",
     }
 }
-if PROD:
+# Включать diskcache только если явно указано переменной окружения
+if PROD and env.bool("USE_DISKCACHE", default=False):
     # https://grantjenks.com/docs/diskcache/tutorial.html#djangocache
     CACHES["default"] = {
         "BACKEND": "diskcache.DjangoCache",
@@ -79,7 +80,6 @@ if PROD:
             """,
         }
     elif DATABASES["default"]["ENGINE"] == "django.db.backends.postgresql":
-        DATABASES["default"]["OPTIONS"] = {"pool": True}
         DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 # Полностью отключено роутирование через falco для MVP
@@ -195,7 +195,8 @@ MIDDLEWARE = [
     # "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
+    # Отключено для MVP (убрали allauth urls)
+    # "allauth.account.middleware.AccountMiddleware",
 ]
 if DEBUG:
     MIDDLEWARE.append("django_browser_reload.middleware.BrowserReloadMiddleware")
@@ -283,7 +284,6 @@ WSGI_APPLICATION = "realty.wsgi.application"
 # django.contrib.auth
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
