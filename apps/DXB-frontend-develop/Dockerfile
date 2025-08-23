@@ -70,8 +70,7 @@ RUN mkdir -p /var/cache/nginx/client_temp \
     && chown -R nginx:nginx /usr/share/nginx/html \
     && chmod -R 755 /usr/share/nginx/html
 
-# Переключение на непривилегированного пользователя
-USER nginx
+# Запуск под root (нужен доступ к /var/run/nginx.pid в nginx:alpine)
 
 # Порт
 EXPOSE 80
