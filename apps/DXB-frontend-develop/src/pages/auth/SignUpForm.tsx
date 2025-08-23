@@ -172,8 +172,31 @@ const SignUpForm: React.FC = () => {
         return '';
     };
 
-    const resendCode = () => {
-        console.log("resend code");
+    const resendCode = async () => {
+        try {
+            if (!email) {
+                message.warning('Введите email на первом шаге');
+                return;
+            }
+
+            console.log('Resend OTP to:', email);
+            const response = await fetch(`${API_BASE_URL}/auth/send-otp/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+            });
+
+            const data = await response.json().catch(() => ({}));
+            if (response.ok) {
+                message.success('Код отправлен повторно');
+            } else {
+                console.error('Failed to resend OTP:', data?.error);
+                message.error(data?.error || 'Не удалось отправить код повторно');
+            }
+        } catch (err) {
+            console.error('Resend OTP error:', err);
+            message.error('Ошибка соединения при повторной отправке');
+        }
     };
 
     const steps = [
