@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProForm, ProFormText, ProFormCheckbox, ProCard } from '@ant-design/pro-components';
 import { message, Steps, Form, Checkbox, Button, Input } from 'antd';
 import CustomInput from '@/components/CustomInput/CustomInput';
@@ -24,6 +24,18 @@ interface FieldType {
 const SignUpForm: React.FC = () => {
     const [currentStep, setCurrentStep] = useState<FormSteps>(FormSteps.Join);
     const [email, setEmail] = useState<string>('');
+    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [sendingOtp, setSendingOtp] = useState<boolean>(false);
+    const [verifyingOtp, setVerifyingOtp] = useState<boolean>(false);
+    const [resendCooldown, setResendCooldown] = useState<number>(0);
+
+    // Восстанавливаем email при монтировании (если страница обновлялась)
+    useEffect(() => {
+        const saved = localStorage.getItem('signup-email');
+        if (saved && !email) {
+            setEmail(saved);
+        }
+    }, []);
     const [otpLength] = useState<number>(6);
     const navigate = useNavigate();
 
@@ -34,9 +46,12 @@ const SignUpForm: React.FC = () => {
         
         try {
             setEmail(values.email as string);
+            // Сохраняем email, чтобы не потерять на шаге Complete при обновлении страницы
+            localStorage.setItem('signup-email', values.email as string);
             console.log('Email set to state:', values.email);
             
             console.log('About to send OTP request to:', `${API_BASE_URL}/auth/send-otp/`);
+            setSendingOtp(true);
             
             const response = await fetch(`${API_BASE_URL}/auth/send-otp/`, {
                 method: 'POST',
@@ -55,6 +70,7 @@ const SignUpForm: React.FC = () => {
             if (response.ok) {
                 console.log('OTP sent successfully, moving to Confirm step');
                 setCurrentStep(FormSteps.Confirm);
+                setResendCooldown(60);
             } else {
                 console.error('Failed to send OTP:', data.error);
                 alert(`Ошибка отправки кода: ${data.error}`);
@@ -62,6 +78,8 @@ const SignUpForm: React.FC = () => {
         } catch (err) {
             console.error('Error in handleSignUp:', err);
             alert('Ошибка соединения с сервером');
+        } finally {
+            setSendingOtp(false);
         }
     };
 
@@ -76,6 +94,7 @@ const SignUpForm: React.FC = () => {
             
             console.log('About to verify OTP:', `${API_BASE_URL}/auth/verify-otp/`);
             
+            setVerifyingOtp(true);
             const response = await fetch(`${API_BASE_URL}/auth/verify-otp/`, {
                 method: 'POST',
                 headers: {
@@ -98,8 +117,8 @@ const SignUpForm: React.FC = () => {
                 
                 // Сохраняем токены
                 if (data.tokens) {
-                    localStorage.setItem("auth-token", data.tokens.access);
-                    localStorage.setItem("refresh-token", data.tokens.refresh);
+                    localStorage.setItem('accessToken', data.tokens.access);
+                    localStorage.setItem('refreshToken', data.tokens.refresh);
                     console.log('Tokens saved to localStorage');
                 }
                 
@@ -112,6 +131,8 @@ const SignUpForm: React.FC = () => {
         } catch (err) {
             console.error('Error in handleValidation:', err);
             alert('Ошибка проверки кода');
+        } finally {
+            setVerifyingOtp(false);
         }
     };
 
@@ -123,13 +144,16 @@ const SignUpForm: React.FC = () => {
             console.log("Registration data:", values);
             console.log("Email from state:", email);
             
-            if (!email) {
+            // Подстраховка: читаем email из localStorage
+            const effectiveEmail = email || localStorage.getItem('signup-email') || '';
+            if (!effectiveEmail) {
                 console.log('No email in state, showing error');
                 message.error('Email is required. Please go back to email step.');
                 return;
             }
             
             console.log('About to send fetch request...');
+            setSubmitting(true);
             
             const response = await fetch(`${API_BASE_URL}/auth/register/`, {
                 method: 'POST',
@@ -137,9 +161,9 @@ const SignUpForm: React.FC = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    email: email,
+                    email: effectiveEmail,
                     password: values.password,
-                    username: email, // Используем email как username
+                    username: effectiveEmail, // Используем email как username
                     first_name: values.name.split(' ')[0] || '',
                     last_name: values.name.split(' ').slice(1).join(' ') || '',
                 }),
@@ -162,6 +186,8 @@ const SignUpForm: React.FC = () => {
         } catch (error) {
             console.error('Registration error:', error);
             message.error('Registration error. Please try again.');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -172,10 +198,20 @@ const SignUpForm: React.FC = () => {
         return '';
     };
 
+    // Тикер кулдауна
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+        const id = setInterval(() => setResendCooldown((v) => v - 1), 1000);
+        return () => clearInterval(id);
+    }, [resendCooldown]);
+
     const resendCode = async () => {
         try {
             if (!email) {
                 message.warning('Введите email на первом шаге');
+                return;
+            }
+            if (resendCooldown > 0) {
                 return;
             }
 
@@ -189,6 +225,7 @@ const SignUpForm: React.FC = () => {
             const data = await response.json().catch(() => ({}));
             if (response.ok) {
                 message.success('Код отправлен повторно');
+                setResendCooldown(60);
             } else {
                 console.error('Failed to resend OTP:', data?.error);
                 message.error(data?.error || 'Не удалось отправить код повторно');
@@ -245,8 +282,10 @@ const SignUpForm: React.FC = () => {
                                     block
                                     icon={<MailOutlined />}
                                     className={styles.primaryButton}
+                                loading={sendingOtp}
+                                disabled={sendingOtp}
                                 >
-                                    SIGN UP
+                                    {sendingOtp ? 'Sending...' : 'SIGN UP'}
                                 </CustomButton>
                             ),
                         }}
@@ -279,8 +318,10 @@ const SignUpForm: React.FC = () => {
                                     block
                                     icon={<CheckCircleOutlined />}
                                     className={styles.primaryButton}
+                                loading={verifyingOtp}
+                                disabled={verifyingOtp}
                                 >
-                                    CONFIRM
+                                    {verifyingOtp ? 'Confirming...' : 'CONFIRM'}
                                 </CustomButton>
                             ),
                         }}
@@ -308,8 +349,8 @@ const SignUpForm: React.FC = () => {
                         />
 
                         <div className={styles.centerBlock}>
-                            <CustomButton type="link" onClick={resendCode}>
-                                Send the code again
+                            <CustomButton type="link" onClick={resendCode} disabled={resendCooldown > 0}>
+                                {resendCooldown > 0 ? `Send the code again (${resendCooldown}s)` : 'Send the code again'}
                             </CustomButton>
                         </div>
                     </ProForm>
@@ -324,6 +365,7 @@ const SignUpForm: React.FC = () => {
                                     type="primary"
                                     size="large"
                                     htmlType="submit"
+                                    loading={submitting}
                                     block
                                     icon={<UserOutlined />}
                                     className={styles.primaryButton}

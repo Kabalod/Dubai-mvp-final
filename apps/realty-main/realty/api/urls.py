@@ -13,6 +13,9 @@ urlpatterns = [
     path('auth/login/', views.login, name='login'),
     path('auth/logout/', views.logout, name='logout'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # Google OAuth
+    path('auth/google/login/', views.google_login, name='google_login'),
+    path('auth/google/callback/', views.google_callback, name='google_callback'),
     
     # OTP Authentication
     path('auth/send-otp/', views.send_otp_code, name='send_otp_code'),

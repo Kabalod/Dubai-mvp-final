@@ -21,3 +21,23 @@ py Storybook\scripts\pdf_to_assets.py "Storybook/Book_component.pdf" "Storybook/
 3) Откройте Storybook и сравните с реализацией
 
 
+Итоговые компоненты (драфт)
+
+- Auth
+  - GoogleButton (loading/disabled)
+  - AuthLayout (двухколоночный макет)
+  - OtpInput (см. `components/ui/input-otp.tsx`)
+
+- Analytics
+  - FiltersBar (категории + select + Search)
+  - OverviewCard (метрики)
+  - ChartCard (placeholder для графиков)
+  - CollapseCard (секция с разворачиванием)
+
+- Transactions
+  - TransactionsTable (таблица + Show more)
+
+- UI primitives
+  - SegmentedGroup (Sales/Rental)
+  - KPI‑Badge (+/– проценты)
+

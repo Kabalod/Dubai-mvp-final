@@ -1,10 +1,18 @@
 import React, { useState } from "react";
-import { Card, Table, Collapse, Segmented, DatePicker, Progress, Statistic, Row, Col, Tag, Space, Tooltip } from "antd";
+import { Card, Collapse, Segmented, DatePicker, Progress, Row, Col, Tag, Space, Divider } from "antd";
+import type { Dayjs } from 'dayjs';
 import CustomButton from "@/components/CustomButton/CustomButton";
 import CustomSelect from "@/components/CustomSelect/CustomSelect";
 import CustomTabs from "@/components/CustomTabs/CustomTabs";
+import SegmentedGroup from "@/components/Segmented/SegmentedGroup";
+import FiltersBar from "@/components/Analytics/FiltersBar";
+import OverviewCard from "@/components/Analytics/OverviewCard";
+import ChartCard from "@/components/Analytics/ChartCard";
+// CollapseCard оставлен на будущее (Liquidity/ROI)
+import KpiBadge from "@/components/KPI/KpiBadge";
+import TransactionsTable from "@/components/Transactions/TransactionsTable";
 import CustomInput from "@/components/CustomInput/CustomInput";
-import { SearchOutlined, FilterOutlined, DownloadOutlined, EyeOutlined, BarChartOutlined, LineChartOutlined, PieChartOutlined } from "@ant-design/icons";
+import { SearchOutlined, FilterOutlined, DownloadOutlined, BarChartOutlined, LineChartOutlined, PieChartOutlined } from "@ant-design/icons";
 import styles from "./Analytics.module.scss";
 
 // replaced Select with CustomSelect; Option not used
@@ -15,12 +23,26 @@ const Analytics: React.FC = () => {
     const [selectedArea, setSelectedArea] = useState<string>("all");
     const [selectedProject, setSelectedProject] = useState<string>("all");
     const [selectedBuilding, setSelectedBuilding] = useState<string>("all");
-    const [dateRange, setDateRange] = useState<any>(null);
+    const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
     const [searchText, setSearchText] = useState<string>("");
     const [activeTab, setActiveTab] = useState<string>("overview");
+    const [catalogMode, setCatalogMode] = useState<string>("developer");
+    const [salesMode, setSalesMode] = useState<string>("sales");
 
     // Моковые данные для таблицы
-    const tableData = [
+    type TableRow = {
+        key: string;
+        area: string;
+        project: string;
+        building: string;
+        price: string;
+        deals: number;
+        volume: string;
+        status: string;
+        trend: string;
+    };
+
+    const tableData: TableRow[] = [
         {
             key: "1",
             area: "Downtown Dubai",
@@ -56,71 +78,8 @@ const Analytics: React.FC = () => {
         },
     ];
 
-    const columns = [
-        {
-            title: "Area",
-            dataIndex: "area",
-            key: "area",
-            render: (text: string) => <Tag color="blue">{text}</Tag>,
-        },
-        {
-            title: "Project",
-            dataIndex: "project",
-            key: "project",
-        },
-        {
-            title: "Building",
-            dataIndex: "building",
-            key: "building",
-        },
-        {
-            title: "Price",
-            dataIndex: "price",
-            key: "price",
-            render: (text: string) => <span className={styles.priceCell}>{text}</span>,
-        },
-        {
-            title: "Deals",
-            dataIndex: "deals",
-            key: "deals",
-            render: (deals: number) => (
-                <Space>
-                    <span>{deals}</span>
-                    <Progress percent={deals} size="small" showInfo={false} />
-                </Space>
-            ),
-        },
-        {
-            title: "Volume",
-            dataIndex: "volume",
-            key: "volume",
-            render: (text: string) => <span className={styles.volumeCell}>{text}</span>,
-        },
-        {
-            title: "Status",
-            dataIndex: "status",
-            key: "status",
-            render: (status: string) => (
-                <Tag color={status === "active" ? "green" : "orange"}>
-                    {status === "active" ? "Active" : "Pending"}
-                </Tag>
-            ),
-        },
-        {
-            title: "Actions",
-            key: "actions",
-            render: () => (
-                <Space>
-                    <Tooltip title="View Details">
-                        <CustomButton variant="link" icon={<EyeOutlined />} size="small" />
-                    </Tooltip>
-                    <Tooltip title="Download Report">
-                        <CustomButton variant="link" icon={<DownloadOutlined />} size="small" />
-                    </Tooltip>
-                </Space>
-            ),
-        },
-    ];
+    // columns оставлены для будущего использования с Ant Table, сейчас не используются
+    // Колонки AntTable больше не нужны (используем свой компонент таблицы)
 
     const handleFilterApply = () => {
         console.log("Filters applied:", { selectedArea, selectedProject, selectedBuilding, dateRange, searchText });
@@ -146,6 +105,22 @@ const Analytics: React.FC = () => {
                     </CustomButton>
                 </Space>
             </div>
+
+            {/* Top search line: Building / Districts / Developer / Naming + select + Search */}
+            <FiltersBar
+                mode={catalogMode}
+                onModeChange={(v)=>setCatalogMode(v)}
+                selectSlot={
+                    <CustomSelect
+                        className={styles.select}
+                        placeholder="Select value"
+                        value={selectedProject}
+                        onChange={setSelectedProject}
+                        options={[{ value: "all", label: "All" }, { value: "option1", label: "Option 1" }, { value: "option2", label: "Option 2" }]}
+                    />
+                }
+                onSearch={handleFilterApply}
+            />
 
             {/* Advanced Filters Section */}
             <Card title={<><FilterOutlined /> Advanced Filters</>} className={styles.filtersCard}>
@@ -231,6 +206,31 @@ const Analytics: React.FC = () => {
                 </Row>
             </Card>
 
+            {/* Developer Analytics section */}
+            <Divider />
+            <h2>Developer Analytics</h2>
+            <Row gutter={[16, 16]} className={styles.cardsRow}>
+                <Col xs={24} lg={8}><ChartCard title="Distribution of buildings by districts" extra={<Tag>DLD</Tag>} /></Col>
+                <Col xs={24} lg={8}><ChartCard title="Lots by apartment type" extra={<Tag>DLD</Tag>} /></Col>
+                <Col xs={24} lg={8}><ChartCard title="Buildings commissioned/under construction" extra={<Tag>DLD</Tag>} /></Col>
+            </Row>
+
+            {/* More Analytics */}
+            <Divider />
+            <div className={styles.headerBar}>
+                <h2>More Analytics</h2>
+                <SegmentedGroup
+                    options={[{label: 'Sales', value: 'sales'}, {label: 'Rental', value: 'rental'}]}
+                    value={salesMode}
+                    onChange={(v) => setSalesMode(v)}
+                />
+            </div>
+            <Row gutter={[16, 16]} className={styles.cardsRow}>
+                <Col xs={24} lg={8}><ChartCard title="Average price AED per sqm" extra={<Tag>DLD</Tag>} /></Col>
+                <Col xs={24} lg={8}><ChartCard title="Average price AED per sqm" extra={<Tag>DLD</Tag>} /></Col>
+                <Col xs={24} lg={8}><ChartCard title="Average ROI %" extra={<Tag>DLD</Tag>} /></Col>
+            </Row>
+
             {/* Tabs for different views */}
             <CustomTabs 
                 activeKey={activeTab} 
@@ -241,52 +241,11 @@ const Analytics: React.FC = () => {
                         key: "overview",
                         label: <span><BarChartOutlined />Overview</span>,
                         children: (
-                            /* Market Overview Cards */
                             <Row gutter={[16, 16]} className={styles.cardsRow}>
-                                <Col span={6}>
-                                    <Card className={styles.card}>
-                                        <Statistic
-                                            title="Total Properties"
-                                            value={15432}
-                                            className={styles.valueBlue}
-                                            suffix={<span className={styles.suffixUpGreen}>↑ +12.5%</span>}
-                                        />
-                                    </Card>
-                                </Col>
-                                <Col span={6}>
-                                    <Card className={styles.card}>
-                                        <Statistic
-                                            title="Average Price"
-                                            value={2850}
-                                            precision={0}
-                                            className={styles.valueBlue}
-                                            prefix="$"
-                                            suffix="/m² ↑ +8.3%"
-                                        />
-                                    </Card>
-                                </Col>
-                                <Col span={6}>
-                                    <Card className={styles.card}>
-                                        <Statistic
-                                            title="Total Deals"
-                                            value={2156}
-                                            className={styles.valueBlue}
-                                            suffix={<span className={styles.suffixUpGreen}>↑ +18.5%</span>}
-                                        />
-                                    </Card>
-                                </Col>
-                                <Col span={6}>
-                                    <Card className={styles.card}>
-                                        <Statistic
-                                            title="Market Volume"
-                                            value={82.5}
-                                            precision={1}
-                                            className={styles.valueBlue}
-                                            prefix="$"
-                                            suffix="M ↑ +20.7%"
-                                        />
-                                    </Card>
-                                </Col>
+                                <Col span={6}><OverviewCard title="Total Properties" value={15432} kpi={<KpiBadge value={12.5} />} /></Col>
+                                <Col span={6}><OverviewCard title="Average Price" value={<><span>$</span>2850<span className={styles.valueBlue}>/m²</span></>} kpi={<KpiBadge value={8.3} />} /></Col>
+                                <Col span={6}><OverviewCard title="Total Deals" value={2156} kpi={<KpiBadge value={18.5} />} /></Col>
+                                <Col span={6}><OverviewCard title="Market Volume" value={<><span>$</span>82.5<span className={styles.valueBlue}>M</span></>} kpi={<KpiBadge value={20.7} />} /></Col>
                             </Row>
                         )
                     },
@@ -295,23 +254,17 @@ const Analytics: React.FC = () => {
                         label: <span><LineChartOutlined />Transactions</span>,
                         children: (
                             /* Detailed Analysis */
-        <Collapse className={styles.expandable}>
+                            <Collapse className={styles.expandable}>
                                 <Panel header="Property Transactions Analysis" key="1">
-        <div className={styles.tableContainer}>
-            <Table
-                                            className={styles.table}
-                columns={columns}
-                                            dataSource={tableData}
-                                            pagination={{
-                                                total: 100,
-                                                pageSize: 10,
-                                                showSizeChanger: true,
-                                                showQuickJumper: true,
-                                                showTotal: (total, range) =>
-                                                    `${range[0]}-${range[1]} of ${total} items`,
-                                            }}
-                                            scroll={{ x: 1200 }}
-                                        />
+                                    <div className={styles.tableContainer}>
+                                        <TransactionsTable rows={tableData.map(r => ({
+                                            key: r.key,
+                                            date: '18 Dec, 2024',
+                                            location: `${r.project}, ${r.area}`,
+                                            rooms: '4 Rooms',
+                                            sqm: 125,
+                                            price: '2,374,238',
+                                        }))} />
                                     </div>
                                 </Panel>
                             </Collapse>

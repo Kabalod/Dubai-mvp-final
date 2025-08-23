@@ -24,6 +24,9 @@ enum Steps {
 const LoginForm: React.FC = () => {
     const navigate = useNavigate();
     const [currentStep, setCurrentStep] = useState(Steps.Login);
+    const [loginLoading, setLoginLoading] = useState(false);
+    const [recoveryLoading, setRecoveryLoading] = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
 
     const [email, setEmail] = useState("");
     const [timeToResend, setTimeToResend] = useState(45);
@@ -31,6 +34,7 @@ const LoginForm: React.FC = () => {
     const onFinish = async (values: any) => {
         try {
             console.log("Login attempt with:", values);
+            setLoginLoading(true);
             
             // Отправляем данные на Django бэкенд
             const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
@@ -45,8 +49,12 @@ const LoginForm: React.FC = () => {
             });
 
             if (response.ok) {
+                const data = await response.json();
+                if (data?.tokens) {
+                    localStorage.setItem('accessToken', data.tokens.access);
+                    localStorage.setItem('refreshToken', data.tokens.refresh);
+                }
                 console.log('Login successful!');
-                // Перенаправляем на Dashboard после успешного входа
                 navigate("/");
             } else {
                 const errorData = await response.json();
@@ -57,6 +65,8 @@ const LoginForm: React.FC = () => {
         } catch (error) {
             console.error('Login error:', error);
             message.error('Login error. Please try again.');
+        } finally {
+            setLoginLoading(false);
         }
     };
 
@@ -75,6 +85,7 @@ const LoginForm: React.FC = () => {
     const handleRecovery = async (values: LoginFormType) => {
         try {
             setEmail(values.email!);
+            setRecoveryLoading(true);
             
             // Отправляем запрос на сброс пароля
             const response = await fetch(`${API_BASE_URL}/api/auth/password/reset/`, {
@@ -100,6 +111,8 @@ const LoginForm: React.FC = () => {
         } catch (error) {
             console.error('Password reset error:', error);
             message.error('Password reset error. Please try again.');
+        } finally {
+            setRecoveryLoading(false);
         }
     };
 
@@ -110,6 +123,7 @@ const LoginForm: React.FC = () => {
     const handleReset = async (values: any) => {
         try {
             // Отправляем новый пароль
+            setResetLoading(true);
             const response = await fetch(`${API_BASE_URL}/api/auth/password/reset/confirm/`, {
                 method: 'POST',
                 headers: {
@@ -135,6 +149,8 @@ const LoginForm: React.FC = () => {
         } catch (error) {
             console.error('Password reset error:', error);
             message.error('Password reset error. Please try again.');
+        } finally {
+            setResetLoading(false);
         }
     };
 
@@ -182,8 +198,10 @@ const LoginForm: React.FC = () => {
                                 size="large"
                                 htmlType="submit"
                                 className={styles.confirmButton}
+                            loading={loginLoading}
+                            disabled={loginLoading}
                             >
-                                {t`LOG IN`}
+                                {loginLoading ? t`LOGGING IN...` : t`LOG IN`}
                             </CustomButton>
                         </Form.Item>
                         <div className={styles.resendCodeWrapper}>
@@ -222,8 +240,10 @@ const LoginForm: React.FC = () => {
                                 size="large"
                                 htmlType="submit"
                                 className={styles.confirmButton}
+                            loading={recoveryLoading}
+                            disabled={recoveryLoading}
                             >
-                                {t`NEXT`}
+                                {recoveryLoading ? t`SENDING...` : t`NEXT`}
                             </CustomButton>
                         </Form.Item>
                     </Form>
@@ -304,8 +324,10 @@ const LoginForm: React.FC = () => {
                                 size="large"
                                 htmlType="submit"
                                 className={styles.confirmButton}
+                            loading={resetLoading}
+                            disabled={resetLoading}
                             >
-                                {t`CHANGE PASSWORD`}
+                                {resetLoading ? t`UPDATING...` : t`CHANGE PASSWORD`}
                             </CustomButton>
                         </Form.Item>
                     </Form>
