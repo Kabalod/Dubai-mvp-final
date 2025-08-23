@@ -1,38 +1,37 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
-from . import views
+from .views import (
+    health_check,
+    RegisterView,
+    OTPLoginView,
+    UserProfileView,
+    StripeWebhookView,
+    UserProfileAdminView,
+    PaymentAdminView,
+    analytics_summary,
+    reports_list,
+)
 
-app_name = 'api'
+app_name = "api"
 
 urlpatterns = [
-    # Health check
-    path('health/', views.health_check, name='health_check'),
-    
-    # Authentication
-    path('auth/register/', views.register, name='register'),
-    path('auth/login/', views.login, name='login'),
-    path('auth/logout/', views.logout, name='logout'),
-    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # Google OAuth
-    path('auth/google/login/', views.google_login, name='google_login'),
-    path('auth/google/callback/', views.google_callback, name='google_callback'),
-    
-    # OTP Authentication
-    path('auth/send-otp/', views.send_otp_code, name='send_otp_code'),
-    path('auth/verify-otp/', views.verify_otp_code, name='verify_otp_code'),
-    path('auth/upgrade/', views.upgrade_plan, name='upgrade_plan'),
-    path('billing/subscription/', views.my_subscription, name='my_subscription'),
-    path('billing/mock-pay/', views.mock_pay, name='mock_pay'),
-    path('billing/webhook/<str:provider>/', views.billing_webhook, name='billing_webhook'),
-    # Profile
-    path('auth/profile/', views.profile_me, name='profile_me'),
-    
-    # Properties
-    path('properties/', views.properties_list, name='properties_list'),
-    path('areas/', views.areas_list, name='areas_list'),
-    path('buildings/', views.buildings_list, name='buildings_list'),
-    
-    # Analytics
-    path('analytics/', views.analytics_summary, name='analytics_summary'),
-    path('reports/', views.reports_list, name='reports_list'),
+    # Health & metrics
+    path("health/", health_check, name="health_check"),
+
+    # Auth (class-based)
+    path("auth/register/", RegisterView.as_view(), name="register"),
+    path("auth/login/", OTPLoginView.as_view(), name="login"),
+    path("auth/profile/", UserProfileView.as_view(), name="profile"),
+    path("auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+
+    # Webhooks (class-based)
+    path("webhooks/stripe/", StripeWebhookView.as_view(), name="stripe_webhook"),
+
+    # Admin (read-only, class-based list views)
+    path("admin/users/", UserProfileAdminView.as_view(), name="admin_users"),
+    path("admin/payments/", PaymentAdminView.as_view(), name="admin_payments"),
+
+    # Analytics & reports (function-based retained)
+    path("analytics/", analytics_summary, name="analytics_summary"),
+    path("reports/", reports_list, name="reports_list"),
 ]
