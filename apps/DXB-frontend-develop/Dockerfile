@@ -28,7 +28,7 @@ COPY package.json yarn.lock ./
 # Включение corepack и установка зависимостей
 RUN corepack enable \
     && yarn config set network-timeout 300000 \
-    && yarn install --frozen-lockfile --production=false \
+    && yarn install --production=false \
     && yarn cache clean
 
 # Копирование исходного кода
