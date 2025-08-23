@@ -36,9 +36,9 @@ const SignUpForm: React.FC = () => {
             setEmail(values.email as string);
             console.log('Email set to state:', values.email);
             
-            console.log('About to send OTP request to:', `${API_BASE_URL}/api/auth/send-otp/`);
+            console.log('About to send OTP request to:', `${API_BASE_URL}/auth/send-otp/`);
             
-            const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
+            const response = await fetch(`${API_BASE_URL}/auth/send-otp/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -74,9 +74,9 @@ const SignUpForm: React.FC = () => {
             console.log('OTP Code:', otpCode);
             console.log('Email:', email);
             
-            console.log('About to verify OTP:', `${API_BASE_URL}/api/auth/verify-otp/`);
+            console.log('About to verify OTP:', `${API_BASE_URL}/auth/verify-otp/`);
             
-            const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp/`, {
+            const response = await fetch(`${API_BASE_URL}/auth/verify-otp/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const SignUpForm: React.FC = () => {
             
             console.log('About to send fetch request...');
             
-            const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
+            const response = await fetch(`${API_BASE_URL}/auth/register/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
