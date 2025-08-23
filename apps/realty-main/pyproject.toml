@@ -101,7 +101,7 @@ lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "realty.settings"
-addopts = "--reuse-db -n auto"
+addopts = "-q"
 norecursedirs = ".* bin build dist *.egg htmlcov logs node_modules static templates venv"
 python_files = "tests.py test_*.py *_tests.py"
 

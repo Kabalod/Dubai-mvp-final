@@ -5,6 +5,11 @@ from django.test.utils import override_settings
 
 pytest_plugins = []  # type: ignore
 
+# Избежать конфликта имени модуля tests в realty/reports/tests.py
+collect_ignore_glob = [
+	"realty/reports/tests.py",
+]
+
 
 def pytest_configure(config):
     logging.disable(logging.CRITICAL)

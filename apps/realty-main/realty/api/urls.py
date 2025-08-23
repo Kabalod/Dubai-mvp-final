@@ -20,8 +20,12 @@ urlpatterns = [
     # OTP Authentication
     path('auth/send-otp/', views.send_otp_code, name='send_otp_code'),
     path('auth/verify-otp/', views.verify_otp_code, name='verify_otp_code'),
+    path('auth/upgrade/', views.upgrade_plan, name='upgrade_plan'),
+    path('billing/subscription/', views.my_subscription, name='my_subscription'),
+    path('billing/mock-pay/', views.mock_pay, name='mock_pay'),
+    path('billing/webhook/<str:provider>/', views.billing_webhook, name='billing_webhook'),
     # Profile
-    # path('auth/profile/', views.profile_me, name='profile_me'),
+    path('auth/profile/', views.profile_me, name='profile_me'),
     
     # Properties
     path('properties/', views.properties_list, name='properties_list'),
@@ -30,5 +34,5 @@ urlpatterns = [
     
     # Analytics
     path('analytics/', views.analytics_summary, name='analytics_summary'),
-    path('reports/', views.building_reports, name='building_reports'),
+    path('reports/', views.reports_list, name='reports_list'),
 ]
