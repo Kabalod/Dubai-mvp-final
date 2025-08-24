@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { apiService } from "@/services/apiService"
+import { useAuth } from "@/contexts/AuthContext"
 
 interface ApplicationHeaderProps {
   activeRoute?: string
@@ -19,6 +20,7 @@ interface ApplicationHeaderProps {
 
 export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderProps) {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const navigationItems = ["Main", "Analytics", "Reports", "Payments", "Pricing"]
 
   const handleLogout = () => {
@@ -68,22 +70,26 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
 
           {/* Right: User Profile */}
           <div className="flex items-center space-x-4">
-            <div className="hidden md:flex flex-col items-end">
-              <span className="text-sm font-medium text-gray-900">john.doe@example.com</span>
-              <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                PREMIUM
-              </Badge>
-            </div>
+                              <div className="hidden md:flex flex-col items-end">
+                    <span className="text-sm font-medium text-gray-900">
+                      {user?.email || 'Not logged in'}
+                    </span>
+                    <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                      {user?.subscription_type?.toUpperCase() || 'FREE'}
+                    </Badge>
+                  </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2 p-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                    <AvatarFallback>JD</AvatarFallback>
-                  </Avatar>
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
-                </Button>
+                                        <Button variant="ghost" className="flex items-center space-x-2 p-2">
+                          <Avatar className="h-8 w-8">
+                            <AvatarImage src={user?.avatar_url || "/placeholder.svg?height=32&width=32"} />
+                            <AvatarFallback>
+                              {user?.first_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <ChevronDown className="h-4 w-4 text-gray-500" />
+                        </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem onClick={() => navigate('/profile')}>

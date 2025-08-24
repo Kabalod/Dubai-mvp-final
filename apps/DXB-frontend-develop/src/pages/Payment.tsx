@@ -9,34 +9,34 @@ import { CreditCard, Calendar, DollarSign, Download, Search, Check, Star, Zap } 
 
 // Payment Plans Configuration
 const PAYMENT_PLANS = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: 0,
+    {
+        id: 'free',
+        name: 'Free',
+        price: 0,
     period: 'forever',
     description: 'Perfect for getting started with basic analytics',
-    features: [
+        features: [
       'Up to 100 property views per month',
       'Basic market analytics',
       'Standard support',
       'Export to PDF'
-    ],
-    limitations: [
+        ],
+        limitations: [
       'Advanced analytics',
       'API access', 
       'Custom reports',
       'Priority support'
     ],
-    popular: false,
+        popular: false,
     current: false,
-  },
-  {
-    id: 'premium',
-    name: 'Premium',
-    price: 299,
-    period: 'month',
+    },
+    {
+        id: 'premium',
+        name: 'Premium',
+        price: 299,
+        period: 'month',
     description: 'Advanced features for real estate professionals',
-    features: [
+        features: [
       'Unlimited property views',
       'Advanced market analytics',
       'Real-time data updates',
@@ -45,29 +45,29 @@ const PAYMENT_PLANS = [
       'Priority support',
       'Export to multiple formats',
       'Team collaboration (up to 5 users)',
-    ],
-    limitations: [],
-    popular: true,
+        ],
+        limitations: [],
+        popular: true,
     current: true,
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 999,
-    period: 'month',
+    },
+    {
+        id: 'enterprise',
+        name: 'Enterprise',
+        price: 999,
+        period: 'month',
     description: 'Complete solution for large organizations',
-    features: [
-      'Everything in Premium',
+        features: [
+            'Everything in Premium',
       'Unlimited team members',
-      'Custom integrations',
-      'Dedicated account manager',
+            'Custom integrations',
+            'Dedicated account manager',
       'SLA guarantee',
       'Custom branding',
       'Advanced security features',
       'On-premise deployment option',
-    ],
-    limitations: [],
-    popular: false,
+        ],
+        limitations: [],
+        popular: false,
     current: false,
   },
 ];
@@ -268,14 +268,14 @@ const Payment: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {PAYMENT_PLANS.map((plan) => (
               <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-blue-500 shadow-lg' : ''}`}>
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            {plan.popular && (
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <Badge className="bg-blue-500 text-white px-4 py-1">
                       <Star className="w-3 h-3 mr-1" />
                       Most Popular
                     </Badge>
-                  </div>
-                )}
+                </div>
+            )}
                 {plan.current && (
                   <div className="absolute top-4 right-4">
                     <Badge className="bg-green-100 text-green-700">Current Plan</Badge>
@@ -287,16 +287,16 @@ const Payment: React.FC = () => {
                   <div className="mt-4">
                     <span className="text-4xl font-bold">${plan.price}</span>
                     <span className="text-gray-500">/{plan.period}</span>
-                  </div>
+                </div>
                   <CardDescription className="mt-2">{plan.description}</CardDescription>
-                </CardHeader>
+            </CardHeader>
 
-                <CardContent className="space-y-6">
+            <CardContent className="space-y-6">
                   <div className="space-y-3">
                     {plan.features.map((feature) => (
                       <div key={feature} className="flex items-center space-x-3">
                         <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
+                                <span className="text-sm">{feature}</span>
                       </div>
                     ))}
                     {plan.limitations.map((limitation) => (
@@ -305,7 +305,7 @@ const Payment: React.FC = () => {
                         <span className="text-sm text-gray-500">{limitation}</span>
                       </div>
                     ))}
-                  </div>
+                </div>
 
                   <Button
                     className={`w-full ${plan.popular ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
@@ -355,12 +355,12 @@ const Payment: React.FC = () => {
                     <p className="text-sm text-gray-600 mb-4">{addon.description}</p>
                     <Button variant="outline" className="w-full bg-transparent">
                       Add to Plan
-                    </Button>
-                  </CardContent>
-                </Card>
+                </Button>
+            </CardContent>
+        </Card>
               ))}
-            </div>
-          </div>
+                        </div>
+                </div>
         </TabsContent>
 
         {/* Transactions Tab */}
@@ -384,8 +384,8 @@ const Payment: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
+                            </CardHeader>
+                            <CardContent>
               <div className="space-y-4">
                 {filteredTransactions.map((transaction) => (
                   <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg">
@@ -417,17 +417,17 @@ const Payment: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+                            </CardContent>
+                        </Card>
         </TabsContent>
-
+                        
         {/* Payment Methods Tab */}
         <TabsContent value="methods" className="space-y-6">
-          <Card>
-            <CardHeader>
+                        <Card>
+                            <CardHeader>
               <CardTitle>Payment Methods</CardTitle>
               <CardDescription>Manage your payment methods and billing information</CardDescription>
-            </CardHeader>
+                            </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-4">
@@ -446,15 +446,15 @@ const Payment: React.FC = () => {
                 <CreditCard className="mr-2 h-4 w-4" />
                 Add Payment Method
               </Button>
-            </CardContent>
-          </Card>
-
+                            </CardContent>
+                        </Card>
+                        
           {/* Billing Information */}
-          <Card>
-            <CardHeader>
+                        <Card>
+                            <CardHeader>
               <CardTitle>Billing Information</CardTitle>
               <CardDescription>Update your billing address and contact information</CardDescription>
-            </CardHeader>
+                            </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -463,8 +463,8 @@ const Payment: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Email</label>
-                  <Input defaultValue="john.doe@example.com" />
-                </div>
+                                      <Input defaultValue={user?.email || ""} />
+                    </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Address</label>
                   <Input defaultValue="123 Business St" />
@@ -473,7 +473,7 @@ const Payment: React.FC = () => {
                   <label className="text-sm font-medium">City</label>
                   <Input defaultValue="Dubai" />
                 </div>
-              </div>
+            </div>
               <Button className="bg-blue-500 hover:bg-blue-600">
                 Update Billing Info
               </Button>
@@ -481,8 +481,8 @@ const Payment: React.FC = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
-  );
+        </div>
+    );
 };
 
 export default Payment;
