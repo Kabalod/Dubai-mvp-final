@@ -10,13 +10,15 @@ class ApiService {
 
     constructor() {
         this.api = axios.create({
-            baseURL: `${API_BASE_URL}`,
+            baseURL: `${API_BASE_URL}/api`,
             timeout: 30000,
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
             },
         });
+
+        console.log('🔧 ApiService initialized with baseURL:', `${API_BASE_URL}/api`);
 
         // Request interceptor to add auth token
         this.api.interceptors.request.use(

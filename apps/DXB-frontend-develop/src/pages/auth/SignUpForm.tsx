@@ -95,7 +95,7 @@ const SignUpForm: React.FC = () => {
             console.log('About to verify OTP:', `${API_BASE_URL}/auth/verify-otp/`);
             
             setVerifyingOtp(true);
-            const response = await fetch(`${API_BASE_URL}/auth/verify-otp/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ const SignUpForm: React.FC = () => {
             console.log('About to send fetch request...');
             setSubmitting(true);
             
-            const response = await fetch(`${API_BASE_URL}/auth/register/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

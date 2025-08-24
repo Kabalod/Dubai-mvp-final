@@ -37,22 +37,44 @@ const Auth: React.FC = () => {
     const handleGoogleLogin = async () => {
         try {
             setGoogleLoading(true);
-            console.log('Attempting Google OAuth login...');
-            const resp = await fetch(`${API_BASE_URL}/api/auth/google/login/`);
+            console.log('🔄 Attempting Google OAuth login to:', `${API_BASE_URL}/auth/google/login/`);
+            
+            const resp = await fetch(`${API_BASE_URL}/api/auth/google/login/`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            console.log('📡 Response status:', resp.status);
+            
             if (!resp.ok) {
-                throw new Error(`Failed to get auth_url: ${resp.status}`);
+                const errorText = await resp.text();
+                console.error('❌ Server error:', errorText);
+                throw new Error(`Server error: ${resp.status} - ${errorText}`);
             }
+            
             const data = await resp.json();
+            console.log('📦 Response data:', data);
+            
             const authUrl = data?.auth_url;
             if (!authUrl) {
-                throw new Error('auth_url is missing');
+                throw new Error('auth_url is missing from server response');
             }
-            console.log('Redirecting to:', authUrl);
+            
+            console.log('🔗 Redirecting to Google OAuth:', authUrl);
             window.location.href = authUrl;
-        } catch (error) {
-            console.error('Google OAuth error:', error);
-            message.error('Google OAuth error. Please try again.');
+            
+        } catch (error: any) {
+            console.error('❌ Google OAuth error:', error);
             setGoogleLoading(false);
+            
+            if (error.message.includes('Failed to fetch')) {
+                message.error('❌ Cannot connect to server. Please check if backend is running.');
+            } else {
+                message.error(`❌ Google OAuth error: ${error.message}`);
+            }
         }
     };
 
