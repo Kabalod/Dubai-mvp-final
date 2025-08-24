@@ -15,6 +15,20 @@ import CustomInput from "@/components/CustomInput/CustomInput";
 import { SearchOutlined, FilterOutlined, DownloadOutlined, BarChartOutlined, LineChartOutlined, PieChartOutlined } from "@ant-design/icons";
 import styles from "./Analytics.module.scss";
 
+// Chart components
+import LineChart from "@/components/Charts/LineChart";
+import PieChart from "@/components/Charts/PieChart";
+import BarChart from "@/components/Charts/BarChart";
+import { 
+  pricesTrendData, 
+  marketDistributionData, 
+  buildingsByDistrictsData, 
+  apartmentTypesData, 
+  constructionStatusData,
+  avgPricePerSqmData,
+  roiData
+} from "@/utils/mockChartData";
+
 // replaced Select with CustomSelect; Option not used
 const { Panel } = Collapse;
 const { RangePicker } = DatePicker;
@@ -210,9 +224,33 @@ const Analytics: React.FC = () => {
             <Divider />
             <h2>Developer Analytics</h2>
             <Row gutter={[16, 16]} className={styles.cardsRow}>
-                <Col xs={24} lg={8}><ChartCard title="Distribution of buildings by districts" extra={<Tag>DLD</Tag>} /></Col>
-                <Col xs={24} lg={8}><ChartCard title="Lots by apartment type" extra={<Tag>DLD</Tag>} /></Col>
-                <Col xs={24} lg={8}><ChartCard title="Buildings commissioned/under construction" extra={<Tag>DLD</Tag>} /></Col>
+                <Col xs={24} lg={8}>
+                    <ChartCard title="Distribution of buildings by districts" extra={<Tag>DLD</Tag>}>
+                        <BarChart 
+                            data={buildingsByDistrictsData.data} 
+                            labels={buildingsByDistrictsData.labels}
+                            color="#3B82F6"
+                        />
+                    </ChartCard>
+                </Col>
+                <Col xs={24} lg={8}>
+                    <ChartCard title="Lots by apartment type" extra={<Tag>DLD</Tag>}>
+                        <BarChart 
+                            data={apartmentTypesData.data} 
+                            labels={apartmentTypesData.labels}
+                            color="#10B981"
+                        />
+                    </ChartCard>
+                </Col>
+                <Col xs={24} lg={8}>
+                    <ChartCard title="Buildings commissioned/under construction" extra={<Tag>DLD</Tag>}>
+                        <PieChart 
+                            data={constructionStatusData.data} 
+                            labels={constructionStatusData.labels}
+                            colors={constructionStatusData.colors}
+                        />
+                    </ChartCard>
+                </Col>
             </Row>
 
             {/* More Analytics */}
@@ -226,9 +264,35 @@ const Analytics: React.FC = () => {
                 />
             </div>
             <Row gutter={[16, 16]} className={styles.cardsRow}>
-                <Col xs={24} lg={8}><ChartCard title="Average price AED per sqm" extra={<Tag>DLD</Tag>} /></Col>
-                <Col xs={24} lg={8}><ChartCard title="Average price AED per sqm" extra={<Tag>DLD</Tag>} /></Col>
-                <Col xs={24} lg={8}><ChartCard title="Average ROI %" extra={<Tag>DLD</Tag>} /></Col>
+                <Col xs={24} lg={8}>
+                    <ChartCard title="Average price AED per sqm" extra={<Tag>DLD</Tag>}>
+                        <LineChart 
+                            data={avgPricePerSqmData.data} 
+                            labels={avgPricePerSqmData.labels}
+                            color="#F59E0B"
+                            gradient={true}
+                        />
+                    </ChartCard>
+                </Col>
+                <Col xs={24} lg={8}>
+                    <ChartCard title="Price Trends (Last 6 months)" extra={<Tag>DLD</Tag>}>
+                        <LineChart 
+                            data={pricesTrendData.data} 
+                            labels={pricesTrendData.labels}
+                            color="#8B5CF6"
+                            gradient={true}
+                        />
+                    </ChartCard>
+                </Col>
+                <Col xs={24} lg={8}>
+                    <ChartCard title="Average ROI %" extra={<Tag>DLD</Tag>}>
+                        <BarChart 
+                            data={roiData.data} 
+                            labels={roiData.labels}
+                            color="#EF4444"
+                        />
+                    </ChartCard>
+                </Col>
             </Row>
 
             {/* Tabs for different views */}
