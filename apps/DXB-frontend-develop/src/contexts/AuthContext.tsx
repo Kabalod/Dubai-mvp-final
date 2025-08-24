@@ -48,15 +48,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setIsLoading(true);
             
             try {
+                console.log('🔐 Checking authentication...');
                 const isAuth = apiService.isAuthenticated();
+                console.log('🔐 Is authenticated:', isAuth);
+                
                 if (isAuth) {
                     const userData = apiService.getCurrentUser();
+                    console.log('🔐 User data from storage:', userData);
                     setUser(userData);
                 } else {
+                    console.log('🔐 No valid authentication found');
                     setUser(null);
                 }
             } catch (error) {
-                console.error('Auth check error:', error);
+                console.error('❌ Auth check error:', error);
+                // УБРАЛИ ХАРДКОД: больше не задаем пользователя по умолчанию
                 setUser(null);
             } finally {
                 setIsLoading(false);
