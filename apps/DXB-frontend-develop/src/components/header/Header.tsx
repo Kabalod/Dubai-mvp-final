@@ -15,7 +15,12 @@ const Header: React.FC = () => {
             case '/reports':
                 return 'Reports';
             case '/payment':
+            case '/payments':
                 return 'Payments';
+            case '/profile':
+                return 'Profile';
+            case '/dashboard':
+                return 'Analytics'; // Dashboard считается как Analytics
             default:
                 return 'Main';
         }

@@ -31,17 +31,30 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
 
           {/* Center: Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {navigationItems.map((item) => (
-              <Button
-                key={item}
-                variant="ghost"
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                  activeRoute === item ? "text-blue-600 border-b-2 border-blue-600 rounded-none pb-1" : "text-gray-600"
-                }`}
-              >
-                {item}
-              </Button>
-            ))}
+            {navigationItems.map((item) => {
+              const getRoute = (navItem: string) => {
+                switch (navItem) {
+                  case 'Main': return '/';
+                  case 'Analytics': return '/analytics';
+                  case 'Reports': return '/reports';
+                  case 'Payments': return '/payment';
+                  default: return '/';
+                }
+              };
+              
+              return (
+                <Button
+                  key={item}
+                  variant="ghost"
+                  className={`text-sm font-medium transition-colors hover:text-blue-600 ${
+                    activeRoute === item ? "text-blue-600 border-b-2 border-blue-600 rounded-none pb-1" : "text-gray-600"
+                  }`}
+                  onClick={() => window.location.href = getRoute(item)}
+                >
+                  {item}
+                </Button>
+              );
+            })}
           </nav>
 
           {/* Right: User Profile */}
@@ -64,11 +77,16 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-                <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+                  Profile Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => window.location.href = '/payment'}>
+                  Billing
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+                <DropdownMenuItem className="text-red-600" onClick={() => window.location.href = '/auth'}>
+                  Logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
