@@ -55,6 +55,59 @@ class RegisterView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegisterSerializer
 
+class PasswordLoginView(APIView):
+    """Обычная авторизация по email/username и паролю (для тестовых пользователей)"""
+    permission_classes = (permissions.AllowAny,)
+    
+    def post(self, request, *args, **kwargs):
+        from django.contrib.auth import authenticate
+        
+        username_or_email = request.data.get('username') or request.data.get('email')
+        password = request.data.get('password')
+        
+        if not username_or_email or not password:
+            return Response({
+                'error': 'Username/email and password are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Пробуем найти пользователя по email или username
+        user = None
+        try:
+            # Сначала пробуем по email
+            if '@' in username_or_email:
+                user = User.objects.get(email=username_or_email)
+            else:
+                user = User.objects.get(username=username_or_email)
+                
+            # Проверяем пароль
+            if user.check_password(password):
+                # Создаем JWT токены
+                refresh = RefreshToken.for_user(user)
+                
+                return Response({
+                    'tokens': {
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token),
+                    },
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                    },
+                    'message': 'Login successful'
+                })
+            else:
+                return Response({
+                    'error': 'Invalid credentials'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except User.DoesNotExist:
+            return Response({
+                'error': 'Invalid credentials'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 class OTPLoginView(APIView):
     permission_classes = (permissions.AllowAny,)
 
