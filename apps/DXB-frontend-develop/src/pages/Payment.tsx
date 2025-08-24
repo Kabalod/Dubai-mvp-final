@@ -130,6 +130,7 @@ const MOCK_TRANSACTIONS = [
 ];
 
 const Payment: React.FC = () => {
+  const { user } = useAuth(); // ✅ ДОБАВЛЕНА ДЕСТРУКТУРИЗАЦИЯ user
   const [testPaymentLoading, setTestPaymentLoading] = useState<string>('');
   const [testPaymentSuccess, setTestPaymentSuccess] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
