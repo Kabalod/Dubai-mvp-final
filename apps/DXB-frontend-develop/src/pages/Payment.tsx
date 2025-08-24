@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
+
 import { Badge } from '../components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../utils/api';
 
 // ========================================
 // Payment Plans Configuration
@@ -78,64 +79,41 @@ const PAYMENT_PLANS = [
 // ========================================
 
 const Payment: React.FC = () => {
-    const { user } = useAuth();
+    const { user, getToken } = useAuth();
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-    const [paymentModalVisible, setPaymentModalVisible] = useState(false);
-    const [processing, setProcessing] = useState(false);
-    // Removed Ant Design form
 
-    // ========================================
-    // Payment Handler (Stub)
-    // ========================================
+    const [userProfile, setUserProfile] = useState<any>(null);
 
-    const handlePayment = async (paymentData: any) => {
-        setProcessing(true);
+    // Load user profile on component mount
+    useEffect(() => {
+        const loadUserProfile = async () => {
+            if (user) {
+                try {
+                    const token = getToken();
+                    if (token) {
+                        const profile = await api.getUserProfile(token);
+                        setUserProfile(profile);
+                    }
+                } catch (error) {
+                    console.error('Failed to load user profile:', error);
+                }
+            }
+        };
 
-        try {
-            // Simulate payment processing
-            await new Promise(resolve => setTimeout(resolve, 2000));
+        loadUserProfile();
+    }, [user, getToken]);
 
-            // Mock payment success
-            const plan = PAYMENT_PLANS.find(p => p.id === selectedPlan);
-            
-            // Show success message (replacing Ant Design message)
-            alert(`Payment successful! Welcome to ${plan?.name} plan!`);
-            setPaymentModalVisible(false);
-            setPaymentData({ cardholderName: '', cardNumber: '', expiryDate: '', cvv: '' });
 
-            // In real implementation, this would update user subscription
-            console.log('Payment processed for plan:', selectedPlan, paymentData);
-
-        } catch (error) {
-            alert('Payment failed. Please try again.');
-        } finally {
-            setProcessing(false);
-        }
-    };
 
     const handleSelectPlan = (planId: string) => {
         setSelectedPlan(planId);
+        const plan = PAYMENT_PLANS.find(p => p.id === planId);
         
-        if (planId === 'free') {
-            // Free plan - no payment needed
-            alert('Free plan activated!');
-        } else {
-            // Paid plans - show payment modal
-            setPaymentModalVisible(true);
-        }
+        // Mock plan selection - no real payment
+        alert(`📋 Demo Mode: "${plan?.name}" plan selected!\n\nThis is a demonstration of the payment flow.\nNo real payment will be processed.`);
     };
 
-    // Payment form state
-    const [paymentData, setPaymentData] = useState({
-        cardholderName: '',
-        cardNumber: '',
-        expiryDate: '',
-        cvv: ''
-    });
 
-    const handleInputChange = (field: string, value: string) => {
-        setPaymentData(prev => ({ ...prev, [field]: value }));
-    };
 
     // ========================================
     // Plan Card Component
@@ -198,139 +176,13 @@ const Payment: React.FC = () => {
                     onClick={() => handleSelectPlan(plan.id)}
                     style={plan.popular ? { backgroundColor: plan.color, borderColor: plan.color } : {}}
                 >
-                    {plan.price === 0 ? 'Get Started Free' : 'Choose Plan'}
+                    {plan.price === 0 ? '📋 Demo: Select Free' : `📋 Demo: Select ${plan.name}`}
                 </Button>
             </CardContent>
         </Card>
     );
 
-    // ========================================
-    // Payment Modal
-    // ========================================
 
-    const PaymentModal = () => {
-        const plan = PAYMENT_PLANS.find(p => p.id === selectedPlan);
-
-        const handleSubmit = (e: React.FormEvent) => {
-            e.preventDefault();
-            
-            // Basic validation
-            if (!paymentData.cardholderName || !paymentData.cardNumber || !paymentData.expiryDate || !paymentData.cvv) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            if (paymentData.cardNumber.length !== 16) {
-                alert('Please enter a valid 16-digit card number');
-                return;
-            }
-            
-            if (!/^\d{2}\/\d{2}$/.test(paymentData.expiryDate)) {
-                alert('Please enter expiry date in MM/YY format');
-                return;
-            }
-            
-            if (!/^\d{3,4}$/.test(paymentData.cvv)) {
-                alert('Please enter a valid CVV');
-                return;
-            }
-            
-            handlePayment(paymentData);
-        };
-
-        return (
-            <Dialog open={paymentModalVisible} onOpenChange={setPaymentModalVisible}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="text-center">
-                            💳 Payment for {plan?.name} Plan
-                        </DialogTitle>
-                        <DialogDescription className="text-center">
-                            Complete your subscription
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="mb-6 p-4 bg-muted rounded-lg">
-                        <div className="flex justify-between items-center">
-                            <span className="text-lg font-semibold">{plan?.name} Plan</span>
-                            <span className="text-2xl font-bold" style={{ color: plan?.color }}>
-                                ${plan?.price}/{plan?.period}
-                            </span>
-                        </div>
-                    </div>
-
-                    <Alert className="mb-6">
-                        <AlertDescription>
-                            <strong>Demo Payment System</strong><br />
-                            This is a demo payment system. No real charges will be made. Enter any card details to test the flow.
-                        </AlertDescription>
-                    </Alert>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="text-sm font-medium">Cardholder Name</label>
-                            <Input
-                                placeholder="John Doe"
-                                value={paymentData.cardholderName}
-                                onChange={(e) => handleInputChange('cardholderName', e.target.value)}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-medium">Card Number</label>
-                            <Input
-                                placeholder="1234 5678 9012 3456"
-                                maxLength={16}
-                                value={paymentData.cardNumber}
-                                onChange={(e) => {
-                                    const value = e.target.value.replace(/\D/g, '');
-                                    handleInputChange('cardNumber', value);
-                                }}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm font-medium">Expiry Date</label>
-                                <Input
-                                    placeholder="MM/YY"
-                                    maxLength={5}
-                                    value={paymentData.expiryDate}
-                                    onChange={(e) => {
-                                        let value = e.target.value.replace(/\D/g, '');
-                                        if (value.length >= 2) {
-                                            value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                                        }
-                                        handleInputChange('expiryDate', value);
-                                    }}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium">CVV</label>
-                                <Input
-                                    placeholder="123"
-                                    maxLength={4}
-                                    value={paymentData.cvv}
-                                    onChange={(e) => {
-                                        const value = e.target.value.replace(/\D/g, '');
-                                        handleInputChange('cvv', value);
-                                    }}
-                                />
-                            </div>
-                        </div>
-
-                        <Button 
-                            type="submit" 
-                            className="w-full h-12"
-                            disabled={processing}
-                        >
-                            {processing ? 'Processing Payment...' : `💳 Pay $${plan?.price}`}
-                        </Button>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        );
-    };
 
     // ========================================
     // Main Render
@@ -348,10 +200,28 @@ const Payment: React.FC = () => {
                         Unlock the power of Dubai real estate analytics
                     </p>
                     {user && (
-                        <p className="text-lg text-blue-600">
-                            Welcome back, {user.first_name || user.username}!
-                        </p>
+                        <div className="space-y-2">
+                            <p className="text-lg text-blue-600">
+                                Welcome back, {user.first_name || user.username}!
+                            </p>
+                            {userProfile?.subscription && (
+                                <Badge className="bg-green-100 text-green-700">
+                                    Current Plan: {userProfile.subscription.plan_name || 'Free'}
+                                </Badge>
+                            )}
+                        </div>
                     )}
+                </div>
+
+                {/* Demo Notice */}
+                <div className="mb-8">
+                    <Alert className="max-w-2xl mx-auto">
+                        <AlertDescription className="text-center">
+                            <strong>🎯 Demo Payment System</strong><br />
+                            This is a demonstration of our pricing plans. No real payments will be processed. 
+                            Click any plan to see the demo selection flow.
+                        </AlertDescription>
+                    </Alert>
                 </div>
 
                 {/* Pricing Cards */}
@@ -381,16 +251,16 @@ const Payment: React.FC = () => {
                                 <CardTitle className="text-left">Is this a demo payment system?</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground text-left">Yes, this is a demo. No real payments will be processed. Use any test card details.</p>
+                                <p className="text-muted-foreground text-left">Yes, this is a demonstration only. No payment processing is implemented. Plan selection shows a demo message.</p>
                             </CardContent>
                         </Card>
                         
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-left">What payment methods do you accept?</CardTitle>
+                                <CardTitle className="text-left">How does the demo work?</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground text-left">We accept all major credit cards, PayPal, and bank transfers (demo only).</p>
+                                <p className="text-muted-foreground text-left">Simply click any plan to see a demo selection message. This showcases the pricing structure without real payment processing.</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -408,8 +278,7 @@ const Payment: React.FC = () => {
                 </div>
             </div>
 
-            {/* Payment Modal */}
-            <PaymentModal />
+
         </div>
     );
 };

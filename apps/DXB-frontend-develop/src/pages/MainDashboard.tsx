@@ -1,76 +1,95 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { RealEstateDashboard } from '../components/real-estate-dashboard';
+import { api, type PropertyStats, type Property } from '../utils/api';
 
 const MainDashboard: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Temporary simple version - will add RealEstateDashboard later */}
-      <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">DLD</span>
-            <span className="text-sm text-gray-400">•</span>
-            <span className="text-sm text-gray-600">Apartments</span>
-          </div>
-        </div>
+  const [stats, setStats] = useState<PropertyStats | null>(null);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center space-x-6">
-          <button className="text-gray-900 border-b-2 border-blue-500 rounded-none pb-2">
-            Sales
-          </button>
-          <button className="text-gray-500 hover:text-gray-900">
-            Rental
-          </button>
-        </div>
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch stats and properties in parallel
+        const [statsResponse, propertiesResponse] = await Promise.all([
+          api.getStats(),
+          api.getProperties({ limit: 20 })
+        ]);
+        
+        setStats(statsResponse);
+        setProperties(propertiesResponse.results);
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+        setError('Failed to load dashboard data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        {/* Search and Filters */}
-        <div className="flex items-center space-x-4">
-          <div className="relative flex-1 max-w-md">
-            <input 
-              placeholder="Search by area, project or building" 
-              className="pl-10 pr-10 bg-gray-100 border-0 w-full p-3 rounded-lg" 
-            />
-          </div>
-          <button className="bg-gray-100 border-0 px-4 py-2 rounded-lg">
-            3 Beds
-          </button>
-          <button className="bg-gray-100 border-0 px-4 py-2 rounded-lg">
-            More
-          </button>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg">
-            SEARCH
-          </button>
-        </div>
+    fetchData();
+  }, []);
 
-        {/* Overview Section */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-semibold">Overview</h2>
-
-          {/* Key Metrics */}
-          <div className="grid grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-3xl font-bold">13</div>
-              <div className="text-sm text-gray-500 uppercase tracking-wide">Buildings</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold">24</div>
-              <div className="text-sm text-gray-500 uppercase tracking-wide">Apartments</div>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center space-x-2">
-                <span className="text-3xl font-bold">3000</span>
-                <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-sm">
-                  +12.5%
-                </span>
-              </div>
-              <div className="text-sm text-gray-500 uppercase tracking-wide">Deals</div>
-            </div>
-          </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-xl mb-4">⚠️ Error</div>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Transform API data to component props
+  const dashboardProps = {
+    stats: stats ? {
+      totalProperties: stats.total_properties,
+      totalBuildings: stats.total_buildings,
+      totalDeals: stats.total_deals,
+      averagePrice: stats.average_price,
+      medianPrice: stats.median_price,
+      avgPricePerSqm: stats.avg_price_per_sqm,
+      priceRange: stats.price_range,
+      marketVolume: stats.market_volume,
+      liquidity: stats.liquidity,
+      roi: stats.roi,
+    } : null,
+    properties: properties.map(property => ({
+      id: property.id,
+      title: property.title,
+      price: property.price,
+      area: property.area,
+      bedrooms: property.bedrooms,
+      bathrooms: property.bathrooms,
+      sqm: property.sqm,
+      location: property.location,
+      images: property.images || [],
+      listingType: property.listing_type,
+    })),
+  };
+
+  return <RealEstateDashboard {...dashboardProps} />;
 };
 
 export default MainDashboard;

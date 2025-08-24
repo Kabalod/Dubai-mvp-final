@@ -104,5 +104,35 @@ export const api = {
     const response = await fetch(`${API_BASE_URL}/health/`);
     if (!response.ok) throw new Error('Health check failed');
     return response.json();
+  },
+
+  // User Profile API
+  async getUserProfile(token: string): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/profile/me/`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) throw new Error('Failed to fetch user profile');
+    return response.json();
+  },
+
+  // Payment API (mock)
+  async createPayment(paymentData: any, token: string): Promise<{ success: boolean, message: string }> {
+    const response = await fetch(`${API_BASE_URL}/payments/create/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(paymentData)
+    });
+    
+    if (!response.ok) {
+      // Mock success response for demo
+      return { success: true, message: 'Demo payment processed successfully!' };
+    }
+    return response.json();
   }
 };

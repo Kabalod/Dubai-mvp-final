@@ -1,43 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { ApplicationHeader } from "./application-header"
-import { DataSourceSelector } from "./data-source-selector"
-import { TransactionsTable } from "./Transactions/TransactionsTable"
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import { Badge } from "./ui/badge"
+import { ApplicationHeader } from "@/components/application-header"
+import { DataSourceSelector } from "@/components/data-source-selector"
+import { TransactionsTable } from "@/components/transactions-table"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import { Search, X, ChevronDown, Info, TrendingUp } from "lucide-react"
 
-interface RealEstateDashboardProps {
-  stats?: {
-    totalProperties: number;
-    totalBuildings: number;
-    totalDeals: number;
-    averagePrice: number;
-    medianPrice: number;
-    avgPricePerSqm: number;
-    priceRange: { min: number; max: number };
-    marketVolume: { deals: number; total_volume: number };
-    liquidity: number;
-    roi: number;
-  } | null;
-  properties?: Array<{
-    id: string;
-    title: string;
-    price: number;
-    area: string;
-    bedrooms: number;
-    bathrooms: number;
-    sqm: number;
-    location: { area: string; building: string };
-    images: string[];
-    listingType: 'sale' | 'rent';
-  }>;
-}
-
-export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashboardProps) {
+export function RealEstateDashboard() {
   const [activeSource, setActiveSource] = useState("DLD")
   const [showAnalytics, setShowAnalytics] = useState(false)
 
@@ -135,16 +108,16 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
               {/* Key Metrics */}
               <div className="grid grid-cols-3 gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats?.totalBuildings?.toLocaleString() || 0}</div>
+                  <div className="text-3xl font-bold">13</div>
                   <div className="text-sm text-gray-500 uppercase tracking-wide">Buildings</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats?.totalProperties?.toLocaleString() || 0}</div>
-                  <div className="text-sm text-gray-500 uppercase tracking-wide">Properties</div>
+                  <div className="text-3xl font-bold">24</div>
+                  <div className="text-sm text-gray-500 uppercase tracking-wide">Apartments</div>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-2">
-                    <span className="text-3xl font-bold">{stats?.totalDeals?.toLocaleString() || 0}</span>
+                    <span className="text-3xl font-bold">3000</span>
                     <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
                       12,5% <TrendingUp className="ml-1 h-3 w-3" />
                     </Badge>
