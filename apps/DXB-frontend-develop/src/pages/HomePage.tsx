@@ -63,20 +63,28 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-      {/* Data Source Selector */}
-      <div className="mb-8">
-        <DataSourceSelector 
-          activeSource={activeSource}
-          onSourceChange={setActiveSource}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Real Estate Analytics Platform</h1>
+          <p className="text-gray-600">Select a data source to analyze Dubai real estate market data</p>
+        </div>
+
+        {/* Data Source Selector */}
+        <div className="mb-12">
+          <DataSourceSelector 
+            activeSource={activeSource}
+            onSourceChange={setActiveSource}
+          />
+        </div>
+        
+        {/* Dashboard with Reports */}
+        <RealEstateDashboard 
+          stats={stats}
+          properties={properties}
         />
       </div>
-      
-      {/* Dashboard with Reports */}
-      <RealEstateDashboard 
-        stats={stats}
-        properties={properties}
-      />
     </div>
   );
 };

@@ -1,8 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ApplicationHeader } from "./application-header"
-import { DataSourceSelector } from "./data-source-selector"
+// Убраны дублированные импорты ApplicationHeader и DataSourceSelector
 import TransactionsTable from "./Transactions/TransactionsTable"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
@@ -38,42 +37,20 @@ interface RealEstateDashboardProps {
 }
 
 export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashboardProps) {
-  const [activeSource, setActiveSource] = useState("DLD")
-  const [showAnalytics, setShowAnalytics] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Application Header */}
-      <ApplicationHeader activeRoute="Analytics" />
-
-      <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
-        {!showAnalytics ? (
-          /* Data Source Selection */
-          <DataSourceSelector
-            activeSource={activeSource}
-            onSourceChange={(source) => {
-              setActiveSource(source)
-              setShowAnalytics(true)
-            }}
-          />
-        ) : (
-          /* Analytics Dashboard */
-          <>
-            {/* Breadcrumb */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowAnalytics(false)}
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
-                  ← Back
-                </Button>
-                <span className="text-sm text-gray-600">DLD</span>
-                <span className="text-sm text-gray-400">•</span>
-                <span className="text-sm text-gray-600">Apartments</span>
-              </div>
+    <div className="bg-white">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
+        {/* Analytics Dashboard */}
+        <>
+          {/* Breadcrumb */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 font-medium">DLD</span>
+              <span className="text-sm text-gray-400">•</span>
+              <span className="text-sm text-gray-600">Apartments</span>
             </div>
+          </div>
 
             {/* Navigation Tabs */}
             <div className="flex items-center space-x-6">
@@ -336,8 +313,7 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
 
             {/* Transactions Table */}
             <TransactionsTable />
-          </>
-        )}
+        </>
       </div>
     </div>
   )
