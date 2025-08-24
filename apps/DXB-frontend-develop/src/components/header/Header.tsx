@@ -40,7 +40,21 @@ const Header: React.FC = () => {
             <div className={styles.header}>
                 {/* Logo */}
                 <div className={styles.logo} onClick={() => navigate('/')}>
-                    <img src={LogoImage} alt="Dubai MVP Logo" className={styles.logoImage} />
+                    <img 
+                        src={LogoImage} 
+                        alt="Dubai MVP Logo" 
+                        className={styles.logoImage}
+                        onError={(e) => {
+                            console.error('Logo image failed to load:', e);
+                            e.currentTarget.style.display = 'none';
+                            // Show fallback text if image fails
+                            const fallback = document.createElement('span');
+                            fallback.textContent = 'Dubai MVP';
+                            fallback.className = styles.logoFallback || '';
+                            e.currentTarget.parentNode?.appendChild(fallback);
+                        }}
+                        onLoad={() => console.log('Logo loaded successfully')}
+                    />
                 </div>
 
                 {/* Navigation Menu */}

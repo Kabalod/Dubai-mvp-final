@@ -172,31 +172,21 @@ class GoogleAuthInitView(APIView):
     permission_classes = (permissions.AllowAny,)
     
     def get(self, request):
-        # Google OAuth настройки
-        client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', 'test-client-id-12345')
-        redirect_uri = request.build_absolute_uri('/api/auth/google/callback/')
-        scope = 'openid email profile'
+        # Для MVP возвращаем mock auth_url, который редиректит сразу на callback
+        callback_url = request.build_absolute_uri('/api/auth/google/callback/')
         
-        # Генерируем state для безопасности  
-        state = ''.join(secrets.choice(string.ascii_letters + string.digits) for i in range(32))
-        request.session['google_oauth_state'] = state
-        
-        # Строим Google OAuth URL
-        params = {
-            'client_id': client_id,
-            'redirect_uri': redirect_uri,
-            'scope': scope,
-            'response_type': 'code',
-            'state': state,
-            'access_type': 'offline',
-            'prompt': 'consent'
+        # Mock Google OAuth - сразу редиректим на callback с mock кодом
+        mock_params = {
+            'code': 'mock_authorization_code_12345',
+            'state': 'mock_state_12345'
         }
         
-        auth_url = f"https://accounts.google.com/o/oauth2/auth?{urlencode(params)}"
+        mock_auth_url = f"{callback_url}?{urlencode(mock_params)}"
         
         return Response({
-            'auth_url': auth_url,
-            'state': state
+            'auth_url': mock_auth_url,
+            'state': 'mock_state_12345',
+            'message': 'MVP Mock Google OAuth - will auto-login as test user'
         })
 
 
@@ -205,33 +195,21 @@ class GoogleAuthCallbackView(APIView):
     permission_classes = (permissions.AllowAny,)
     
     def get(self, request):
-        # Получаем код авторизации от Google
-        code = request.GET.get('code')
-        state = request.GET.get('state')
+        # Получаем mock код авторизации
+        code = request.GET.get('code', 'mock_authorization_code_12345')
+        state = request.GET.get('state', 'mock_state_12345')
         error = request.GET.get('error')
         
         if error:
-            # Редирект с ошибкой
             return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error={error}")
         
-        if not code or not state:
-            return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error=missing_parameters")
-        
-        # Проверяем state для безопасности
-        session_state = request.session.get('google_oauth_state')
-        if not session_state or session_state != state:
-            return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error=invalid_state")
-        
         try:
-            # В MVP используем mock данные для Google OAuth
-            # В продакшене здесь будет реальный обмен кода на токены с Google API
-            
-            # Mock пользователь от Google
+            # MVP Mock Google OAuth - создаем тестового пользователя
             google_user_data = {
-                'email': 'user@gmail.com',
-                'given_name': 'Test',
+                'email': 'testuser@gmail.com',
+                'given_name': 'Google',
                 'family_name': 'User',
-                'sub': '1234567890'  # Google user ID
+                'sub': '1234567890'
             }
             
             # Создаем или получаем пользователя
@@ -248,10 +226,6 @@ class GoogleAuthCallbackView(APIView):
             # Генерируем JWT токены
             refresh = RefreshToken.for_user(user)
             access_token = refresh.access_token
-            
-            # Очищаем session state
-            if 'google_oauth_state' in request.session:
-                del request.session['google_oauth_state']
             
             # Редирект с токенами в hash для frontend
             redirect_url = f"{settings.FRONTEND_URL}/auth#access={access_token}&refresh={refresh}"
