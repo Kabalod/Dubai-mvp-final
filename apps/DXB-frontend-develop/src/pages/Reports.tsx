@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,15 +53,56 @@ const Reports: React.FC = () => {
   const [showRentingDropdown, setShowRentingDropdown] = useState(false);
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const reportRef = useRef<HTMLDivElement>(null);
 
   const bedOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8+'];
   const rentingOptions = ['Renting out', 'Flipping', 'Live in an apartment'];
 
+  // Функция для генерации PDF
+  const handleDownloadPDF = async () => {
+    if (!reportRef.current || !reportData) return;
+    
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+      const imgY = 30;
+      
+      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+      pdf.save(`Dubai_MVP_Report_${filters.building || 'Property'}_${new Date().toLocaleDateString()}.pdf`);
+      
+      console.log('📄 PDF успешно сгенерирован и скачан!');
+    } catch (error) {
+      console.error('Ошибка при генерации PDF:', error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const handleGenerateReport = async () => {
     setIsGenerating(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Здесь будет реальный API вызов в будущем
+      // const response = await apiService.generateReport(filters);
+      // setReportData(response.data);
+      
+      // Пока используем моковые данные с улучшенной структурой
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Реалистичная задержка
       setReportData({
         inputData: {
           building: filters.building || 'Sadat 7',
@@ -140,8 +183,11 @@ const Reports: React.FC = () => {
           }
         }
       });
+    } catch (error) {
+      console.error('Ошибка генерации отчета:', error);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -318,11 +364,11 @@ const Reports: React.FC = () => {
 
         {/* Smart Report Results */}
         {reportData && (
-          <Card className="mt-8">
+          <Card className="mt-8" ref={reportRef}>
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-blue-600 flex items-center gap-2">
                 <Star className="h-6 w-6" />
-                Smart Report
+                Smart Report Results
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
@@ -441,9 +487,13 @@ const Reports: React.FC = () => {
 
               {/* PDF Download */}
               <div className="text-center pt-6 border-t">
-                <Button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3">
+                <Button 
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3"
+                  onClick={handleDownloadPDF}
+                  disabled={isDownloading}
+                >
                   <FileDown className="h-4 w-4 mr-2" />
-                  Download PDF Report
+                  {isDownloading ? 'Generating PDF...' : 'Download PDF Report'}
                 </Button>
               </div>
             </CardContent>
