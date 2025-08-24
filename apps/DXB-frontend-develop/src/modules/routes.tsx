@@ -18,9 +18,9 @@ export default function AppRoutes() {
         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<MainDashboard />} />
-            <Route path="/auth" element={<SimpleAuth />} />
-            <Route path="/analytics" element={<SimpleAnalytics />} />
-            <Route path="/reports" element={<SimpleReports />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/reports" element={<Reports />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/payment" element={<Payment />} />
             <Route path="/pricing" element={<PricingPage />} />
