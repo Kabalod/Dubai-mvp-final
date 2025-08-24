@@ -32,7 +32,15 @@ from .serializers import (
     PaymentSerializer,
     PaymentEventAuditSerializer,
     UserProfileSerializer,
+    PropertySerializer,
+    PropertySearchSerializer,
 )
+
+# Import property models with fallback for MVP
+try:
+    from realty.pfimport.models import PFListSale, PFListRent, Area, Building
+except ImportError:
+    PFListSale = PFListRent = Area = Building = None
 
 User = get_user_model()
 
@@ -233,3 +241,225 @@ class GoogleAuthCallbackView(APIView):
             
         except Exception as e:
             return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error=oauth_failed")
+
+
+# --- Properties API Views ---
+
+class PropertiesListView(APIView):
+    """API для получения списка недвижимости (заглушка парсера)"""
+    permission_classes = (permissions.AllowAny,)
+    
+    def get(self, request):
+        """Возвращает список объявлений недвижимости"""
+        if not PFListSale or not PFListRent:
+            return Response({
+                'error': 'Property models not available',
+                'message': 'Run: python manage.py create_mock_properties'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        # Получаем параметры поиска
+        search_serializer = PropertySearchSerializer(data=request.query_params)
+        search_serializer.is_valid(raise_exception=True)
+        search_params = search_serializer.validated_data
+        
+        listing_type = search_params.get('listing_type', '')
+        search_query = search_params.get('search', '')
+        property_type = search_params.get('property_type', '')
+        bedrooms = search_params.get('bedrooms', '')
+        area_filter = search_params.get('area', '')
+        min_price = search_params.get('min_price')
+        max_price = search_params.get('max_price')
+        limit = search_params.get('limit', 50)
+        offset = search_params.get('offset', 0)
+        
+        # Объединяем запросы к продаже и аренде
+        properties = []
+        
+        # Получаем объявления продажи
+        if listing_type != 'rent':
+            sale_qs = PFListSale.objects.select_related('area', 'building').all()
+            
+            # Применяем фильтры
+            if search_query:
+                sale_qs = sale_qs.filter(
+                    Q(title__icontains=search_query) |
+                    Q(display_address__icontains=search_query) |
+                    Q(area__area_name__icontains=search_query) |
+                    Q(building__building_name__icontains=search_query)
+                )
+            
+            if property_type:
+                sale_qs = sale_qs.filter(property_type__icontains=property_type)
+                
+            if bedrooms:
+                sale_qs = sale_qs.filter(bedrooms=bedrooms)
+                
+            if area_filter:
+                sale_qs = sale_qs.filter(area__area_name__icontains=area_filter)
+                
+            if min_price:
+                sale_qs = sale_qs.filter(price__gte=min_price)
+                
+            if max_price:
+                sale_qs = sale_qs.filter(price__lte=max_price)
+            
+            # Добавляем в общий список
+            for prop in sale_qs:
+                properties.append(prop)
+        
+        # Получаем объявления аренды
+        if listing_type != 'sale':
+            rent_qs = PFListRent.objects.select_related('area', 'building').all()
+            
+            # Применяем фильтры
+            if search_query:
+                rent_qs = rent_qs.filter(
+                    Q(title__icontains=search_query) |
+                    Q(display_address__icontains=search_query) |
+                    Q(area__area_name__icontains=search_query) |
+                    Q(building__building_name__icontains=search_query)
+                )
+            
+            if property_type:
+                rent_qs = rent_qs.filter(property_type__icontains=property_type)
+                
+            if bedrooms:
+                rent_qs = rent_qs.filter(bedrooms=bedrooms)
+                
+            if area_filter:
+                rent_qs = rent_qs.filter(area__area_name__icontains=area_filter)
+                
+            if min_price:
+                rent_qs = rent_qs.filter(price__gte=min_price)
+                
+            if max_price:
+                rent_qs = rent_qs.filter(price__lte=max_price)
+            
+            # Добавляем в общий список
+            for prop in rent_qs:
+                properties.append(prop)
+        
+        # Сортируем по дате добавления (новые сначала)
+        properties.sort(key=lambda x: x.added_on or timezone.now(), reverse=True)
+        
+        # Пагинация
+        total = len(properties)
+        properties = properties[offset:offset + limit]
+        
+        # Сериализуем результат
+        serializer = PropertySerializer(properties, many=True)
+        
+        return Response({
+            'count': total,
+            'results': serializer.data,
+            'next': offset + limit if offset + limit < total else None,
+            'previous': offset - limit if offset > 0 else None,
+        })
+
+
+class PropertyDetailView(APIView):
+    """API для получения детальной информации об объявлении"""
+    permission_classes = (permissions.AllowAny,)
+    
+    def get(self, request, listing_id):
+        """Возвращает детальную информацию об объявлении"""
+        if not PFListSale or not PFListRent:
+            return Response({
+                'error': 'Property models not available'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        # Ищем в объявлениях продажи
+        try:
+            property_obj = PFListSale.objects.select_related('area', 'building').get(
+                listing_id=listing_id
+            )
+        except PFListSale.DoesNotExist:
+            # Ищем в объявлениях аренды
+            try:
+                property_obj = PFListRent.objects.select_related('area', 'building').get(
+                    listing_id=listing_id
+                )
+            except PFListRent.DoesNotExist:
+                return Response({
+                    'error': 'Property not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = PropertySerializer(property_obj)
+        return Response(serializer.data)
+
+
+class AreasListView(APIView):
+    """API для получения списка районов"""
+    permission_classes = (permissions.AllowAny,)
+    
+    def get(self, request):
+        """Возвращает список районов с количеством объявлений"""
+        if not Area:
+            return Response({
+                'error': 'Area model not available'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        areas = Area.objects.all().order_by('area_name')
+        
+        # Добавляем подсчет объявлений для каждого района
+        result = []
+        for area in areas:
+            sale_count = 0
+            rent_count = 0
+            
+            if PFListSale:
+                sale_count = PFListSale.objects.filter(area=area).count()
+            if PFListRent:
+                rent_count = PFListRent.objects.filter(area=area).count()
+            
+            result.append({
+                'id': area.id,
+                'name': area.area_name,
+                'sale_count': sale_count,
+                'rent_count': rent_count,
+                'total_count': sale_count + rent_count
+            })
+        
+        return Response(result)
+
+
+class PropertyStatsView(APIView):
+    """API для получения статистики по недвижимости"""
+    permission_classes = (permissions.AllowAny,)
+    
+    def get(self, request):
+        """Возвращает общую статистику по недвижимости"""
+        if not PFListSale or not PFListRent:
+            return Response({
+                'error': 'Property models not available'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        
+        # Подсчитываем статистику
+        sale_count = PFListSale.objects.count()
+        rent_count = PFListRent.objects.count()
+        total_properties = sale_count + rent_count
+        
+        areas_count = Area.objects.count() if Area else 0
+        buildings_count = Building.objects.count() if Building else 0
+        
+        # Средние цены по типам недвижимости
+        from django.db.models import Avg
+        
+        avg_sale_price = PFListSale.objects.aggregate(
+            avg=Avg('price')
+        )['avg'] or 0
+        
+        avg_rent_price = PFListRent.objects.aggregate(
+            avg=Avg('price')
+        )['avg'] or 0
+        
+        return Response({
+            'total_properties': total_properties,
+            'sale_properties': sale_count,
+            'rent_properties': rent_count,
+            'areas': areas_count,
+            'buildings': buildings_count,
+            'avg_sale_price': round(float(avg_sale_price), 2),
+            'avg_rent_price': round(float(avg_rent_price), 2),
+            'last_updated': timezone.now().isoformat()
+        })

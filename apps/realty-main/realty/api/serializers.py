@@ -17,22 +17,32 @@ class PropertySerializer(serializers.Serializer):
     """Unified property serializer for both sale and rent properties."""
     
     id = serializers.CharField()
+    listing_id = serializers.CharField()
     title = serializers.CharField()
     display_address = serializers.CharField()
     bedrooms = serializers.CharField(allow_null=True)
     bathrooms = serializers.CharField(allow_null=True)
     price = serializers.DecimalField(max_digits=12, decimal_places=2)
     price_currency = serializers.CharField(default='AED')
+    price_duration = serializers.CharField(allow_null=True)
     property_type = serializers.CharField()
     listing_type = serializers.CharField()
-    added_on = serializers.DateTimeField()
-    latitude = serializers.DecimalField(max_digits=10, decimal_places=7, allow_null=True)
-    longitude = serializers.DecimalField(max_digits=10, decimal_places=7, allow_null=True)
-    numeric_area = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True)
+    numeric_area = serializers.FloatField(allow_null=True)
+    size_min = serializers.CharField(allow_null=True)
     furnishing = serializers.CharField(allow_null=True)
     broker = serializers.CharField(allow_null=True)
     agent = serializers.CharField(allow_null=True)
-    verified = serializers.BooleanField()
+    agent_phone = serializers.CharField(allow_null=True)
+    verified = serializers.BooleanField(default=False)
+    latitude = serializers.FloatField(allow_null=True)
+    longitude = serializers.FloatField(allow_null=True)
+    added_on = serializers.DateTimeField(allow_null=True)
+    url = serializers.URLField(allow_null=True)
+    description = serializers.CharField(allow_null=True)
+    
+    # Связанные объекты
+    area_name = serializers.CharField(allow_null=True, source='area.area_name')
+    building_name = serializers.CharField(allow_null=True, source='building.building_name')
 
 
 if Area is not None:

@@ -21,8 +21,12 @@ def setup_demo_data():
     
     try:
         # Создаем тестовых пользователей и платежи
-        print("📋 Создание тестовых данных...")
+        print("👥 Создание тестовых пользователей...")
         call_command('create_test_data', '--users-count=5')
+        
+        # Создаем mock недвижимость
+        print("\n🏠 Создание mock недвижимости...")
+        call_command('create_mock_properties', '--count=50', '--areas-count=10', '--buildings-count=20')
         
         print("\n✅ Демо данные успешно созданы!")
         print("\n🔗 Доступные тестовые аккаунты:")
@@ -33,10 +37,16 @@ def setup_demo_data():
             print(f"  👤 {user.username} - {user.email} (пароль: testpass123)")
         
         print("\n🌐 Для тестирования MVP:")
-        print("  1. Войдите через любого тестового пользователя")
-        print("  2. Проверьте профиль: /api/profile/me/") 
-        print("  3. Проверьте платежи: /api/admin/payments/")
-        print("  4. Admin панель: /admin/")
+        print("  👤 Пользователи:")
+        print("    - Профиль: /api/profile/me/") 
+        print("    - Платежи: /api/admin/payments/")
+        print("    - Admin: /admin/")
+        print("  🏠 Недвижимость:")
+        print("    - API: /api/properties/")
+        print("    - Районы: /api/areas/") 
+        print("    - Статистика: /api/stats/")
+        print("    - Карта: /pfimport/map/")
+        print("  📱 Frontend: https://frontend-production-5c48.up.railway.app/")
         
     except Exception as e:
         print(f"❌ Ошибка при создании демо данных: {e}")
