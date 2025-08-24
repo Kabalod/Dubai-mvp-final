@@ -53,7 +53,7 @@ const SignUpForm: React.FC = () => {
             console.log('About to send OTP request to:', `${API_BASE_URL}/auth/send-otp/`);
             setSendingOtp(true);
             
-            const response = await fetch(`${API_BASE_URL}/auth/send-otp/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -216,7 +216,7 @@ const SignUpForm: React.FC = () => {
             }
 
             console.log('Resend OTP to:', email);
-            const response = await fetch(`${API_BASE_URL}/auth/send-otp/`, {
+            const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
