@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from allauth.socialaccount.models import SocialApp
 from django.contrib.sites.models import Site
+from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -26,15 +27,25 @@ class Command(BaseCommand):
                     self.style.SUCCESS(f'✅ Найден существующий сайт: {site.domain}')
                 )
             
-            # Создаем или получаем Google OAuth приложение
+            # Получаем реальные Google OAuth credentials из настроек
+            client_id = getattr(settings, 'GOOGLE_OAUTH_CLIENT_ID', 'test-client-id-12345')
+            client_secret = getattr(settings, 'GOOGLE_OAUTH_CLIENT_SECRET', 'test-secret-12345')
+            
+            # Создаем или обновляем Google OAuth приложение
             app, app_created = SocialApp.objects.get_or_create(
                 provider='google',
                 defaults={
                     'name': 'Google OAuth',
-                    'client_id': 'test-client-id-12345',
-                    'secret': 'test-secret-key-12345'
+                    'client_id': client_id,
+                    'secret': client_secret
                 }
             )
+            
+            # Если приложение уже существует, обновляем credentials
+            if not app_created:
+                app.client_id = client_id
+                app.secret = client_secret
+                app.save()
             
             if app_created:
                 self.stdout.write(

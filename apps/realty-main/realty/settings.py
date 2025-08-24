@@ -333,8 +333,9 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 # Frontend URL for OAuth redirects
 FRONTEND_URL = "https://frontend-production-5c48.up.railway.app"
 
-# Google OAuth settings (for MVP - mock values)  
-GOOGLE_OAUTH_CLIENT_ID = "test-client-id-12345"
+# Google OAuth settings - теперь из переменных окружения
+GOOGLE_OAUTH_CLIENT_ID = env.str("GOOGLE_CLIENT_ID", default="test-client-id-12345")
+GOOGLE_OAUTH_CLIENT_SECRET = env.str("GOOGLE_CLIENT_SECRET", default="test-secret-12345")
 
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*"]
 
