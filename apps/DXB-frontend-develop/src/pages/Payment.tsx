@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Card, Button, Row, Col, message, Modal, Form, Input, Radio, Tag } from 'antd';
-import { 
-    CrownOutlined, 
-    CheckOutlined, 
-    DollarOutlined,
-    CreditCardOutlined,
-    StarOutlined
-} from '@ant-design/icons';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../contexts/AuthContext';
 
 // ========================================
@@ -84,7 +82,7 @@ const Payment: React.FC = () => {
     const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
     const [paymentModalVisible, setPaymentModalVisible] = useState(false);
     const [processing, setProcessing] = useState(false);
-    const [form] = Form.useForm();
+    // Removed Ant Design form
 
     // ========================================
     // Payment Handler (Stub)
@@ -100,15 +98,16 @@ const Payment: React.FC = () => {
             // Mock payment success
             const plan = PAYMENT_PLANS.find(p => p.id === selectedPlan);
             
-            message.success(`Payment successful! Welcome to ${plan?.name} plan!`);
+            // Show success message (replacing Ant Design message)
+            alert(`Payment successful! Welcome to ${plan?.name} plan!`);
             setPaymentModalVisible(false);
-            form.resetFields();
+            setPaymentData({ cardholderName: '', cardNumber: '', expiryDate: '', cvv: '' });
 
             // In real implementation, this would update user subscription
             console.log('Payment processed for plan:', selectedPlan, paymentData);
 
         } catch (error) {
-            message.error('Payment failed. Please try again.');
+            alert('Payment failed. Please try again.');
         } finally {
             setProcessing(false);
         }
@@ -119,11 +118,23 @@ const Payment: React.FC = () => {
         
         if (planId === 'free') {
             // Free plan - no payment needed
-            message.success('Free plan activated!');
+            alert('Free plan activated!');
         } else {
             // Paid plans - show payment modal
             setPaymentModalVisible(true);
         }
+    };
+
+    // Payment form state
+    const [paymentData, setPaymentData] = useState({
+        cardholderName: '',
+        cardNumber: '',
+        expiryDate: '',
+        cvv: ''
+    });
+
+    const handleInputChange = (field: string, value: string) => {
+        setPaymentData(prev => ({ ...prev, [field]: value }));
     };
 
     // ========================================
@@ -131,69 +142,65 @@ const Payment: React.FC = () => {
     // ========================================
 
     const PlanCard: React.FC<{ plan: typeof PAYMENT_PLANS[0] }> = ({ plan }) => (
-        <Card
-            className={`h-full relative ${plan.popular ? 'border-2 border-blue-500' : ''}`}
-            style={{
-                borderRadius: '12px',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-            }}
-            bodyStyle={{ padding: '24px' }}
-            hoverable
-        >
+        <Card className={`h-full relative rounded-[var(--radius-lg)] transition-all duration-200 hover:shadow-lg ${
+            plan.popular ? 'border-2 border-blue-500 shadow-blue-100' : ''
+        }`}>
             {plan.popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Tag color="blue" className="px-3 py-1">
-                        <StarOutlined /> Most Popular
-                    </Tag>
+                    <Badge className="px-3 py-1 bg-blue-500 text-white">
+                        ⭐ Most Popular
+                    </Badge>
                 </div>
             )}
 
-            <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold mb-2" style={{ color: plan.color }}>
+            <CardHeader className="text-center pb-4">
+                <CardTitle className="text-2xl font-bold" style={{ color: plan.color }}>
                     {plan.name}
-                </h3>
+                </CardTitle>
                 <div className="mb-2">
                     <span className="text-4xl font-bold">${plan.price}</span>
-                    <span className="text-gray-500 ml-1">/{plan.period}</span>
+                    <span className="text-muted-foreground ml-1">/{plan.period}</span>
                 </div>
-                <p className="text-gray-600">{plan.description}</p>
-            </div>
+                <CardDescription className="text-center">{plan.description}</CardDescription>
+            </CardHeader>
 
-            <div className="mb-6">
-                <h4 className="font-semibold mb-3 text-green-600">✅ Included:</h4>
-                <ul className="space-y-2">
-                    {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start">
-                            <CheckOutlined className="text-green-500 mr-2 mt-1" />
-                            <span className="text-sm">{feature}</span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            {plan.limitations.length > 0 && (
-                <div className="mb-6">
-                    <h4 className="font-semibold mb-3 text-orange-600">⚠️ Limitations:</h4>
+            <CardContent className="space-y-6">
+                <div>
+                    <h4 className="font-semibold mb-3 text-green-600">✅ Included:</h4>
                     <ul className="space-y-2">
-                        {plan.limitations.map((limitation, index) => (
+                        {plan.features.map((feature, index) => (
                             <li key={index} className="flex items-start">
-                                <span className="text-orange-500 mr-2">•</span>
-                                <span className="text-sm text-gray-600">{limitation}</span>
+                                <span className="text-green-500 mr-2 mt-1">✓</span>
+                                <span className="text-sm">{feature}</span>
                             </li>
                         ))}
                     </ul>
                 </div>
-            )}
 
-            <Button
-                type={plan.popular ? 'primary' : 'default'}
-                size="large"
-                className="w-full h-12"
-                onClick={() => handleSelectPlan(plan.id)}
-                style={plan.popular ? { background: plan.color, borderColor: plan.color } : {}}
-            >
-                {plan.price === 0 ? 'Get Started Free' : 'Choose Plan'}
-            </Button>
+                {plan.limitations.length > 0 && (
+                    <div>
+                        <h4 className="font-semibold mb-3 text-orange-600">⚠️ Limitations:</h4>
+                        <ul className="space-y-2">
+                            {plan.limitations.map((limitation, index) => (
+                                <li key={index} className="flex items-start">
+                                    <span className="text-orange-500 mr-2">•</span>
+                                    <span className="text-sm text-muted-foreground">{limitation}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                <Button
+                    variant={plan.popular ? 'default' : 'outline'}
+                    size="lg"
+                    className="w-full h-12"
+                    onClick={() => handleSelectPlan(plan.id)}
+                    style={plan.popular ? { backgroundColor: plan.color, borderColor: plan.color } : {}}
+                >
+                    {plan.price === 0 ? 'Get Started Free' : 'Choose Plan'}
+                </Button>
+            </CardContent>
         </Card>
     );
 
@@ -204,127 +211,124 @@ const Payment: React.FC = () => {
     const PaymentModal = () => {
         const plan = PAYMENT_PLANS.find(p => p.id === selectedPlan);
 
+        const handleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            
+            // Basic validation
+            if (!paymentData.cardholderName || !paymentData.cardNumber || !paymentData.expiryDate || !paymentData.cvv) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (paymentData.cardNumber.length !== 16) {
+                alert('Please enter a valid 16-digit card number');
+                return;
+            }
+            
+            if (!/^\d{2}\/\d{2}$/.test(paymentData.expiryDate)) {
+                alert('Please enter expiry date in MM/YY format');
+                return;
+            }
+            
+            if (!/^\d{3,4}$/.test(paymentData.cvv)) {
+                alert('Please enter a valid CVV');
+                return;
+            }
+            
+            handlePayment(paymentData);
+        };
+
         return (
-            <Modal
-                title={
-                    <div className="text-center">
-                        <CreditCardOutlined className="mr-2" />
-                        Payment for {plan?.name} Plan
+            <Dialog open={paymentModalVisible} onOpenChange={setPaymentModalVisible}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-center">
+                            💳 Payment for {plan?.name} Plan
+                        </DialogTitle>
+                        <DialogDescription className="text-center">
+                            Complete your subscription
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="mb-6 p-4 bg-muted rounded-lg">
+                        <div className="flex justify-between items-center">
+                            <span className="text-lg font-semibold">{plan?.name} Plan</span>
+                            <span className="text-2xl font-bold" style={{ color: plan?.color }}>
+                                ${plan?.price}/{plan?.period}
+                            </span>
+                        </div>
                     </div>
-                }
-                open={paymentModalVisible}
-                onCancel={() => setPaymentModalVisible(false)}
-                footer={null}
-                width={600}
-                centered
-            >
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold">{plan?.name} Plan</span>
-                        <span className="text-2xl font-bold" style={{ color: plan?.color }}>
-                            ${plan?.price}/{plan?.period}
-                        </span>
-                    </div>
-                </div>
 
-                <Alert
-                    message="Demo Payment System"
-                    description="This is a demo payment system. No real charges will be made. Enter any card details to test the flow."
-                    type="info"
-                    showIcon
-                    className="mb-6"
-                />
+                    <Alert className="mb-6">
+                        <AlertDescription>
+                            <strong>Demo Payment System</strong><br />
+                            This is a demo payment system. No real charges will be made. Enter any card details to test the flow.
+                        </AlertDescription>
+                    </Alert>
 
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={handlePayment}
-                    size="large"
-                >
-                    <Form.Item
-                        label="Cardholder Name"
-                        name="cardholderName"
-                        rules={[{ required: true, message: 'Please enter cardholder name!' }]}
-                    >
-                        <Input placeholder="John Doe" />
-                    </Form.Item>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="text-sm font-medium">Cardholder Name</label>
+                            <Input
+                                placeholder="John Doe"
+                                value={paymentData.cardholderName}
+                                onChange={(e) => handleInputChange('cardholderName', e.target.value)}
+                            />
+                        </div>
 
-                    <Form.Item
-                        label="Card Number"
-                        name="cardNumber"
-                        rules={[
-                            { required: true, message: 'Please enter card number!' },
-                            { pattern: /^\d{16}$/, message: 'Please enter a valid 16-digit card number!' }
-                        ]}
-                    >
-                        <Input 
-                            placeholder="1234 5678 9012 3456" 
-                            maxLength={16}
-                            onChange={(e) => {
-                                // Auto-format card number
-                                const value = e.target.value.replace(/\D/g, '');
-                                form.setFieldsValue({ cardNumber: value });
-                            }}
-                        />
-                    </Form.Item>
+                        <div>
+                            <label className="text-sm font-medium">Card Number</label>
+                            <Input
+                                placeholder="1234 5678 9012 3456"
+                                maxLength={16}
+                                value={paymentData.cardNumber}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(/\D/g, '');
+                                    handleInputChange('cardNumber', value);
+                                }}
+                            />
+                        </div>
 
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item
-                                label="Expiry Date"
-                                name="expiryDate"
-                                rules={[
-                                    { required: true, message: 'Please enter expiry date!' },
-                                    { pattern: /^\d{2}\/\d{2}$/, message: 'Format: MM/YY' }
-                                ]}
-                            >
-                                <Input 
-                                    placeholder="MM/YY" 
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm font-medium">Expiry Date</label>
+                                <Input
+                                    placeholder="MM/YY"
                                     maxLength={5}
+                                    value={paymentData.expiryDate}
                                     onChange={(e) => {
                                         let value = e.target.value.replace(/\D/g, '');
                                         if (value.length >= 2) {
                                             value = value.substring(0, 2) + '/' + value.substring(2, 4);
                                         }
-                                        form.setFieldsValue({ expiryDate: value });
+                                        handleInputChange('expiryDate', value);
                                     }}
                                 />
-                            </Form.Item>
-                        </Col>
-                        <Col span={12}>
-                            <Form.Item
-                                label="CVV"
-                                name="cvv"
-                                rules={[
-                                    { required: true, message: 'Please enter CVV!' },
-                                    { pattern: /^\d{3,4}$/, message: 'Please enter valid CVV!' }
-                                ]}
-                            >
-                                <Input 
-                                    placeholder="123" 
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium">CVV</label>
+                                <Input
+                                    placeholder="123"
                                     maxLength={4}
+                                    value={paymentData.cvv}
                                     onChange={(e) => {
                                         const value = e.target.value.replace(/\D/g, '');
-                                        form.setFieldsValue({ cvv: value });
+                                        handleInputChange('cvv', value);
                                     }}
                                 />
-                            </Form.Item>
-                        </Col>
-                    </Row>
+                            </div>
+                        </div>
 
-                    <Form.Item>
                         <Button 
-                            type="primary" 
-                            htmlType="submit" 
+                            type="submit" 
                             className="w-full h-12"
-                            loading={processing}
-                            icon={<CreditCardOutlined />}
+                            disabled={processing}
                         >
-                            {processing ? 'Processing Payment...' : `Pay $${plan?.price}`}
+                            {processing ? 'Processing Payment...' : `💳 Pay $${plan?.price}`}
                         </Button>
-                    </Form.Item>
-                </Form>
-            </Modal>
+                    </form>
+                </DialogContent>
+            </Dialog>
         );
     };
 
@@ -337,10 +341,10 @@ const Payment: React.FC = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold text-gray-800 mb-4">
+                    <h1 className="text-5xl font-bold text-foreground mb-4">
                         Choose Your Plan
                     </h1>
-                    <p className="text-xl text-gray-600 mb-2">
+                    <p className="text-xl text-muted-foreground mb-2">
                         Unlock the power of Dubai real estate analytics
                     </p>
                     {user && (
@@ -351,40 +355,52 @@ const Payment: React.FC = () => {
                 </div>
 
                 {/* Pricing Cards */}
-                <Row gutter={[24, 24]} justify="center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center mb-16">
                     {PAYMENT_PLANS.map((plan) => (
-                        <Col xs={24} md={8} key={plan.id}>
-                            <PlanCard plan={plan} />
-                        </Col>
+                        <PlanCard key={plan.id} plan={plan} />
                     ))}
-                </Row>
+                </div>
 
                 {/* FAQ Section */}
                 <div className="mt-16 text-center">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                    <h2 className="text-2xl font-bold text-foreground mb-6">
                         Frequently Asked Questions
                     </h2>
-                    <div className="max-w-2xl mx-auto">
-                        <div className="bg-white p-6 rounded-lg shadow-sm mb-4">
-                            <h3 className="font-semibold mb-2">Can I change my plan later?</h3>
-                            <p className="text-gray-600">Yes, you can upgrade or downgrade your plan at any time from your account settings.</p>
-                        </div>
-                        <div className="bg-white p-6 rounded-lg shadow-sm mb-4">
-                            <h3 className="font-semibold mb-2">Is this a demo payment system?</h3>
-                            <p className="text-gray-600">Yes, this is a demo. No real payments will be processed. Use any test card details.</p>
-                        </div>
-                        <div className="bg-white p-6 rounded-lg shadow-sm">
-                            <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
-                            <p className="text-gray-600">We accept all major credit cards, PayPal, and bank transfers (demo only).</p>
-                        </div>
+                    <div className="max-w-2xl mx-auto space-y-4">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-left">Can I change my plan later?</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-left">Yes, you can upgrade or downgrade your plan at any time from your account settings.</p>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-left">Is this a demo payment system?</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-left">Yes, this is a demo. No real payments will be processed. Use any test card details.</p>
+                            </CardContent>
+                        </Card>
+                        
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-left">What payment methods do you accept?</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-left">We accept all major credit cards, PayPal, and bank transfers (demo only).</p>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
 
                 {/* Back to Dashboard */}
                 <div className="text-center mt-12">
                     <Button 
-                        type="link" 
-                        size="large"
+                        variant="link" 
+                        size="lg"
                         onClick={() => window.location.href = '/dashboard'}
                     >
                         ← Back to Dashboard
