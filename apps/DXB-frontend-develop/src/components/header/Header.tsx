@@ -17,6 +17,8 @@ const Header: React.FC = () => {
             case '/payment':
             case '/payments':
                 return 'Payments';
+            case '/pricing':
+                return 'Pricing';
             case '/profile':
                 return 'Profile';
             case '/dashboard':

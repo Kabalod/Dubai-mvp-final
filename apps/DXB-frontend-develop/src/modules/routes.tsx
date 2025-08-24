@@ -8,6 +8,7 @@ import Reports from "@/pages/Reports";
 import Policy from "@/pages/Policy/Policy";
 import Profile from "@/pages/Profile";
 import Payment from "@/pages/Payment";
+import PricingPage from "@/pages/PricingPage";
 
 export default function AppRoutes() {
     return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
             <Route path="/reports" element={<Reports />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/payment" element={<Payment />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/policy" element={<Policy />} />
             <Route path="*" element={<NotFound />} />
         </Routes>

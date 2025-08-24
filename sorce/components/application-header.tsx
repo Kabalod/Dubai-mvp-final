@@ -1,74 +1,65 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Building2, ChevronDown } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface ApplicationHeaderProps {
   activeRoute?: string
 }
 
 export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderProps) {
-  const navigationItems = ["Main", "Analytics", "Reports", "Payments"]
+  const navigationItems = [
+    { name: "Main", href: "/" },
+    { name: "Analytics", href: "/analytics" },
+    { name: "Reports", href: "/reports" },
+    { name: "Pricing", href: "/pricing" },
+  ]
 
   return (
     <header className="w-full bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          {/* Left: Logo */}
-          <div className="flex items-center space-x-2">
-            <Building2 className="h-6 w-6 text-blue-500" />
-            <span className="text-xl font-bold text-gray-900">Dubai MVP</span>
+          <div className="flex items-center">
+            <span className="text-lg font-bold text-gray-900">LOGO</span>
           </div>
 
-          {/* Center: Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => (
               <Button
-                key={item}
+                key={item.name}
                 variant="ghost"
-                className={`text-sm font-medium transition-colors hover:text-blue-600 ${
-                  activeRoute === item ? "text-blue-600 border-b-2 border-blue-600 rounded-none pb-1" : "text-gray-600"
+                className={`text-sm font-medium transition-colors hover:text-blue-600 px-0 ${
+                  activeRoute === item.name ? "text-blue-600" : "text-gray-600"
                 }`}
+                onClick={() => (window.location.href = item.href)}
               >
-                {item}
+                {item.name}
               </Button>
             ))}
           </nav>
 
-          {/* Right: User Profile */}
           <div className="flex items-center space-x-4">
-            <div className="hidden md:flex flex-col items-end">
-              <span className="text-sm font-medium text-gray-900">john.doe@example.com</span>
-              <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                PREMIUM
-              </Badge>
-            </div>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center space-x-2 p-2">
+                <Button
+                  variant="ghost"
+                  className="flex items-center space-x-2 text-sm font-medium text-gray-600 hover:text-gray-900"
+                >
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">JD</AvatarFallback>
                   </Avatar>
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                  <span>John Doe</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>Profile Settings</DropdownMenuItem>
-                <DropdownMenuItem>Account</DropdownMenuItem>
-                <DropdownMenuItem>Billing</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => (window.location.href = "/profile")}>
+                  Profile Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => (window.location.href = "/payments")}>
+                  Billing & Payments
+                </DropdownMenuItem>
+                <DropdownMenuItem>Sign out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

@@ -17,7 +17,7 @@ interface ApplicationHeaderProps {
 }
 
 export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderProps) {
-  const navigationItems = ["Main", "Analytics", "Reports", "Payments"]
+  const navigationItems = ["Main", "Analytics", "Reports", "Payments", "Pricing"]
 
   return (
     <header className="w-full bg-white border-b border-gray-200">
@@ -32,15 +32,16 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
           {/* Center: Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => {
-              const getRoute = (navItem: string) => {
-                switch (navItem) {
-                  case 'Main': return '/';
-                  case 'Analytics': return '/analytics';
-                  case 'Reports': return '/reports';
-                  case 'Payments': return '/payment';
-                  default: return '/';
-                }
-              };
+                                  const getRoute = (navItem: string) => {
+                        switch (navItem) {
+                            case 'Main': return '/';
+                            case 'Analytics': return '/analytics';
+                            case 'Reports': return '/reports';
+                            case 'Payments': return '/payment';
+                            case 'Pricing': return '/pricing';
+                            default: return '/';
+                        }
+                    };
               
               return (
                 <Button
