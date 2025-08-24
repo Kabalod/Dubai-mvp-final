@@ -1,286 +1,488 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-
 import { Badge } from '../components/ui/badge';
-
+import { Input } from '../components/ui/input';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../utils/api';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { CreditCard, Calendar, DollarSign, Download, Search, Check, Star, Zap } from 'lucide-react';
 
-// ========================================
 // Payment Plans Configuration
-// ========================================
-
 const PAYMENT_PLANS = [
-    {
-        id: 'free',
-        name: 'Free',
-        price: 0,
-        period: 'month',
-        description: 'Basic access to property data',
-        features: [
-            'View up to 50 properties per day',
-            'Basic search and filters',
-            'Public analytics dashboard',
-            'Email support',
-        ],
-        limitations: [
-            'Limited property details',
-            'No export functionality',
-            'Basic support only',
-        ],
-        color: '#52c41a',
-        popular: false,
-    },
-    {
-        id: 'premium',
-        name: 'Premium',
-        price: 299,
-        period: 'month',
-        description: 'Full access with advanced features',
-        features: [
-            'Unlimited property access',
-            'Advanced search and analytics',
-            'Export to CSV/Excel',
-            'Real-time market insights',
-            'Premium dashboard with charts',
-            'Priority email & chat support',
-            'API access (limited)',
-        ],
-        limitations: [],
-        color: '#1890ff',
-        popular: true,
-    },
-    {
-        id: 'enterprise',
-        name: 'Enterprise',
-        price: 999,
-        period: 'month',
-        description: 'Complete solution for businesses',
-        features: [
-            'Everything in Premium',
-            'Unlimited API access',
-            'Custom integrations',
-            'White-label options',
-            'Dedicated account manager',
-            '24/7 phone support',
-            'Custom reports and analytics',
-            'Multi-user team access',
-        ],
-        limitations: [],
-        color: '#722ed1',
-        popular: false,
-    },
+  {
+    id: 'free',
+    name: 'Free',
+    price: 0,
+    period: 'forever',
+    description: 'Perfect for getting started with basic analytics',
+    features: [
+      'Up to 100 property views per month',
+      'Basic market analytics',
+      'Standard support',
+      'Export to PDF'
+    ],
+    limitations: [
+      'Advanced analytics',
+      'API access', 
+      'Custom reports',
+      'Priority support'
+    ],
+    popular: false,
+    current: false,
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    price: 299,
+    period: 'month',
+    description: 'Advanced features for real estate professionals',
+    features: [
+      'Unlimited property views',
+      'Advanced market analytics',
+      'Real-time data updates',
+      'API access',
+      'Custom reports',
+      'Priority support',
+      'Export to multiple formats',
+      'Team collaboration (up to 5 users)',
+    ],
+    limitations: [],
+    popular: true,
+    current: true,
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 999,
+    period: 'month',
+    description: 'Complete solution for large organizations',
+    features: [
+      'Everything in Premium',
+      'Unlimited team members',
+      'Custom integrations',
+      'Dedicated account manager',
+      'SLA guarantee',
+      'Custom branding',
+      'Advanced security features',
+      'On-premise deployment option',
+    ],
+    limitations: [],
+    popular: false,
+    current: false,
+  },
 ];
 
-// ========================================
-// Payment Component
-// ========================================
+const ADD_ONS = [
+  {
+    name: 'Additional API Calls',
+    price: '0.01',
+    unit: 'per call',
+    description: 'Extra API calls beyond your plan limit',
+  },
+  {
+    name: 'Data Export Credits',
+    price: '49',
+    unit: 'per 1000 exports',
+    description: 'Additional data export capabilities',
+  },
+  {
+    name: 'Custom Analytics',
+    price: '199',
+    unit: 'per month',
+    description: 'Tailored analytics dashboard',
+  },
+];
+
+const MOCK_TRANSACTIONS = [
+  {
+    id: 'TXN-001',
+    date: '2024-01-15',
+    description: 'Premium Plan Subscription',
+    amount: '299.00',
+    status: 'Completed',
+    method: 'Visa ****4242',
+  },
+  {
+    id: 'TXN-002',
+    date: '2024-01-01',
+    description: 'Analytics Add-on',
+    amount: '99.00',
+    status: 'Completed',
+    method: 'Visa ****4242',
+  },
+  {
+    id: 'TXN-003',
+    date: '2023-12-15',
+    description: 'Premium Plan Subscription',
+    amount: '299.00',
+    status: 'Completed',
+    method: 'Visa ****4242',
+  },
+  {
+    id: 'TXN-004',
+    date: '2023-12-01',
+    description: 'Data Export Credits',
+    amount: '49.00',
+    status: 'Failed',
+    method: 'Visa ****4242',
+  },
+];
 
 const Payment: React.FC = () => {
-    const { user, getToken } = useAuth();
-    const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [testPaymentLoading, setTestPaymentLoading] = useState<string>('');
+  const [testPaymentSuccess, setTestPaymentSuccess] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState('');
 
-    const [userProfile, setUserProfile] = useState<any>(null);
+  const handleTestPayment = async (planId: string) => {
+    setTestPaymentLoading(planId);
+    setTestPaymentSuccess('');
+    
+    // Симуляция тестового платежа
+    setTimeout(() => {
+      setTestPaymentLoading('');
+      setTestPaymentSuccess(planId);
+      
+      // Сброс сообщения через 3 секунды
+      setTimeout(() => {
+        setTestPaymentSuccess('');
+      }, 3000);
+    }, 2000);
+  };
 
-    // Load user profile on component mount
-    useEffect(() => {
-        const loadUserProfile = async () => {
-            if (user) {
-                try {
-                    const token = getToken();
-                    if (token) {
-                        const profile = await api.getUserProfile(token);
-                        setUserProfile(profile);
-                    }
-                } catch (error) {
-                    console.error('Failed to load user profile:', error);
-                }
-            }
-        };
+  const filteredTransactions = MOCK_TRANSACTIONS.filter(transaction =>
+    transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    transaction.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-        loadUserProfile();
-    }, [user, getToken]);
+  return (
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
+      
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Payments & Billing</h1>
+          <p className="text-gray-600 mt-1">Manage your subscription, billing, and payment history</p>
+        </div>
+        <Button className="bg-blue-500 hover:bg-blue-600">
+          <Download className="mr-2 h-4 w-4" />
+          Export
+        </Button>
+      </div>
 
+      {/* Success Message */}
+      {testPaymentSuccess && (
+        <Alert className="border-green-200 bg-green-50">
+          <Check className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            ✅ Test payment successful! Upgraded to {PAYMENT_PLANS.find(p => p.id === testPaymentSuccess)?.name} plan
+          </AlertDescription>
+        </Alert>
+      )}
 
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="plans">Plans & Pricing</TabsTrigger>
+          <TabsTrigger value="transactions">Transactions</TabsTrigger>
+          <TabsTrigger value="methods">Payment Methods</TabsTrigger>
+        </TabsList>
 
-    const handleSelectPlan = (planId: string) => {
-        setSelectedPlan(planId);
-        const plan = PAYMENT_PLANS.find(p => p.id === planId);
-        
-        // Mock plan selection - no real payment
-        alert(`📋 Demo Mode: "${plan?.name}" plan selected!\n\nThis is a demonstration of the payment flow.\nNo real payment will be processed.`);
-    };
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          {/* Payment Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$1,234.56</div>
+                <p className="text-xs text-muted-foreground">Available credits</p>
+              </CardContent>
+            </Card>
 
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">This Month</CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$398.00</div>
+                <p className="text-xs text-muted-foreground">Total spent</p>
+              </CardContent>
+            </Card>
 
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Payment Method</CardTitle>
+                <CreditCard className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">Visa ****4242</div>
+                <p className="text-xs text-muted-foreground">Expires 12/25</p>
+              </CardContent>
+            </Card>
+          </div>
 
-    // ========================================
-    // Plan Card Component
-    // ========================================
-
-    const PlanCard: React.FC<{ plan: typeof PAYMENT_PLANS[0] }> = ({ plan }) => (
-        <Card className={`h-full relative rounded-[var(--radius-lg)] transition-all duration-200 hover:shadow-lg ${
-            plan.popular ? 'border-2 border-blue-500 shadow-blue-100' : ''
-        }`}>
-            {plan.popular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge className="px-3 py-1 bg-blue-500 text-white">
-                        ⭐ Most Popular
-                    </Badge>
-                </div>
-            )}
-
-            <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl font-bold" style={{ color: plan.color }}>
-                    {plan.name}
-                </CardTitle>
-                <div className="mb-2">
-                    <span className="text-4xl font-bold">${plan.price}</span>
-                    <span className="text-muted-foreground ml-1">/{plan.period}</span>
-                </div>
-                <CardDescription className="text-center">{plan.description}</CardDescription>
+          {/* Current Plan */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Plan</CardTitle>
+              <CardDescription>You are currently on the Premium plan</CardDescription>
             </CardHeader>
-
-            <CardContent className="space-y-6">
+            <CardContent>
+              <div className="flex items-center justify-between p-6 border rounded-lg bg-blue-50">
                 <div>
-                    <h4 className="font-semibold mb-3 text-green-600">✅ Included:</h4>
-                    <ul className="space-y-2">
-                        {plan.features.map((feature, index) => (
-                            <li key={index} className="flex items-start">
-                                <span className="text-green-500 mr-2 mt-1">✓</span>
-                                <span className="text-sm">{feature}</span>
-                            </li>
-                        ))}
-                    </ul>
+                  <h3 className="text-xl font-bold">Premium Plan</h3>
+                  <p className="text-gray-600">$299/month • Next billing: January 15, 2024</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge className="bg-green-100 text-green-700">Active</Badge>
+                    <Badge className="bg-blue-100 text-blue-700">Most Popular</Badge>
+                  </div>
                 </div>
+                <div className="text-right">
+                  <Button variant="outline" className="mb-2">Manage Plan</Button>
+                  <br />
+                  <Button variant="ghost" className="text-red-500">Cancel Subscription</Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                {plan.limitations.length > 0 && (
-                    <div>
-                        <h4 className="font-semibold mb-3 text-orange-600">⚠️ Limitations:</h4>
-                        <ul className="space-y-2">
-                            {plan.limitations.map((limitation, index) => (
-                                <li key={index} className="flex items-start">
-                                    <span className="text-orange-500 mr-2">•</span>
-                                    <span className="text-sm text-muted-foreground">{limitation}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+        {/* Plans & Pricing Tab */}
+        <TabsContent value="plans" className="space-y-6">
+          {/* Test Payment Notice */}
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center gap-2 text-yellow-800">
+              <Zap className="h-4 w-4" />
+              <strong>Test Mode</strong>
+            </div>
+            <p className="text-sm text-yellow-700 mt-1">
+              All payments are simulated for testing purposes. No real charges will be made.
+            </p>
+          </div>
+
+          {/* Pricing Plans */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {PAYMENT_PLANS.map((plan) => (
+              <Card key={plan.name} className={`relative ${plan.popular ? 'ring-2 ring-blue-500 shadow-lg' : ''}`}>
+                {plan.popular && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-blue-500 text-white px-4 py-1">
+                      <Star className="w-3 h-3 mr-1" />
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+                {plan.current && (
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-green-100 text-green-700">Current Plan</Badge>
+                  </div>
                 )}
 
-                <Button
-                    variant={plan.popular ? 'default' : 'outline'}
-                    size="lg"
-                    className="w-full h-12"
-                    onClick={() => handleSelectPlan(plan.id)}
-                    style={plan.popular ? { backgroundColor: plan.color, borderColor: plan.color } : {}}
-                >
-                    {plan.price === 0 ? '📋 Demo: Select Free' : `📋 Demo: Select ${plan.name}`}
-                </Button>
-            </CardContent>
-        </Card>
-    );
+                <CardHeader className="text-center pb-8">
+                  <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold">${plan.price}</span>
+                    <span className="text-gray-500">/{plan.period}</span>
+                  </div>
+                  <CardDescription className="mt-2">{plan.description}</CardDescription>
+                </CardHeader>
 
-
-
-    // ========================================
-    // Main Render
-    // ========================================
-
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-5xl font-bold text-foreground mb-4">
-                        Choose Your Plan
-                    </h1>
-                    <p className="text-xl text-muted-foreground mb-2">
-                        Unlock the power of Dubai real estate analytics
-                    </p>
-                    {user && (
-                        <div className="space-y-2">
-                            <p className="text-lg text-blue-600">
-                                Welcome back, {user.first_name || user.username}!
-                            </p>
-                            {userProfile?.subscription && (
-                                <Badge className="bg-green-100 text-green-700">
-                                    Current Plan: {userProfile.subscription.plan_name || 'Free'}
-                                </Badge>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                {/* Demo Notice */}
-                <div className="mb-8">
-                    <Alert className="max-w-2xl mx-auto">
-                        <AlertDescription className="text-center">
-                            <strong>🎯 Demo Payment System</strong><br />
-                            This is a demonstration of our pricing plans. No real payments will be processed. 
-                            Click any plan to see the demo selection flow.
-                        </AlertDescription>
-                    </Alert>
-                </div>
-
-                {/* Pricing Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center mb-16">
-                    {PAYMENT_PLANS.map((plan) => (
-                        <PlanCard key={plan.id} plan={plan} />
+                <CardContent className="space-y-6">
+                  <div className="space-y-3">
+                    {plan.features.map((feature) => (
+                      <div key={feature} className="flex items-center space-x-3">
+                        <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm">{feature}</span>
+                      </div>
                     ))}
-                </div>
+                    {plan.limitations.map((limitation) => (
+                      <div key={limitation} className="flex items-center space-x-3">
+                        <span className="h-4 w-4 text-gray-400 flex-shrink-0">✕</span>
+                        <span className="text-sm text-gray-500">{limitation}</span>
+                      </div>
+                    ))}
+                  </div>
 
-                {/* FAQ Section */}
-                <div className="mt-16 text-center">
-                    <h2 className="text-2xl font-bold text-foreground mb-6">
-                        Frequently Asked Questions
-                    </h2>
-                    <div className="max-w-2xl mx-auto space-y-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-left">Can I change my plan later?</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground text-left">Yes, you can upgrade or downgrade your plan at any time from your account settings.</p>
-                            </CardContent>
-                        </Card>
-                        
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-left">Is this a demo payment system?</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground text-left">Yes, this is a demonstration only. No payment processing is implemented. Plan selection shows a demo message.</p>
-                            </CardContent>
-                        </Card>
-                        
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-left">How does the demo work?</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground text-left">Simply click any plan to see a demo selection message. This showcases the pricing structure without real payment processing.</p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
+                  <Button
+                    className={`w-full ${plan.popular ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
+                    variant={plan.current ? 'outline' : plan.popular ? 'default' : 'outline'}
+                    disabled={plan.current || testPaymentLoading === plan.id}
+                    onClick={() => handleTestPayment(plan.id)}
+                  >
+                    {testPaymentLoading === plan.id ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </>
+                    ) : plan.current ? (
+                      'Current Plan'
+                    ) : plan.name === 'Free' ? (
+                      'Get Started'
+                    ) : (
+                      'Test Upgrade'
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-                {/* Back to Dashboard */}
-                <div className="text-center mt-12">
-                    <Button 
-                        variant="link" 
-                        size="lg"
-                        onClick={() => window.location.href = '/dashboard'}
-                    >
-                        ← Back to Dashboard
-                    </Button>
-                </div>
+          {/* Add-ons Section */}
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900">Add-ons</h2>
+              <p className="text-gray-600 mt-2">Enhance your plan with additional features</p>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {ADD_ONS.map((addon) => (
+                <Card key={addon.name}>
+                  <CardHeader>
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-5 w-5 text-blue-500" />
+                      <CardTitle className="text-lg">{addon.name}</CardTitle>
+                    </div>
+                    <div className="mt-2">
+                      <span className="text-2xl font-bold">${addon.price}</span>
+                      <span className="text-gray-500 text-sm"> {addon.unit}</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-600 mb-4">{addon.description}</p>
+                    <Button variant="outline" className="w-full bg-transparent">
+                      Add to Plan
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
 
-        </div>
-    );
+        {/* Transactions Tab */}
+        <TabsContent value="transactions" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Transaction History</CardTitle>
+                  <CardDescription>Your recent payment transactions</CardDescription>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input 
+                      placeholder="Search transactions..." 
+                      className="pl-10 w-64"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredTransactions.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <DollarSign className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{transaction.description}</p>
+                        <p className="text-sm text-gray-500">
+                          {transaction.date} • {transaction.method}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className="font-medium">${transaction.amount}</p>
+                        <Badge
+                          variant={transaction.status === "Completed" ? "default" : "destructive"}
+                          className={transaction.status === "Completed" ? "bg-green-100 text-green-700" : ""}
+                        >
+                          {transaction.status}
+                        </Badge>
+                      </div>
+                      <Button variant="ghost" size="sm">
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Payment Methods Tab */}
+        <TabsContent value="methods" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment Methods</CardTitle>
+              <CardDescription>Manage your payment methods and billing information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <CreditCard className="h-8 w-8 text-blue-500" />
+                  <div>
+                    <p className="font-medium">Visa ending in 4242</p>
+                    <p className="text-sm text-gray-500">Expires 12/25</p>
+                  </div>
+                  <Badge className="bg-green-100 text-green-700">Primary</Badge>
+                </div>
+                <Button variant="outline" size="sm">
+                  Edit
+                </Button>
+              </div>
+              <Button variant="outline" className="w-full bg-transparent">
+                <CreditCard className="mr-2 h-4 w-4" />
+                Add Payment Method
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Billing Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Billing Information</CardTitle>
+              <CardDescription>Update your billing address and contact information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Company Name</label>
+                  <Input defaultValue="Real Estate Pro LLC" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Email</label>
+                  <Input defaultValue="john.doe@example.com" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Address</label>
+                  <Input defaultValue="123 Business St" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">City</label>
+                  <Input defaultValue="Dubai" />
+                </div>
+              </div>
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                Update Billing Info
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
 };
 
 export default Payment;
