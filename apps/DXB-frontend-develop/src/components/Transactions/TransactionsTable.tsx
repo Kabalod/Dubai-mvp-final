@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface TransactionsTableProps {
-    rows: Array<{
+    rows?: Array<{
         key: React.Key;
         date: string;
         location: string;
@@ -11,7 +11,51 @@ interface TransactionsTableProps {
     }>;
 }
 
-const TransactionsTable: React.FC<TransactionsTableProps> = ({ rows }) => {
+// Моковые данные для демонстрации
+const mockTransactions = [
+    {
+        key: '1',
+        date: '2024-08-21',
+        location: 'Downtown Dubai',
+        rooms: '2BR',
+        sqm: '95',
+        price: '1,850,000'
+    },
+    {
+        key: '2',
+        date: '2024-08-20',
+        location: 'Dubai Marina',
+        rooms: '1BR',
+        sqm: '75',
+        price: '1,200,000'
+    },
+    {
+        key: '3',
+        date: '2024-08-19',
+        location: 'Business Bay',
+        rooms: '3BR',
+        sqm: '120',
+        price: '2,500,000'
+    },
+    {
+        key: '4',
+        date: '2024-08-18',
+        location: 'DIFC',
+        rooms: '2BR',
+        sqm: '85',
+        price: '2,100,000'
+    },
+    {
+        key: '5',
+        date: '2024-08-17',
+        location: 'JBR',
+        rooms: '1BR',
+        sqm: '65',
+        price: '1,400,000'
+    }
+];
+
+const TransactionsTable: React.FC<TransactionsTableProps> = ({ rows = mockTransactions }) => {
     return (
         <div className="space-y-3">
             <table className="w-full">

@@ -16,14 +16,14 @@ export function DataSourceSelector({ activeSource = "DLD", onSourceChange }: Dat
       title: "DLD",
       description: "Analyze all real transaction data obtained from Dubai Land Department.",
       icon: <CheckCircle className="h-5 w-5 text-blue-500" />,
-      logo: "/dubai-land-department-logo.png",
+      logo: null, // Логотип пока не подключен
     },
     {
       id: "Marketplace",
       title: "Marketplace",
       description: "Analyze data received from real estate sales marketplaces.",
       icon: <Building2 className="h-5 w-5 text-red-500" />,
-      logos: ["/property-finder-logo.png", "/bayut-logo.png"],
+      logos: [], // Логотипы пока не подключены
     },
   ]
 
