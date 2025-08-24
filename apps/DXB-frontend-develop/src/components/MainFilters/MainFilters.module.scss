@@ -79,6 +79,51 @@
     }
 }
 
+.expandableFilters {
+    margin-top: 16px;
+    
+    & :global(.ant-collapse-header) {
+        border-radius: var(--radius-lg) !important;
+        background-color: $bgColorGrey;
+        border: none !important;
+    }
+    
+    & :global(.ant-collapse-content-box) {
+        padding: 20px;
+        background-color: $bgColorWhite;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+}
+
+.filterCount {
+    color: $primary;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.advancedFiltersContent {
+    .filterRow {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 16px;
+        
+        label {
+            @include body1medium;
+            color: $textColorGrey;
+        }
+    }
+    
+    .filterActions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid $bgColorGrey;
+    }
+}
+
 .searchButton {
     height: 48px;
     @include body1medium;

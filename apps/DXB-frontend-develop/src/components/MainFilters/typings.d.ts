@@ -9,6 +9,12 @@ interface IMainQuery {
     offset: number;
     limit?: number;
     sorting: Ordering;
+    // Расширенные фильтры
+    propertyType?: string;
+    area?: string;
+    priceRange?: string;
+    minPrice?: number | null;
+    maxPrice?: number | null;
 }
 
 type PropertyComponents =

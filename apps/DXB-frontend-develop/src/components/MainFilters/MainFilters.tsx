@@ -1,5 +1,5 @@
 import styles from "./MainFilters.module.scss";
-import { Flex, Row, Segmented } from "antd";
+import { Flex, Row, Segmented, InputNumber, Space, Collapse } from "antd";
 import { useEffect, useState, useCallback } from "react";
 import { Ordering, TransactionTypeEnum } from "@/api/schema";
 import { Trans } from "@lingui/react/macro";
@@ -26,6 +26,36 @@ const propertyComponentsOptions: Array<PropertyComponentsOption> = [
     { value: "4 B/R", label: "4+ B/R" },
 ];
 
+// Расширенные опции фильтрации
+const propertyTypeOptions = [
+    { value: "apartment", label: "Apartment" },
+    { value: "villa", label: "Villa" },
+    { value: "townhouse", label: "Townhouse" },
+    { value: "penthouse", label: "Penthouse" },
+    { value: "office", label: "Office" },
+    { value: "land", label: "Land" },
+];
+
+const areaOptions = [
+    { value: "downtown", label: "Downtown Dubai" },
+    { value: "marina", label: "Dubai Marina" },
+    { value: "jbr", label: "JBR" },
+    { value: "palm", label: "Palm Jumeirah" },
+    { value: "business_bay", label: "Business Bay" },
+    { value: "difc", label: "DIFC" },
+    { value: "jumeirah", label: "Jumeirah" },
+    { value: "deira", label: "Deira" },
+];
+
+const priceRanges = [
+    { value: "0-500000", label: "Under 500K AED" },
+    { value: "500000-1000000", label: "500K - 1M AED" },
+    { value: "1000000-2000000", label: "1M - 2M AED" },
+    { value: "2000000-5000000", label: "2M - 5M AED" },
+    { value: "5000000-10000000", label: "5M - 10M AED" },
+    { value: "10000000+", label: "10M+ AED" },
+];
+
 const transactionsTypeOptions: Array<TransactionTypeOption> = [
     { value: "SALE", label: "Sales" },
     { value: "RENT", label: "Rental" },
@@ -49,6 +79,12 @@ export const initialQueryState: IMainQuery = {
     offset: 0,
     limit: 100,
     sorting: Ordering.Desc,
+    // Новые поля фильтров
+    propertyType: "",
+    area: "",
+    priceRange: "",
+    minPrice: null,
+    maxPrice: null,
 };
 
 const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
@@ -92,6 +128,48 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
     const handleSearch = useCallback(() => {
         onSearch(filtersState);
     }, [filtersState, onSearch]);
+
+    // Новые обработчики для расширенных фильтров
+    const handlePropertyTypeChange = (value: string) => {
+        const nextVal: IMainQuery = { ...filtersState, propertyType: value };
+        setFiltersState(nextVal);
+    };
+
+    const handleAreaChange = (value: string) => {
+        const nextVal: IMainQuery = { ...filtersState, area: value };
+        setFiltersState(nextVal);
+    };
+
+    const handlePriceRangeChange = (value: string) => {
+        const nextVal: IMainQuery = { ...filtersState, priceRange: value };
+        setFiltersState(nextVal);
+    };
+
+    const handleMinPriceChange = (value: number | null) => {
+        const nextVal: IMainQuery = { ...filtersState, minPrice: value };
+        setFiltersState(nextVal);
+    };
+
+    const handleMaxPriceChange = (value: number | null) => {
+        const nextVal: IMainQuery = { ...filtersState, maxPrice: value };
+        setFiltersState(nextVal);
+    };
+
+    const handleClearFilters = () => {
+        setFiltersState(initialQueryState);
+        onSearch(initialQueryState);
+    };
+
+    const getActiveFiltersCount = () => {
+        let count = 0;
+        if (filtersState.propertyComponents.length > 0) count++;
+        if (filtersState.propertyType) count++;
+        if (filtersState.area) count++;
+        if (filtersState.priceRange) count++;
+        if (filtersState.minPrice || filtersState.maxPrice) count++;
+        if (filtersState.searchSubstring) count++;
+        return count;
+    };
 
     useEffect(() => {
         // Инициализация фильтров при монтировании
@@ -139,6 +217,104 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                         <Trans id="filters.search">SEARCH</Trans>
                     </CustomButton>
                 </Flex>
+
+                {/* Расширенные фильтры */}
+                <Collapse 
+                    className={styles.expandableFilters}
+                    bordered={false}
+                    items={[
+                        {
+                            key: 'advanced',
+                            label: (
+                                <Space>
+                                    <Trans id="filters.advanced">Advanced Filters</Trans>
+                                    {getActiveFiltersCount() > 0 && (
+                                        <span className={styles.filterCount}>
+                                            ({getActiveFiltersCount()} active)
+                                        </span>
+                                    )}
+                                </Space>
+                            ),
+                            children: (
+                                <div className={styles.advancedFiltersContent}>
+                                    <Row gutter={[16, 16]}>
+                                        <div className={styles.filterRow}>
+                                            <label>Property Type:</label>
+                                            <CustomSelect
+                                                placeholder="Select property type"
+                                                allowClear
+                                                value={filtersState.propertyType || undefined}
+                                                onChange={handlePropertyTypeChange}
+                                                options={propertyTypeOptions}
+                                                className={styles.selectProperty}
+                                            />
+                                        </div>
+                                        <div className={styles.filterRow}>
+                                            <label>Area:</label>
+                                            <CustomSelect
+                                                placeholder="Select area"
+                                                allowClear
+                                                value={filtersState.area || undefined}
+                                                onChange={handleAreaChange}
+                                                options={areaOptions}
+                                                className={styles.selectProperty}
+                                            />
+                                        </div>
+                                        <div className={styles.filterRow}>
+                                            <label>Price Range:</label>
+                                            <CustomSelect
+                                                placeholder="Select price range"
+                                                allowClear
+                                                value={filtersState.priceRange || undefined}
+                                                onChange={handlePriceRangeChange}
+                                                options={priceRanges}
+                                                className={styles.selectProperty}
+                                            />
+                                        </div>
+                                        <div className={styles.filterRow}>
+                                            <label>Custom Price Range (AED):</label>
+                                            <Space>
+                                                <InputNumber
+                                                    placeholder="Min"
+                                                    value={filtersState.minPrice}
+                                                    onChange={handleMinPriceChange}
+                                                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                    parser={(value) => value!.replace(/\$\s?|(,*)/g, '')}
+                                                    style={{ width: 120 }}
+                                                />
+                                                <span>—</span>
+                                                <InputNumber
+                                                    placeholder="Max"
+                                                    value={filtersState.maxPrice}
+                                                    onChange={handleMaxPriceChange}
+                                                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                    parser={(value) => value!.replace(/\$\s?|(,*)/g, '')}
+                                                    style={{ width: 120 }}
+                                                />
+                                            </Space>
+                                        </div>
+                                    </Row>
+                                    
+                                    <div className={styles.filterActions}>
+                                        <CustomButton 
+                                            onClick={handleClearFilters}
+                                            variant="secondary"
+                                        >
+                                            <Trans id="filters.clear">Clear All</Trans>
+                                        </CustomButton>
+                                        <CustomButton 
+                                            onClick={handleSearch}
+                                            variant="primary"
+                                        >
+                                            <Trans id="filters.apply">Apply Filters</Trans>
+                                        </CustomButton>
+                                    </div>
+                                </div>
+                            )
+                        }
+                    ]}
+                />
+            </section>
             </Row>
             <Row className={styles.lastRow}>
                 <Flex gap={"small"}>
