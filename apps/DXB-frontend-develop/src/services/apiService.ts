@@ -188,11 +188,83 @@ class ApiService {
     }
 
     // ========================================
+    // New Authentication API (OTP-based)
+    // ========================================
+
+    async otpLogin(email: string, otp_code?: string): Promise<LoginResponse> {
+        const response = await this.api.post('/auth/login/', {
+            email,
+            otp_code
+        });
+        
+        if (response.data.access) {
+            localStorage.setItem('accessToken', response.data.access);
+            localStorage.setItem('refreshToken', response.data.refresh);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
+        
+        return response.data;
+    }
+
+    async registerUser(userData: RegisterRequest): Promise<LoginResponse> {
+        const response = await this.api.post('/auth/register/', userData);
+        
+        if (response.data.access) {
+            localStorage.setItem('accessToken', response.data.access);
+            localStorage.setItem('refreshToken', response.data.refresh);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
+        
+        return response.data;
+    }
+
+    // ========================================
     // Profile API
     // ========================================
 
-    async getProfile() {
-        const response = await this.api.get('/auth/profile/');
+    async getProfile(): Promise<User> {
+        const response = await this.api.get('/profile/me/');
+        return response.data;
+    }
+
+    async updateProfile(profileData: Partial<User>): Promise<User> {
+        const response = await this.api.put('/profile/me/', profileData);
+        return response.data;
+    }
+
+    async partialUpdateProfile(profileData: Partial<User>): Promise<User> {
+        const response = await this.api.patch('/profile/me/', profileData);
+        return response.data;
+    }
+
+    // ========================================
+    // Admin API
+    // ========================================
+
+    async getUsers(): Promise<User[]> {
+        const response = await this.api.get('/admin/users/');
+        return response.data;
+    }
+
+    async getPayments(): Promise<Payment[]> {
+        const response = await this.api.get('/admin/payments/');
+        return response.data;
+    }
+
+    // ========================================
+    // User Reports API  
+    // ========================================
+
+    async getUserReports(): Promise<UserReportHistory[]> {
+        const response = await this.api.get('/reports/history/');
+        return response.data;
+    }
+
+    async generateReport(reportType: string, parameters: Record<string, any>): Promise<UserReportHistory> {
+        const response = await this.api.post('/reports/generate/', {
+            report_type: reportType,
+            parameters
+        });
         return response.data;
     }
 
@@ -286,10 +358,80 @@ export interface User {
     email: string;
     first_name: string;
     last_name: string;
-    role?: string;
+    is_active: boolean;
+    is_staff: boolean;
+    is_superuser: boolean;
+    date_joined: string;
+    last_login?: string;
+    groups: string[];
+    user_permissions: string[];
+}
+
+export interface OTPCode {
+    id: number;
+    email: string;
+    code: string;
+    created_at: string;
+    expires_at: string;
+    is_used: boolean;
+    attempts: number;
+}
+
+export interface Payment {
+    id: number;
+    user: number;
+    stripe_charge_id: string;
+    amount: string;
+    currency: string;
+    status: string;
+    created_at: string;
+    updated_at: string;
+    description?: string;
+}
+
+export interface PaymentEventAudit {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    provider: string;
+    event_type: string;
+    event_id: string;
+    payload: Record<string, any>;
+    processed_at?: string;
+    status: string;
+    error_message?: string;
+    related_payment?: number;
+}
+
+export interface UserReportHistory {
+    id: number;
+    user: number;
+    report_type: string;
+    generated_at: string;
+    file_path: string;
+    parameters: Record<string, any>;
 }
 
 export interface AuthTokens {
     access: string;
     refresh: string;
+}
+
+export interface RegisterRequest {
+    username: string;
+    email: string;
+    password: string;
+    first_name?: string;
+    last_name?: string;
+}
+
+export interface OTPLoginRequest {
+    email: string;
+    otp_code?: string;
+}
+
+export interface LoginResponse {
+    access: string;
+    refresh: string;
+    user: User;
 }
