@@ -41,7 +41,7 @@ const DashboardBlock: React.FC<DashboardBlockProps> = ({ title, content }) => {
                         <div className={styles.mosaic}>
                             {content.map((item, index) => {
                                 return (
-                                    <Card className={styles.card} key={index}>
+                                    <Card className={styles.card} key={item.title || `card-${index}`}>
                                         <Row>
                                             <Col span={16}>
                                                 <span

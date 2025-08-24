@@ -142,7 +142,7 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
             </Row>
             <Row className={styles.lastRow}>
                 <Flex gap={"small"}>
-                    {periodOptions.map((period, index) => (
+                    {periodOptions.map((period) => (
                         <CustomButton
                             shape="round"
                             className={styles.periodButton}
@@ -152,7 +152,7 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                                     ? "primary"
                                     : "outline"
                             }
-                            key={index}
+                            key={period.value}
                         >
                             {period.label}
                         </CustomButton>

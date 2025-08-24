@@ -45,7 +45,7 @@ const Transactions: React.FC<TransactionsProps> = ({
 }) => {
     const numberOfRecords = data?.totalCount ?? 0;
     const transactions =
-        data?.results?.map((d) => ({ ...d, key: Math.random() })) ?? [];
+        data?.results?.map((d, index) => ({ ...d, key: d.id || `transaction-${index}` })) ?? [];
 
     const handlePagination = (
         pagination: TablePaginationConfig,
