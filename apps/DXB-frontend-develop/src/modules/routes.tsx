@@ -1,13 +1,10 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Auth from "@/pages/auth/Auth";
-import SimpleAuth from "@/pages/SimpleAuth";
 import HomePage from "@/pages/HomePage";
 import MainDashboard from "@/pages/MainDashboard";
 import NotFound from "@/pages/NotFound";
 import Analytics from "@/pages/analytics/Analytics";
 import Reports from "@/pages/Reports";
-import SimpleAnalytics from "@/pages/SimpleAnalytics";
-import SimpleReports from "@/pages/SimpleReports";
 import Policy from "@/pages/Policy/Policy";
 import Profile from "@/pages/Profile";
 import Payment from "@/pages/Payment";

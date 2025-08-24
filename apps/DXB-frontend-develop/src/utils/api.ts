@@ -8,13 +8,17 @@ export interface Property {
   id: string;
   listing_id: string;
   title: string;
-  description: string;
+  description?: string;
+  display_address: string;
   property_type: string;
   price: number;
+  price_currency?: string;
+  price_duration?: string;
   area: string;
-  bedrooms: number;
-  bathrooms: number;
+  bedrooms: string | null; // Backend возвращает CharField - может быть строкой
+  bathrooms: string | null;
   sqm: number;
+  numeric_area?: number;
   location: {
     area: string;
     building: string;
@@ -22,7 +26,18 @@ export interface Property {
   };
   images?: string[];
   listing_type: 'sale' | 'rent';
-  created_at: string;
+  created_at?: string;
+  added_on?: string;
+  area_name?: string;
+  building_name?: string;
+  furnishing?: string;
+  broker?: string;
+  agent?: string;
+  agent_phone?: string;
+  verified?: boolean;
+  latitude?: number;
+  longitude?: number;
+  url?: string;
 }
 
 export interface Area {
@@ -54,7 +69,7 @@ export interface PropertyStats {
 export interface PropertyFilters {
   search?: string;
   property_type?: string;
-  bedrooms?: number;
+  bedrooms?: string; // Backend ожидает строку
   area?: string;
   min_price?: number;
   max_price?: number;

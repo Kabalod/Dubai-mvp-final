@@ -29,8 +29,8 @@ interface RealEstateDashboardProps {
     title: string;
     price: number;
     area: string;
-    bedrooms: number;
-    bathrooms: number;
+    bedrooms: string | null; // Соответствие с backend
+    bathrooms: string | null;
     sqm: number;
     location: { area: string; building: string };
     images: string[];
