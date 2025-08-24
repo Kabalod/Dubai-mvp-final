@@ -1,4 +1,6 @@
 // apps/DXB-frontend-develop/src/styles/custom-buttons.scss
+@use "./typography" as *;
+@use "./tokens" as *;
 
 // Base styles for custom buttons, leveraging Ant Design's structure
 .custom-btn {

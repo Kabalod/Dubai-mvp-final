@@ -1,4 +1,5 @@
-// типографика и токены подключены через global.scss, лишний @use удалён
+@use "@/styles/typography" as *;
+@use "@/styles/tokens" as *;
 
 .container {
     display: flex;

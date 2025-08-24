@@ -1,4 +1,5 @@
-// Глобальные стили уже инжектятся через global.scss; прямые @use убраны, чтобы избежать конфликтов миксинов
+@use "@/styles/typography" as *;
+@use "@/styles/tokens" as *;
 
 .container {
     position: sticky;
