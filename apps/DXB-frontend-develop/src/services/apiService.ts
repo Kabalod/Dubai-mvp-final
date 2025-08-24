@@ -273,12 +273,42 @@ class ApiService {
     // ========================================
 
     isAuthenticated(): boolean {
-        return !!localStorage.getItem('accessToken');
+        const token = localStorage.getItem('accessToken');
+        if (!token) return false;
+        
+        try {
+            // Проверяем что токен не пустой и корректный
+            if (token.length < 10) return false;
+            
+            // Проверяем срок действия токена (JWT)
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+            
+            if (payload.exp && payload.exp < currentTime) {
+                console.log('Token expired, clearing auth');
+                this.clearAuth();
+                return false;
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('Token validation error:', error);
+            this.clearAuth();
+            return false;
+        }
     }
 
     getCurrentUser() {
         const userStr = localStorage.getItem('user');
         return userStr ? JSON.parse(userStr) : null;
+    }
+
+    // Полная очистка авторизации (для отладки)
+    clearAuth() {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken'); 
+        localStorage.removeItem('user');
+        console.log('🔐 Auth cleared - user logged out');
     }
 
     setAuthToken(token: string) {

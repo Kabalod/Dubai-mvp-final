@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { Button } from "./ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Badge } from "./ui/badge"
-import { Building2, ChevronDown } from "lucide-react"
+import { Building2, ChevronDown, LogOut } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
+import { apiService } from "@/services/apiService"
 
 interface ApplicationHeaderProps {
   activeRoute?: string
@@ -19,6 +20,12 @@ interface ApplicationHeaderProps {
 export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderProps) {
   const navigate = useNavigate()
   const navigationItems = ["Main", "Analytics", "Reports", "Payments", "Pricing"]
+
+  const handleLogout = () => {
+    apiService.clearAuth();
+    navigate('/auth');
+    window.location.reload(); // Принудительная перезагрузка для очистки состояния
+  }
 
   return (
     <header className="w-full bg-white border-b border-gray-200">
@@ -82,13 +89,14 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                 <DropdownMenuItem onClick={() => navigate('/profile')}>
                   Profile Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/payment')}>
-                  Billing
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600" onClick={() => navigate('/auth')}>
-                  Logout
-                </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => navigate('/payment')}>
+                              Billing
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
+                              <LogOut className="h-4 w-4 mr-2" />
+                              Logout
+                            </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
