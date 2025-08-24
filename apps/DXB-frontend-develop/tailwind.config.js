@@ -42,10 +42,11 @@ export default {
         },
       },
       borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
         xl: "var(--radius-xl)",
-        lg: "var(--radius-lg)", 
-        md: "var(--radius-md)",
-        sm: "var(--radius-sm)",
+        "2xl": "var(--radius-xl)",
       },
       fontFamily: {
         sans: ["Onest", "sans-serif"],

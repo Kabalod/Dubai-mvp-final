@@ -102,7 +102,7 @@ const PricingPage: React.FC = () => {
         {plans.map((plan) => (
           <Card 
             key={plan.name} 
-            className={`relative rounded-[var(--radius-md)] ${
+            className={`relative rounded-lg ${
               plan.popular ? "ring-2 ring-blue-500 shadow-lg" : ""
             }`}
           >
@@ -147,7 +147,7 @@ const PricingPage: React.FC = () => {
               </div>
 
               <Button
-                className={`w-full rounded-[var(--radius-xl)] ${
+                className={`w-full rounded-full ${
                   plan.popular ? "bg-blue-500 hover:bg-blue-600" : ""
                 }`}
                 variant={plan.current ? "outline" : plan.popular ? "default" : "outline"}
@@ -169,7 +169,7 @@ const PricingPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {addOns.map((addon) => (
-            <Card key={addon.name} className="rounded-[var(--radius-md)]">
+            <Card key={addon.name} className="rounded-lg">
               <CardHeader>
                 <div className="flex items-center space-x-2">
                   <Zap className="h-5 w-5 text-blue-500" />
@@ -184,7 +184,7 @@ const PricingPage: React.FC = () => {
                 <p className="text-sm text-gray-600 mb-4">{addon.description}</p>
                 <Button 
                   variant="outline" 
-                  className="w-full bg-transparent rounded-[var(--radius-xl)]"
+                  className="w-full bg-transparent rounded-full"
                 >
                   Add to Plan
                 </Button>
@@ -195,7 +195,7 @@ const PricingPage: React.FC = () => {
       </div>
 
       {/* FAQ Section */}
-      <Card className="rounded-[var(--radius-md)]">
+      <Card className="rounded-lg">
         <CardHeader>
           <CardTitle className="text-center">Frequently Asked Questions</CardTitle>
         </CardHeader>

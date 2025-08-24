@@ -24,6 +24,12 @@ export default defineConfig(({ mode }) => {
             },
         },
         css: {
+            postcss: {
+                plugins: [
+                    require('@tailwindcss/postcss'),
+                    require('autoprefixer'),
+                ]
+            },
             preprocessorOptions: {
                 scss: {
                     additionalData: `@use "@/styles/global.scss" as *;`,
