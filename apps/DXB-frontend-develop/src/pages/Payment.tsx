@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreditCard, Calendar, DollarSign, Download, Search, Check, Star, Zap } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext'; // ✅ ДОБАВЛЕН ИМПОРТ
 
 // Payment Plans Configuration
 const PAYMENT_PLANS = [
