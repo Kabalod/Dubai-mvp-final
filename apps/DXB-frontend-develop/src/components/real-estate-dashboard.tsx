@@ -1,6 +1,4 @@
-"use client"
-
-import { useState } from "react"
+import React, { useState } from "react"
 // Убраны дублированные импорты ApplicationHeader и DataSourceSelector
 import TransactionsTable from "./Transactions/TransactionsTable"
 import MainFilters from "./MainFilters/MainFilters"

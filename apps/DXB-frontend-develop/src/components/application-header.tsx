@@ -1,5 +1,5 @@
-"use client"
-
+import React from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "./ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Badge } from "./ui/badge"
@@ -17,6 +17,7 @@ interface ApplicationHeaderProps {
 }
 
 export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderProps) {
+  const navigate = useNavigate()
   const navigationItems = ["Main", "Analytics", "Reports", "Payments", "Pricing"]
 
   return (
@@ -50,7 +51,7 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                   className={`text-sm font-medium transition-colors hover:text-blue-600 ${
                     activeRoute === item ? "text-blue-600 border-b-2 border-blue-600 rounded-none pb-1" : "text-gray-600"
                   }`}
-                  onClick={() => window.location.href = getRoute(item)}
+                  onClick={() => navigate(getRoute(item))}
                 >
                   {item}
                 </Button>
@@ -78,14 +79,14 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
                   Profile Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => window.location.href = '/payment'}>
+                <DropdownMenuItem onClick={() => navigate('/payment')}>
                   Billing
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600" onClick={() => window.location.href = '/auth'}>
+                <DropdownMenuItem className="text-red-600" onClick={() => navigate('/auth')}>
                   Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
