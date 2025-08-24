@@ -44,4 +44,7 @@ Write-Host "Backend: https://workerproject-production.up.railway.app/api/health/
 Write-Host "Frontend: https://frontend-production-5c48.up.railway.app/auth" -ForegroundColor White
 Write-Host "OTP Test: Введите kbalodk@gmail.com и нажмите SIGN UP" -ForegroundColor White
 
+# Устанавливаем кодировку консоли в UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 Write-Host "`n🏁 Проверка завершена!" -ForegroundColor Green
