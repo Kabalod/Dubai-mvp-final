@@ -18,8 +18,8 @@
     border: 1px solid $borderColorDefault;
 
     &:hover {
-      background-color: darken($bgColorGrey, 5%);
-      border-color: darken($borderColorDefault, 10%);
+      background-color: #e8e8e8; // Заменил darken($bgColorGrey, 5%)
+      border-color: #d1d5db; // Заменил darken($borderColorDefault, 10%)
     }
   }
 
@@ -29,7 +29,7 @@
     color: $bgColorWhite;
 
     &:hover {
-      background-color: lighten($textColorPrimary, 10%);
+      background-color: #374151; // Заменил lighten($textColorPrimary, 10%)
     }
   }
 
@@ -61,7 +61,7 @@
       color: $textColorPrimary;
 
       &:hover {
-        color: lighten($textColorPrimary, 20%);
+        color: #6b7280; // Заменил lighten($textColorPrimary, 20%)
       }
     }
   }
