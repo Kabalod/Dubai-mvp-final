@@ -5,8 +5,7 @@ import { I18nProvider } from "@lingui/react";
 import { messages as enMessages } from "./locales/en/messages";
 import { messages as ruMessages } from "./locales/ru/messages";
 import { messages as deMessages } from "./locales/de/messages";
-import "./index.css"; // Подключаем базовые стили для UI компонентов
-import "./styles/global.scss"; // Подключаем глобальные SCSS стили
+import "./index.css"; // Подключаем базовые стили для UI компонентов (включает Tailwind + SCSS совместимость)
 import App from "./App";
 
 // Инициализация i18n

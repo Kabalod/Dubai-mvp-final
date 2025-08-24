@@ -10,7 +10,11 @@ urlpatterns = [
     # Authentication
     path("auth/register/", views.RegisterView.as_view(), name="register"),
     path("auth/login/", views.PasswordLoginView.as_view(), name="password_login"),  # Обычный логин для тестовых пользователей
-    path("auth/otp-login/", views.OTPLoginView.as_view(), name="otp_login"),  # OTP логин
+    
+    # OTP Authentication - полный цикл
+    path("auth/send-otp/", views.SendOTPView.as_view(), name="send_otp"),  # Отправка OTP кода
+    path("auth/verify-otp/", views.VerifyOTPView.as_view(), name="verify_otp"),  # Верификация OTP кода
+    path("auth/otp-login/", views.OTPLoginView.as_view(), name="otp_login"),  # Legacy OTP логин
     
     # Google OAuth
     path("auth/google/login/", views.GoogleAuthInitView.as_view(), name="google_auth_init"),

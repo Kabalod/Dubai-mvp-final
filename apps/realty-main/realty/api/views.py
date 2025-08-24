@@ -108,7 +108,92 @@ class PasswordLoginView(APIView):
                 'error': 'Invalid credentials'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+class SendOTPView(APIView):
+    """Отправка OTP кода на email"""
+    permission_classes = (permissions.AllowAny,)
+    
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Генерируем OTP код
+        otp_code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+        
+        # Деактивируем старые коды для этого email
+        OTPCode.objects.filter(email=email, is_used=False).update(is_used=True)
+        
+        # Создаем новый OTP код
+        otp = OTPCode.objects.create(
+            email=email,
+            code=otp_code,
+            expires_at=timezone.now() + timedelta(minutes=10)
+        )
+        
+        # Для MVP возвращаем код в ответе (в продакшн отправлять на email)
+        return Response({
+            'message': 'OTP code sent successfully',
+            'otp_code': otp_code,  # ТОЛЬКО ДЛЯ MVP! Убрать в продакшн
+            'expires_in': 600,  # 10 minutes
+            'email': email,
+            'note': 'MVP: OTP code provided in response. In production, will be sent via email.'
+        })
+
+
+class VerifyOTPView(APIView):
+    """Верификация OTP кода"""
+    permission_classes = (permissions.AllowAny,)
+    
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+        
+        if not email or not code:
+            return Response({
+                'error': 'Email and code are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            otp = OTPCode.objects.get(
+                email=email,
+                code=code,
+                is_used=False,
+                expires_at__gt=timezone.now()
+            )
+            
+            # Создаем/получаем пользователя
+            user, created = User.objects.get_or_create(
+                email=email, 
+                defaults={'username': email}
+            )
+            
+            # Деактивируем OTP код
+            otp.is_used = True
+            otp.save()
+            
+            # Генерируем JWT токены
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'message': 'OTP verified successfully',
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': {
+                    'id': user.id,
+                    'email': user.email,
+                    'username': user.username,
+                    'is_new_user': created
+                }
+            })
+            
+        except OTPCode.DoesNotExist:
+            return Response({
+                'error': 'Invalid or expired OTP code'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
 class OTPLoginView(APIView):
+    """Legacy OTP login view - совместимость со старым API"""
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, *args, **kwargs):
