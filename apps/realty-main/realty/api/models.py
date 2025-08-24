@@ -8,7 +8,22 @@ from django.db import models
 class User(AbstractUser):
     # Дополнительные поля пользователя, если они понадобятся в будущем
     # Например: avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
-    pass
+    
+    # Исправляем конфликт с встроенной auth.User моделью
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='api_user_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='api_user_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
 
 
 class OTPCode(models.Model):
@@ -38,9 +53,9 @@ class Payment(models.Model):
         on_delete=models.CASCADE,
         related_name="payments"
     )
-    stripe_charge_id = models.CharField(max_length=100, unique=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=10)
+    stripe_charge_id = models.CharField(max_length=100, unique=True, default='')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    currency = models.CharField(max_length=10, default='AED')
     status = models.CharField(max_length=20, default="succeeded")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
