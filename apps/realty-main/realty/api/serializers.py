@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework import serializers as drf_serializers
-from realty.api.models import UserProfile, UserSubscription, SubscriptionPlan, Payment, Report
+from realty.api.models import Payment, PaymentEventAudit, UserReportHistory
 try:
     from realty.pfimport.models import PFListSale, PFListRent, Building, Area
 except Exception:  # pragma: no cover - optional deps not loaded in MVP
@@ -132,26 +132,17 @@ class AnalyticsSerializer(serializers.Serializer):
 
 
 class ProfileSerializer(drf_serializers.Serializer):
+    """Simple profile serializer for MVP."""
     id = drf_serializers.IntegerField()
     email = drf_serializers.EmailField(allow_blank=True, allow_null=True)
-    role = drf_serializers.CharField()
+    role = drf_serializers.CharField(default="free")
 
 
-class SubscriptionSerializer(drf_serializers.Serializer):
-    status = drf_serializers.CharField()
-    plan = drf_serializers.CharField(allow_null=True)
-    price_aed = drf_serializers.CharField(allow_null=True)
-    valid_until = drf_serializers.DateTimeField(allow_null=True)
-    payment_method = drf_serializers.CharField(allow_null=True)
-    last_payment_at = drf_serializers.DateTimeField(allow_null=True)
-
-
-class ReportSerializer(drf_serializers.ModelSerializer):
+class UserReportHistorySerializer(drf_serializers.ModelSerializer):
+    """User report history serializer."""
     class Meta:
-        model = Report
-        fields = [
-            'id', 'title', 'status', 'created_at', 'updated_at'
-        ]
+        model = UserReportHistory
+        fields = ['id', 'user', 'report_type', 'generated_at', 'file_path', 'parameters']
 
 
 # Additional serializers for API views

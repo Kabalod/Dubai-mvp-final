@@ -81,7 +81,7 @@ class PaymentEventAudit(models.Model):
     provider = models.CharField(max_length=32)
     event_type = models.CharField(max_length=64)
     event_id = models.CharField(max_length=128, unique=True) # Ensure idempotency
-    payload = models.JSONField()
+    payload = models.JSONField(default=dict)
     processed_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=32, default="received") # received, processed, failed
     error_message = models.TextField(blank=True, null=True)
@@ -103,4 +103,30 @@ class PaymentEventAudit(models.Model):
         indexes = [
             models.Index(fields=["provider", "event_id"]),
             models.Index(fields=["event_type"]),
+        ]
+
+
+class UserReportHistory(models.Model):
+    """История генерации PDF отчетов пользователем"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="report_history"
+    )
+    report_type = models.CharField(max_length=50, default="property_analysis")
+    generated_at = models.DateTimeField(auto_now_add=True)
+    file_path = models.CharField(max_length=500, blank=True)
+    parameters = models.JSONField(default=dict, blank=True)
+    
+    def __str__(self):
+        return f"Report {self.report_type} by {self.user.username} at {self.generated_at}"
+    
+    class Meta:
+        verbose_name = "User Report History"
+        verbose_name_plural = "User Report Histories"
+        ordering = ["-generated_at"]
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["report_type"]),
+            models.Index(fields=["generated_at"]),
         ]
