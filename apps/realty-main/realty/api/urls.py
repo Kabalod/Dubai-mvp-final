@@ -11,6 +11,10 @@ urlpatterns = [
     path("auth/register/", views.RegisterView.as_view(), name="register"),
     path("auth/login/", views.OTPLoginView.as_view(), name="otp_login"),
     
+    # Google OAuth
+    path("auth/google/login/", views.GoogleAuthInitView.as_view(), name="google_auth_init"),
+    path("auth/google/callback/", views.GoogleAuthCallbackView.as_view(), name="google_auth_callback"),
+    
     # User Profile
     path("profile/me/", views.UserProfileView.as_view(), name="user_profile"),
     

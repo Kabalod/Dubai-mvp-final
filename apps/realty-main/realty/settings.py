@@ -330,6 +330,12 @@ ACCOUNT_LOGIN_METHODS = {"email"}
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 
+# Frontend URL for OAuth redirects
+FRONTEND_URL = "https://frontend-production-5c48.up.railway.app"
+
+# Google OAuth settings (for MVP - mock values)  
+GOOGLE_OAUTH_CLIENT_ID = "test-client-id-12345"
+
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*"]
 
 ACCOUNT_LOGOUT_REDIRECT_URL = "account_login"
