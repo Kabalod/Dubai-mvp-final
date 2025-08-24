@@ -314,7 +314,6 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                         }
                     ]}
                 />
-            </section>
             </Row>
             <Row className={styles.lastRow}>
                 <Flex gap={"small"}>

@@ -5,6 +5,30 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Apply spacing utilities */
+@layer utilities {
+  .m-0 { margin: 0 !important; }
+  .m-xs { margin: 4px !important; }
+  .m-sm { margin: 8px !important; }
+  .m-md { margin: 16px !important; }
+  .m-lg { margin: 24px !important; }
+  .m-xl { margin: 32px !important; }
+  
+  .p-0 { padding: 0 !important; }
+  .p-xs { padding: 4px !important; }
+  .p-sm { padding: 8px !important; }
+  .p-md { padding: 16px !important; }
+  .p-lg { padding: 24px !important; }
+  .p-xl { padding: 32px !important; }
+  
+  .gap-0 { gap: 0 !important; }
+  .gap-xs { gap: 4px !important; }
+  .gap-sm { gap: 8px !important; }
+  .gap-md { gap: 16px !important; }
+  .gap-lg { gap: 24px !important; }
+  .gap-xl { gap: 32px !important; }
+}
+
 :root {
   /* Основная цветовая палитра */
   --background: 0 0% 100%;

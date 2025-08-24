@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Search, FileDown, Star } from 'lucide-react';
+import ReportsTable from '@/components/Tables/ReportsTable';
+import { mockReportsTableData, generateReportsData } from '@/utils/mockTableData';
 
 interface ReportFilters {
   building: string;
@@ -54,7 +56,11 @@ const Reports: React.FC = () => {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedTableRows, setSelectedTableRows] = useState<React.Key[]>([]);
   const reportRef = useRef<HTMLDivElement>(null);
+  
+  // Mock table data - in real app would come from API
+  const [tableData] = useState(() => generateReportsData(50));
 
   const bedOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8+'];
   const rentingOptions = ['Renting out', 'Flipping', 'Live in an apartment'];
@@ -480,8 +486,14 @@ const Reports: React.FC = () => {
                 
                 <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">PRICES FOR 1 BED</p>
-                  <div className="w-full h-8 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-600 rounded"></div>
-                  <p className="text-xs text-gray-400 mt-2">Chart visualization would be here</p>
+                  <div className="w-full">
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">Property Analysis Report</h4>
+                    <ReportsTable 
+                      data={tableData}
+                      loading={false}
+                      onRowSelect={setSelectedTableRows}
+                    />
+                  </div>
                 </div>
               </div>
 

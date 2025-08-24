@@ -1,11 +1,12 @@
 @use "@/styles/typography" as *;
 @use "@/styles/tokens" as *;
+@use "@/styles/spacing" as *;
 
 .container {
-    margin: 24px 0;
+    margin: $spacing-lg 0;
 }
 .midsection {
-    margin-bottom: 32px;
+    margin-bottom: $spacing-xl;
 }
 
 .firstRow {
@@ -80,7 +81,7 @@
 }
 
 .expandableFilters {
-    margin-top: 16px;
+    margin-top: $spacing-md;
     
     & :global(.ant-collapse-header) {
         border-radius: var(--radius-lg) !important;

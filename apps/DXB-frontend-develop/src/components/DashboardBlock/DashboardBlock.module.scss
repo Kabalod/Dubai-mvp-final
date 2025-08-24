@@ -1,5 +1,6 @@
 @use "@/styles/typography" as *;
 @use "@/styles/tokens" as *;
+@use "@/styles/spacing" as *;
 
 .container {
     border-radius: var(--radius-xl);
@@ -12,14 +13,13 @@
 }
 
 .mosaic {
-    display: grid;
-    gap: 16px;
+    @include grid-spacing(1, $spacing-md);
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .card {
     border-radius: var(--radius-md);
-    padding: 16px;
+    padding: $spacing-md;
     background: $bgColorWhite;
     box-shadow: var(--shadow-card);
     min-width: 260px;
