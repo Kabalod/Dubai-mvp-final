@@ -17,7 +17,7 @@ function NotFound() {
                 <h3>🔗 Доступные страницы:</h3>
                 <div className={styles.linkRow}>
                     <a href="/" className={`${styles.btn} ${styles.btnHome}`}>Главная</a>
-                    <a href="/dash" className={`${styles.btn} ${styles.btnDash}`}>Dashboard</a>
+                    <a href="/dashboard" className={`${styles.btn} ${styles.btnDash}`}>Dashboard</a>
                     <a href="/analytics" className={`${styles.btn} ${styles.btnAnalytics}`}>Аналитика</a>
                     <a href="/auth" className={`${styles.btn} ${styles.btnAuth}`}>Авторизация</a>
                 </div>
