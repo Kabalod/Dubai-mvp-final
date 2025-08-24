@@ -106,6 +106,7 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
             propertyComponents: val,
         };
         setFiltersState(nextVal);
+        onSearch(nextVal); // ✅ ИСПРАВЛЕНО: теперь вызывает поиск
     };
 
     const handleSearchValue = (obj: AutocompleteState) => {
@@ -114,6 +115,7 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
             searchSubstring: obj.value,
         };
         setFiltersState(nextVal);
+        onSearch(nextVal); // ✅ ИСПРАВЛЕНО: теперь вызывает поиск
     };
 
     const handlePeriodChange = (period: Periods) => {
@@ -133,26 +135,31 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
     const handlePropertyTypeChange = (value: string) => {
         const nextVal: IMainQuery = { ...filtersState, propertyType: value };
         setFiltersState(nextVal);
+        onSearch(nextVal); // ✅ ИСПРАВЛЕНО: применяем фильтр
     };
 
     const handleAreaChange = (value: string) => {
         const nextVal: IMainQuery = { ...filtersState, area: value };
         setFiltersState(nextVal);
+        onSearch(nextVal); // ✅ ИСПРАВЛЕНО: применяем фильтр
     };
 
     const handlePriceRangeChange = (value: string) => {
         const nextVal: IMainQuery = { ...filtersState, priceRange: value };
         setFiltersState(nextVal);
+        onSearch(nextVal); // ✅ ИСПРАВЛЕНО: применяем фильтр
     };
 
     const handleMinPriceChange = (value: number | null) => {
         const nextVal: IMainQuery = { ...filtersState, minPrice: value };
         setFiltersState(nextVal);
+        onSearch(nextVal); // ✅ ИСПРАВЛЕНО: применяем фильтр
     };
 
     const handleMaxPriceChange = (value: number | null) => {
         const nextVal: IMainQuery = { ...filtersState, maxPrice: value };
         setFiltersState(nextVal);
+        onSearch(nextVal); // ✅ ИСПРАВЛЕНО: применяем фильтр
     };
 
     const handleClearFilters = () => {
@@ -202,9 +209,16 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                     <DropdownMenu
                         content={
                             <MoreDropdown
-                                onStateChange={() =>
-                                    console.log("state change")
-                                }
+                                onStateChange={(newState) => {
+                                    console.log("🔄 More filters state change:", newState);
+                                    // Применяем дополнительные фильтры
+                                    const nextVal: IMainQuery = { 
+                                        ...filtersState, 
+                                        ...newState 
+                                    };
+                                    setFiltersState(nextVal);
+                                    onSearch(nextVal); // ✅ ИСПРАВЛЕНО: применяем фильтр
+                                }}
                             />
                         }
                     />

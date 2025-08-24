@@ -41,13 +41,46 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
 
   // Обработчик фильтров
   const handleSearch = async (query: IMainQuery) => {
-    console.log('Filter query:', query);
+    console.log('🔍 Фильтры применены:', query);
     setLoading(true);
     
     try {
-      // Здесь можно добавить вызов API для фильтрации данных
-      // const filteredData = await api.getFilteredProperties(query);
-      // Пока просто логируем
+      // Преобразуем параметры фильтра в API запрос
+      const searchParams: any = {
+        transaction_type: query.transactionType,
+        bedrooms: query.propertyComponents.length > 0 ? query.propertyComponents.join(',') : undefined,
+        search: query.searchSubstring || undefined,
+        period: query.periods,
+        ordering: query.sorting === 'desc' ? '-created_date' : 'created_date',
+        limit: query.limit || 20,
+        offset: query.offset || 0
+      };
+
+      // Добавляем новые фильтры
+      if (query.propertyType) searchParams.property_type = query.propertyType;
+      if (query.area) searchParams.area = query.area;
+      if (query.minPrice) searchParams.min_price = query.minPrice;
+      if (query.maxPrice) searchParams.max_price = query.maxPrice;
+
+      console.log('📡 API parameters:', searchParams);
+      
+      // TODO: Подключить к реальному API
+      // const filteredData = await api.getFilteredProperties(searchParams);
+      
+      // Показываем результат применения фильтров
+      const filterSummary = [];
+      if (query.transactionType) filterSummary.push(`Type: ${query.transactionType}`);
+      if (query.propertyComponents.length > 0) filterSummary.push(`Beds: ${query.propertyComponents.join(', ')}`);
+      if (query.searchSubstring) filterSummary.push(`Search: "${query.searchSubstring}"`);
+      if (query.propertyType) filterSummary.push(`Property: ${query.propertyType}`);
+      if (query.area) filterSummary.push(`Area: ${query.area}`);
+      if (query.minPrice || query.maxPrice) {
+        const priceRange = `${query.minPrice || 0} - ${query.maxPrice || '∞'} AED`;
+        filterSummary.push(`Price: ${priceRange}`);
+      }
+      
+      alert(`✅ Фильтры применены!\n${filterSummary.join('\n')}\n\nПараметры в консоли браузера`);
+      
     } catch (error) {
       console.error('Filter error:', error);
     } finally {

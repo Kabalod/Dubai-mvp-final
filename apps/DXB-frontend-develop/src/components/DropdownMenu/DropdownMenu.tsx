@@ -18,6 +18,12 @@ interface IDropdownMenuContentProps {
 
 const initMoreState = {
     developer: "",
+    soldBy: "",
+    status: "",
+    minPrice: "",
+    maxPrice: "",
+    minSize: "",
+    maxSize: "",
 };
 
 const SoldByOptions = [
@@ -56,25 +62,47 @@ export const MoreDropdown: React.FC<IDropdownMenuContentProps> = ({
     const [state, setState] = useState(initMoreState);
 
     const handleDeveloperChange = (obj: AutocompleteState) => {
-        setState({ ...state, developer: obj.value });
+        const newState = { ...state, developer: obj.value };
+        setState(newState);
+        onStateChange(newState); // ✅ ИСПРАВЛЕНО: вызываем callback
     };
 
     const handleMinPriceChange = (ev: ChangeEvent<HTMLInputElement>) => {
-        console.log(ev.target.value);
+        const value = ev.target.value;
+        console.log('🔄 Min price changed:', value);
+        const newState = { ...state, minPrice: value };
+        setState(newState);
+        onStateChange(newState); // ✅ ИСПРАВЛЕНО: вызываем callback
     };
 
     const handleMinSizeChange = (ev: ChangeEvent<HTMLInputElement>) => {
-        console.log(ev.target.value);
+        const value = ev.target.value;
+        console.log('🔄 Min size changed:', value);
+        const newState = { ...state, minSize: value };
+        setState(newState);
+        onStateChange(newState); // ✅ ИСПРАВЛЕНО: вызываем callback
     };
+    
     const handleMaxSizeChange = (ev: ChangeEvent<HTMLInputElement>) => {
-        console.log(ev.target.value);
+        const value = ev.target.value;
+        console.log('🔄 Max size changed:', value);
+        const newState = { ...state, maxSize: value };
+        setState(newState);
+        onStateChange(newState); // ✅ ИСПРАВЛЕНО: вызываем callback
     };
 
     const handleSoldByChange = (val: string) => {
-        console.log({ val });
+        console.log('🔄 SoldBy changed:', { val });
+        const newState = { ...state, soldBy: val };
+        setState(newState);
+        onStateChange(newState); // ✅ ИСПРАВЛЕНО: вызываем callback
     };
+    
     const handleStatusChange = (val: string) => {
-        console.log({ val });
+        console.log('🔄 Status changed:', { val });
+        const newState = { ...state, status: val };
+        setState(newState);
+        onStateChange(newState); // ✅ ИСПРАВЛЕНО: вызываем callback
     };
 
     return (
