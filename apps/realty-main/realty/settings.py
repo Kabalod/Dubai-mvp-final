@@ -119,6 +119,7 @@ THIRD_PARTY_APPS = [
     # Django REST Framework for MVP API
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     # Email backend
     "anymail",
 ]
