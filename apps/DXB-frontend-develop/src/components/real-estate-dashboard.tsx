@@ -3,6 +3,8 @@
 import { useState } from "react"
 // Убраны дублированные импорты ApplicationHeader и DataSourceSelector
 import TransactionsTable from "./Transactions/TransactionsTable"
+import MainFilters from "./MainFilters/MainFilters"
+import type { IMainQuery } from "./MainFilters/typings"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
@@ -37,6 +39,23 @@ interface RealEstateDashboardProps {
 }
 
 export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashboardProps) {
+  const [loading, setLoading] = useState(false);
+
+  // Обработчик фильтров
+  const handleSearch = async (query: IMainQuery) => {
+    console.log('Filter query:', query);
+    setLoading(true);
+    
+    try {
+      // Здесь можно добавить вызов API для фильтрации данных
+      // const filteredData = await api.getFilteredProperties(query);
+      // Пока просто логируем
+    } catch (error) {
+      console.error('Filter error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white">
@@ -44,6 +63,9 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
         {/* Analytics Dashboard */}
         <>
           {/* Breadcrumb */}
+          {/* Фильтры */}
+          <MainFilters onSearch={handleSearch} />
+
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-600 font-medium">DLD</span>
