@@ -38,6 +38,15 @@
     font-size: 20px;
     font-weight: bold;
     color: var(--color-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    
+    .logoImage {
+        height: 40px;
+        width: auto;
+        object-fit: contain;
+    }
 }
 
 .rightSection { display: flex; align-items: center; gap: 10px; }

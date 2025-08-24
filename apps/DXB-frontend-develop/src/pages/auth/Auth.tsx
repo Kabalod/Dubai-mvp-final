@@ -6,6 +6,7 @@ import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 import { API_BASE_URL } from "@/config";
 import CustomButton from "@/components/CustomButton/CustomButton";
+import LogoImage from "@/assets/Logo.png";
 
 const Auth: React.FC = () => {
     const [authType, setAuthType] = useState<string>("login");
@@ -58,7 +59,9 @@ const Auth: React.FC = () => {
     return (
         <div className={styles.container}>
             <div className={styles.leftContainer}>
-                <div className={styles.logo}>LOGO</div>
+                <div className={styles.logo}>
+                    <img src={LogoImage} alt="Dubai MVP Logo" className={styles.logoImage} />
+                </div>
             </div>
             <div className={styles.rightContainer}>
                 <div className={styles.wrapper}>

@@ -23,6 +23,16 @@
     font-weight: bold;
     position: absolute;
     top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .logoImage {
+        height: 60px;
+        width: auto;
+        object-fit: contain;
+        filter: brightness(0) invert(1); // Делаем логотип белым для темного фона
+    }
     right: 2rem;
 }
 

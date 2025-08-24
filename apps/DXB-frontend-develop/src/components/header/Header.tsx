@@ -6,6 +6,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import "@/styles/custom-buttons.scss";
 import styles from "./Header.module.scss";
 import apiService from "@/services/apiService";
+import LogoImage from "@/assets/Logo.png";
 
 const Header: React.FC = () => {
     const navigate = useNavigate();
@@ -38,8 +39,8 @@ const Header: React.FC = () => {
         <div className={styles.container}>
             <div className={styles.header}>
                 {/* Logo */}
-                <div className={styles.logo}>
-                    LOGO
+                <div className={styles.logo} onClick={() => navigate('/')}>
+                    <img src={LogoImage} alt="Dubai MVP Logo" className={styles.logoImage} />
                 </div>
 
                 {/* Navigation Menu */}
