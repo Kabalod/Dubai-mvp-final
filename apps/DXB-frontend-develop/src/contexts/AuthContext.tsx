@@ -44,7 +44,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Check authentication status on mount
     useEffect(() => {
-        checkAuth();
+        const performAuthCheck = () => {
+            setIsLoading(true);
+            
+            try {
+                const isAuth = apiService.isAuthenticated();
+                if (isAuth) {
+                    const userData = apiService.getCurrentUser();
+                    setUser(userData);
+                } else {
+                    setUser(null);
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                setUser(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        performAuthCheck();
     }, []);
 
     const checkAuth = () => {

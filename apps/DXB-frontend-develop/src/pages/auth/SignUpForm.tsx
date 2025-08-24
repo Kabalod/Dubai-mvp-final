@@ -35,7 +35,7 @@ const SignUpForm: React.FC = () => {
         if (saved && !email) {
             setEmail(saved);
         }
-    }, []);
+    }, []); // Намеренно игнорируем email в зависимостях для избежания цикла
     const [otpLength] = useState<number>(6);
     const navigate = useNavigate();
 

@@ -1,6 +1,6 @@
 import styles from "./MainFilters.module.scss";
 import { Flex, Row, Segmented } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Ordering, TransactionTypeEnum } from "@/api/schema";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -89,13 +89,14 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
         onSearch(nextVal);
     };
 
-    const handleSearch = () => {
+    const handleSearch = useCallback(() => {
         onSearch(filtersState);
-    };
+    }, [filtersState, onSearch]);
 
     useEffect(() => {
-        handleSearch();
-    }, []);
+        // Инициализация фильтров при монтировании
+        onSearch(initialQueryState);
+    }, [onSearch]);
 
     return (
         <section className={styles.container}>
