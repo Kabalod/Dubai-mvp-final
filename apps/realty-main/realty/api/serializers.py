@@ -152,3 +152,59 @@ class ReportSerializer(drf_serializers.ModelSerializer):
         fields = [
             'id', 'title', 'status', 'created_at', 'updated_at'
         ]
+
+
+# Additional serializers for API views
+class UserSerializer(serializers.ModelSerializer):
+    """Basic user serializer."""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined']
+        
+
+class RegisterSerializer(serializers.ModelSerializer):
+    """User registration serializer (alias for compatibility)."""
+    password = serializers.CharField(write_only=True, min_length=8)
+    password_confirm = serializers.CharField(write_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'password', 'password_confirm']
+    
+    def validate(self, data):
+        if data['password'] != data['password_confirm']:
+            raise serializers.ValidationError("Passwords don't match")
+        return data
+    
+    def create(self, validated_data):
+        validated_data.pop('password_confirm')
+        user = User.objects.create_user(**validated_data)
+        return user
+
+
+class OTPLoginSerializer(serializers.Serializer):
+    """OTP login serializer."""
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """User profile serializer."""
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined']
+        read_only_fields = ['id', 'username', 'date_joined']
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+    """Payment serializer."""
+    class Meta:
+        model = Payment
+        fields = '__all__'
+
+
+class PaymentEventAuditSerializer(serializers.ModelSerializer):
+    """Payment event audit serializer."""
+    class Meta:
+        model = PaymentEventAudit
+        fields = '__all__'
