@@ -1,5 +1,5 @@
 import React from "react";
-import { ApplicationHeader } from "../application-header";
+import { SimpleHeader } from "../simple-header";
 import { useLocation } from "react-router-dom";
 
 const Header: React.FC = () => {
@@ -28,7 +28,7 @@ const Header: React.FC = () => {
         }
     };
 
-    return <ApplicationHeader activeRoute={getActiveRoute()} />;
+    return <SimpleHeader activeRoute={getActiveRoute()} />;
 };
 
 export default Header;
