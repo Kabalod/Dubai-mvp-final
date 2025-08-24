@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { ApplicationHeader } from "./application-header"
 import { DataSourceSelector } from "./data-source-selector"
-import { TransactionsTable } from "./Transactions/TransactionsTable"
+import TransactionsTable from "./Transactions/TransactionsTable"
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
