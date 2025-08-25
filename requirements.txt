@@ -1,5 +1,5 @@
-# Complete Railway requirements for Dubai MVP v2.3
-# Version: 2.3 - Fixed anymail version compatibility
+# Complete Railway requirements for Dubai MVP v2.5
+# Version: 2.5 - Added whitenoise for static files
 # Build: 2025-08-25 - Force Railway to rebuild
 django>=4.2
 djangorestframework>=3.15
@@ -11,3 +11,4 @@ gunicorn>=21.2
 dj-database-url>=2.3
 django-anymail[sendgrid]>=10.0
 marshmallow>=3.20
+whitenoise>=6.8

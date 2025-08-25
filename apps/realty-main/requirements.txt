@@ -1,7 +1,6 @@
-# Complete Railway requirements for Dubai MVP v2.4
-# Version: 2.4 - Force Railway rebuild with timestamp
-# Build: 2025-08-25-18-30 - Force Railway to rebuild NOW
-# Timestamp: 2025-08-25T18:30:00Z
+# Complete Railway requirements for Dubai MVP v2.5
+# Version: 2.5 - Added whitenoise for static files
+# Build: 2025-08-25 - Force Railway to rebuild
 django>=4.2
 djangorestframework>=3.15
 djangorestframework-simplejwt>=5.3
@@ -12,3 +11,4 @@ gunicorn>=21.2
 dj-database-url>=2.3
 django-anymail[sendgrid]>=10.0
 marshmallow>=3.20
+whitenoise>=6.8
