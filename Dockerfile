@@ -1,13 +1,19 @@
-# Ultra-light Dockerfile for Railway - no system dependencies
-# Uses pure Python to avoid resource limits
+# Dockerfile for Railway - copy everything first
+# Alternative approach to avoid context issues
 
 FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy the realty-main directory
-COPY apps/realty-main/ .
+# Copy everything first to avoid context issues
+COPY . .
+
+# Verify that realty-main exists
+RUN ls -la && ls -la apps/ && ls -la apps/realty-main/
+
+# Move to realty-main directory
+WORKDIR /app/apps/realty-main
 
 # Install Python dependencies (only what's needed)
 RUN pip install --no-cache-dir Django djangorestframework django-cors-headers
