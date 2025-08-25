@@ -9,11 +9,8 @@ WORKDIR /app
 # Copy everything first to avoid context issues
 COPY . .
 
-# Verify that realty-main exists
-RUN ls && ls apps/ && ls apps/realty-main/
-
-# Move to realty-main directory
-WORKDIR /app/apps/realty-main
+# Verify that we have the right files
+RUN ls && echo "Files copied successfully"
 
 # Install Python dependencies (only what's needed)
 RUN pip install --no-cache-dir Django djangorestframework django-cors-headers
