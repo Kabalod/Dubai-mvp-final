@@ -12,8 +12,8 @@ COPY . .
 # Verify that we have the right files
 RUN ls && echo "Files copied successfully"
 
-# Install Python dependencies (only what's needed)
-RUN pip install --no-cache-dir Django djangorestframework django-cors-headers
+# Install Python dependencies from requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Set environment variables
 ENV DJANGO_SETTINGS_MODULE=realty.settings
