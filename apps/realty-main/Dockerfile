@@ -31,5 +31,5 @@ ENV DJANGO_SETTINGS_MODULE=realty.settings
 # Expose port
 EXPOSE 8000
 
-# Start server directly without migrations
-CMD ["sh", "-c", "python manage.py collectstatic --noinput && gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
+# Start Gunicorn directly - minimal startup
+CMD ["gunicorn", "realty.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "60"]
