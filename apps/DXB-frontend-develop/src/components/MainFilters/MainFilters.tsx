@@ -314,13 +314,13 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                                             onClick={handleClearFilters}
                                             variant="secondary"
                                         >
-                                            <Trans id="filters.clear">Clear All</Trans>
+                                            Clear All
                                         </CustomButton>
                                         <CustomButton 
                                             onClick={handleSearch}
                                             variant="primary"
                                         >
-                                            <Trans id="filters.apply">Apply Filters</Trans>
+                                            Apply Filters
                                         </CustomButton>
                                     </div>
                                 </div>
