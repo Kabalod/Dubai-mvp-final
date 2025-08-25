@@ -1,8 +1,9 @@
 // API client for Dubai MVP
-// ✅ ИСПРАВЛЕНО: используем правильный URL бекенда
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://backend-production-dbb4.up.railway.app/api'
-  : 'http://localhost:8000/api';
+// Единый источник базового URL бекенда
+import { API_BASE_URL } from '../config';
+
+// Префикс API для всех запросов
+const API_PREFIX = `${API_BASE_URL}/api`;
 
 // Types
 export interface Property {
@@ -90,41 +91,41 @@ export const api = {
       }
     });
     
-    const response = await fetch(`${API_BASE_URL}/properties/?${params}`);
+    const response = await fetch(`${API_PREFIX}/properties/?${params}`);
     if (!response.ok) throw new Error('Failed to fetch properties');
     return response.json();
   },
 
   async getPropertyDetail(listingId: string): Promise<Property> {
-    const response = await fetch(`${API_BASE_URL}/properties/${listingId}/`);
+    const response = await fetch(`${API_PREFIX}/properties/${listingId}/`);
     if (!response.ok) throw new Error('Failed to fetch property detail');
     return response.json();
   },
 
   // Areas API
   async getAreas(): Promise<Area[]> {
-    const response = await fetch(`${API_BASE_URL}/areas/`);
+    const response = await fetch(`${API_PREFIX}/areas/`);
     if (!response.ok) throw new Error('Failed to fetch areas');
     return response.json();
   },
 
   // Stats API
   async getStats(): Promise<PropertyStats> {
-    const response = await fetch(`${API_BASE_URL}/stats/`);
+    const response = await fetch(`${API_PREFIX}/stats/`);
     if (!response.ok) throw new Error('Failed to fetch stats');
     return response.json();
   },
 
   // Health check
   async healthCheck(): Promise<{ status: string }> {
-    const response = await fetch(`${API_BASE_URL}/health/`);
+    const response = await fetch(`${API_PREFIX}/health/`);
     if (!response.ok) throw new Error('Health check failed');
     return response.json();
   },
 
   // User Profile API
   async getUserProfile(token: string): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/profile/me/`, {
+    const response = await fetch(`${API_PREFIX}/profile/me/`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -136,7 +137,7 @@ export const api = {
 
   // Payment API (mock)
   async createPayment(paymentData: any, token: string): Promise<{ success: boolean, message: string }> {
-    const response = await fetch(`${API_BASE_URL}/payments/create/`, {
+    const response = await fetch(`${API_PREFIX}/payments/create/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
