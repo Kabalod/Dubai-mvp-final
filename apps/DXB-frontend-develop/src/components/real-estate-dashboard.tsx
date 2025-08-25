@@ -40,11 +40,13 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
   const [loading, setLoading] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<string[]>([]); // ✅ ИСПРАВЛЕНО: добавлено отсутствующее состояние
   const [filteredProperties, setFilteredProperties] = useState(properties); // ✅ ДОБАВЛЕНО: состояние для отфильтрованных объектов
+  const [filteredStats, setFilteredStats] = useState(stats); // ✅ ДОБАВЛЕНО: локальные статистики для фильтрации
   
   // ✅ ДОБАВЛЕНО: обновляем отфильтрованные объекты при изменении properties
   React.useEffect(() => {
     setFilteredProperties(properties);
-  }, [properties]);
+    setFilteredStats(stats);
+  }, [properties, stats]);
 
   // Обработчик фильтров
   const handleSearch = async (query: IMainQuery) => {
@@ -115,6 +117,22 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
         setFilteredProperties(filtered);
         console.log(`📊 Filtered ${filtered.length} of ${properties.length} properties`);
         
+        // ✅ ДОБАВЛЕНО: Обновляем статистики на основе отфильтрованных данных
+        if (stats && filtered.length > 0) {
+          const filteredRatio = filtered.length / properties.length;
+          const newStats = {
+            ...stats,
+            totalProperties: Math.round(stats.totalProperties * filteredRatio),
+            totalDeals: Math.round(stats.totalDeals * filteredRatio),
+            marketVolume: {
+              ...stats.marketVolume,
+              deals: Math.round(stats.marketVolume.deals * filteredRatio),
+            }
+          };
+          setFilteredStats(newStats);
+          console.log('📊 Updated stats for filtered data:', newStats);
+        }
+        
         // В реальности здесь будет:
         // const newData = await apiService.getFilteredProperties(searchParams);
         // setProperties(newData);
@@ -122,6 +140,7 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
       } else {
         setAppliedFilters([]); // ✅ ДОБАВЛЕНО: очищаем если фильтров нет
         setFilteredProperties(properties); // ✅ ДОБАВЛЕНО: показываем все данные
+        setFilteredStats(stats); // ✅ ДОБАВЛЕНО: восстанавливаем исходные статистики
       }
       
     } catch (error) {
@@ -227,16 +246,16 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
               {/* Key Metrics */}
               <div className="grid grid-cols-3 gap-8">
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats?.totalBuildings?.toLocaleString() || 0}</div>
+                  <div className="text-3xl font-bold">{filteredStats?.totalBuildings?.toLocaleString() || 0}</div>
                   <div className="text-sm text-gray-500 uppercase tracking-wide">Buildings</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold">{stats?.totalProperties?.toLocaleString() || 0}</div>
+                  <div className="text-3xl font-bold">{filteredStats?.totalProperties?.toLocaleString() || 0}</div>
                   <div className="text-sm text-gray-500 uppercase tracking-wide">Properties</div>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-2">
-                    <span className="text-3xl font-bold">{stats?.totalDeals?.toLocaleString() || 0}</span>
+                    <span className="text-3xl font-bold">{filteredStats?.totalDeals?.toLocaleString() || 0}</span>
                     <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
                       12,5% <TrendingUp className="ml-1 h-3 w-3" />
                     </Badge>

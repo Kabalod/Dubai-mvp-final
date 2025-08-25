@@ -37,9 +37,9 @@ const Auth: React.FC = () => {
     const handleGoogleLogin = async () => {
         try {
             setGoogleLoading(true);
-            console.log('🔄 Attempting Google OAuth login to:', `${API_BASE_URL}/api/auth/google/login/`);
+            console.log('🔄 Attempting Google OAuth login to: /api/auth/google/login/');
             
-            const resp = await fetch(`${API_BASE_URL}/api/auth/google/login/`, {
+            const resp = await fetch('/api/auth/google/login/', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

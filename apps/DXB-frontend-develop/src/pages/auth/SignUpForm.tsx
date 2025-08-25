@@ -51,10 +51,10 @@ const SignUpForm: React.FC = () => {
             localStorage.setItem('signup-email', values.email as string);
             console.log('Email set to state:', values.email);
             
-            console.log('About to send OTP request to:', `${API_BASE_URL}/auth/send-otp/`);
+            console.log('About to send OTP request to: /api/auth/send-otp/');
             setSendingOtp(true);
             
-            const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
+            const response = await fetch('/api/auth/send-otp/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,10 +93,10 @@ const SignUpForm: React.FC = () => {
             console.log('OTP Code:', otpCode);
             console.log('Email:', email);
             
-            console.log('About to verify OTP:', `${API_BASE_URL}/auth/verify-otp/`);
+            console.log('About to verify OTP: /api/auth/verify-otp/');
             
             setVerifyingOtp(true);
-            const response = await fetch(`${API_BASE_URL}/api/auth/verify-otp/`, {
+            const response = await fetch('/api/auth/verify-otp/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ const SignUpForm: React.FC = () => {
             console.log('About to send fetch request...');
             setSubmitting(true);
             
-            const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
+            const response = await fetch('/api/auth/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ const SignUpForm: React.FC = () => {
             }
 
             console.log('Resend OTP to:', email);
-            const response = await fetch(`${API_BASE_URL}/api/auth/send-otp/`, {
+            const response = await fetch('/api/auth/send-otp/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email }),
