@@ -21,7 +21,6 @@ import PieChart from "@/components/Charts/PieChart";
 import BarChart from "@/components/Charts/BarChart";
 import { 
   pricesTrendData, 
-  marketDistributionData, 
   buildingsByDistrictsData, 
   apartmentTypesData, 
   constructionStatusData,
@@ -56,19 +55,7 @@ const Analytics: React.FC = () => {
     const [catalogMode, setCatalogMode] = useState<string>("developer");
     const [salesMode, setSalesMode] = useState<string>("sales");
     
-    // ✅ ДОБАВЛЕНО: состояния для обновления графиков при применении фильтров
-    const [filteredData, setFilteredData] = useState<TableRow[]>(tableData);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [appliedFilters, setAppliedFilters] = useState<string[]>([]);
-    const [chartData, setChartData] = useState({
-        buildingsData: buildingsByDistrictsData,
-        apartmentData: apartmentTypesData,
-        constructionData: constructionStatusData,
-        priceData: avgPricePerSqmData,
-        trendsData: pricesTrendData,
-        roiData: roiData
-    });
-
+    // ✅ ИСПРАВЛЕНО: Сначала объявляем tableData, затем используем в useState
     // Моковые данные для таблицы
     const tableData: TableRow[] = [
         {
@@ -105,6 +92,19 @@ const Analytics: React.FC = () => {
             trend: "up",
         },
     ];
+
+    // ✅ ДОБАВЛЕНО: состояния для обновления графиков при применении фильтров (после объявления tableData)
+    const [filteredData, setFilteredData] = useState<TableRow[]>(tableData);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [appliedFilters, setAppliedFilters] = useState<string[]>([]);
+    const [chartData, setChartData] = useState({
+        buildingsData: buildingsByDistrictsData,
+        apartmentData: apartmentTypesData,
+        constructionData: constructionStatusData,
+        priceData: avgPricePerSqmData,
+        trendsData: pricesTrendData,
+        roiData: roiData
+    });
 
     // columns оставлены для будущего использования с Ant Table, сейчас не используются
     // Колонки AntTable больше не нужны (используем свой компонент таблицы)
@@ -150,13 +150,7 @@ const Analytics: React.FC = () => {
             await new Promise(resolve => setTimeout(resolve, 800));
             
             // Обновляем данные графиков на основе фильтров
-            const updatedChartData = updateChartsBasedOnFilters(newFilteredData, {
-                selectedArea,
-                selectedProject, 
-                selectedBuilding,
-                dateRange,
-                searchText
-            });
+            const updatedChartData = updateChartsBasedOnFilters(newFilteredData);
             
             setChartData(updatedChartData);
             console.log("✅ Charts updated with filtered data!");
@@ -169,7 +163,7 @@ const Analytics: React.FC = () => {
     };
     
     // ✅ ДОБАВЛЕНО: Функция для обновления данных графиков на основе фильтров
-    const updateChartsBasedOnFilters = (filteredData: TableRow[], filters: any) => {
+    const updateChartsBasedOnFilters = (filteredData: TableRow[]) => {
         // В реальном приложении здесь будут настоящие вычисления на основе отфильтрованных данных
         // Сейчас имитируем изменение данных для демонстрации функциональности
         
@@ -515,7 +509,7 @@ const Analytics: React.FC = () => {
                                 <Panel header={
                                     <Space>
                                         Property Transactions Analysis
-                                        {appliedFilters.length > 0 && <Tag color="blue" size="small">Showing {filteredData.length} of {tableData.length} records</Tag>}
+                                        {appliedFilters.length > 0 && <Tag color="blue">Showing {filteredData.length} of {tableData.length} records</Tag>}
                                     </Space>
                                 } key="1">
                                     <div className={styles.tableContainer}>

@@ -18,10 +18,10 @@ console.log('🔧 API_BASE_URL:', API_BASE_URL);
 
 // GraphQL endpoint (defaults to `${API_BASE_URL}/graphql`)
 export const GRAPHQL_API_URL: string =
-    (import.meta.env as any).VITE_GRAPHQL_API_URL || "/graphql";
+    (import.meta.env.VITE_GRAPHQL_API_URL as string) || "/graphql";
 
 // Memory LLM API base (defaults to `${API_BASE_URL}/memory`)
 export const MEMORY_API_URL: string =
-    (import.meta.env as any).VITE_MEMORY_API_URL || `${API_BASE_URL}/memory`;
+    (import.meta.env.VITE_MEMORY_API_URL as string) || `${API_BASE_URL}/memory`;
 
 
