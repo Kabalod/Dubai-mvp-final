@@ -16,10 +16,10 @@ const HomePage: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Fetch stats and properties in parallel
+        // ✅ ИСПРАВЛЕНО: используем apiService вместо api
         const [statsResponse, propertiesResponse] = await Promise.all([
-          api.getStats(),
-          api.getProperties({ limit: 20 })
+          fetch('/api/stats/').then(r => r.json()), // временное решение для stats
+          apiService.getProperties({ limit: 20 })
         ]);
         
         setStats(statsResponse);

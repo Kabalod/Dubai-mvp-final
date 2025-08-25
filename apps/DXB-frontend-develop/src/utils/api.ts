@@ -1,6 +1,7 @@
 // API client for Dubai MVP
+// ✅ ИСПРАВЛЕНО: используем правильный URL бекенда
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://workerproject-production.up.railway.app/api'
+  ? 'https://backend-production-dbb4.up.railway.app/api'
   : 'http://localhost:8000/api';
 
 // Types
