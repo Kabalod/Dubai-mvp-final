@@ -19,7 +19,7 @@ RUN apt-get update \
 
 # Install python deps
 RUN pip install --no-cache-dir --upgrade pip==25.2 setuptools wheel \
-    && pip install --no-cache-dir -r api/requirements.txt \
+    && pip install --no-cache-dir -r requirements.txt \
     && pip install --no-cache-dir \
         djangorestframework==3.15.2 \
         djangorestframework-simplejwt==5.3.0 \
