@@ -147,6 +147,17 @@ class ApiService {
     }
 
     // ========================================
+    // Stats API  
+    // ========================================
+
+    async getStats() {
+        console.log('📊 ApiService.getStats() called');
+        const response = await this.api.get('/stats/');
+        console.log('📊 Stats response:', response.data);
+        return response.data;
+    }
+
+    // ========================================
     // Properties API
     // ========================================
 
