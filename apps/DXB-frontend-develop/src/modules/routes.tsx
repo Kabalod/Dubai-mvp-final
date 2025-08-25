@@ -9,19 +9,53 @@ import Policy from "@/pages/Policy/Policy";
 import Profile from "@/pages/Profile";
 import Payment from "@/pages/Payment";
 import PricingPage from "@/pages/PricingPage";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function AppRoutes() {
     return (
         <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/dashboard" element={<MainDashboard />} />
+            {/* Публичные маршруты */}
             <Route path="/auth" element={<Auth />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/policy" element={<Policy />} />
+            
+            {/* Защищенные маршруты - требуют авторизации */}
+            <Route path="/" element={
+                <ProtectedRoute>
+                    <HomePage />
+                </ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+                <ProtectedRoute>
+                    <MainDashboard />
+                </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+                <ProtectedRoute>
+                    <Analytics />
+                </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+                <ProtectedRoute>
+                    <Reports />
+                </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+                <ProtectedRoute>
+                    <Profile />
+                </ProtectedRoute>
+            } />
+            <Route path="/payment" element={
+                <ProtectedRoute>
+                    <Payment />
+                </ProtectedRoute>
+            } />
+            <Route path="/pricing" element={
+                <ProtectedRoute>
+                    <PricingPage />
+                </ProtectedRoute>
+            } />
+            
+            {/* 404 страница */}
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

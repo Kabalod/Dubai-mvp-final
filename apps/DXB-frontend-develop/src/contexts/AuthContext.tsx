@@ -55,14 +55,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 if (isAuth) {
                     const userData = apiService.getCurrentUser();
                     console.log('🔐 User data from storage:', userData);
-                    setUser(userData);
+                    
+                    // ✅ ИСПРАВЛЕНО: если токен есть, но пользователя нет - очищаем все
+                    if (!userData) {
+                        console.log('⚠️ Valid token but no user data - clearing auth');
+                        apiService.clearAuth();
+                        setUser(null);
+                    } else {
+                        setUser(userData);
+                    }
                 } else {
                     console.log('🔐 No valid authentication found');
                     setUser(null);
                 }
             } catch (error) {
                 console.error('❌ Auth check error:', error);
-                // УБРАЛИ ХАРДКОД: больше не задаем пользователя по умолчанию
+                // Очищаем авторизацию при ошибке
+                apiService.clearAuth();
                 setUser(null);
             } finally {
                 setIsLoading(false);
@@ -79,12 +88,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const isAuth = apiService.isAuthenticated();
             if (isAuth) {
                 const userData = apiService.getCurrentUser();
-                setUser(userData);
+                
+                // ✅ ИСПРАВЛЕНО: проверяем данные пользователя
+                if (!userData) {
+                    console.log('⚠️ Valid token but no user data - clearing auth');
+                    apiService.clearAuth();
+                    setUser(null);
+                } else {
+                    setUser(userData);
+                }
             } else {
                 setUser(null);
             }
         } catch (error) {
             console.error('Auth check error:', error);
+            apiService.clearAuth();
             setUser(null);
         } finally {
             setIsLoading(false);
@@ -178,7 +196,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
-    const isAuthenticated = !!user;
+    // ✅ ИСПРАВЛЕНО: проверяем И токен И пользователя
+    const isAuthenticated = !!user && apiService.isAuthenticated();
 
     const value: AuthContextType = {
         user,
