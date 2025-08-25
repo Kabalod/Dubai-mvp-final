@@ -1,4 +1,5 @@
 # Ultra-minimal Dockerfile for Railway
+# Version: 2.0 - Fixed dj-database-url dependency
 FROM python:3.11-slim
 
 WORKDIR /app
