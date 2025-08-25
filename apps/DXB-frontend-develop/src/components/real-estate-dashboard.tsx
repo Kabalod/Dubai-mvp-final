@@ -53,6 +53,9 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
     console.log('🔍 Фильтры применены:', query);
     setLoading(true);
     
+    // ✅ ДОБАВЛЕНО: Визуальная индикация загрузки
+    console.log('⏳ Начинается фильтрация данных...');
+    
     try {
       // Преобразуем параметры фильтра в API запрос
       const searchParams: any = {
@@ -146,7 +149,11 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
     } catch (error) {
       console.error('Filter error:', error);
     } finally {
-      setLoading(false);
+      // ✅ ДОБАВЛЕНО: Небольшая задержка для видимости загрузки
+      setTimeout(() => {
+        setLoading(false);
+        console.log('✅ Фильтрация завершена!');
+      }, 500);
     }
   };
 
@@ -158,6 +165,16 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
           {/* Breadcrumb */}
           {/* Фильтры */}
           <MainFilters onSearch={handleSearch} />
+        
+        {/* ✅ ДОБАВЛЕНО: Индикатор загрузки фильтров */}
+        {loading && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg animate-pulse">
+            <div className="flex items-center gap-2 text-sm text-blue-800">
+              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="font-medium">🔄 Применение фильтров...</span>
+            </div>
+          </div>
+        )}
           
           {/* ✅ ДОБАВЛЕНО: Индикатор активных фильтров */}
           {appliedFilters.length > 0 && (
