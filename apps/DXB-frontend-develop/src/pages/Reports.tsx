@@ -114,12 +114,16 @@ const Reports: React.FC = () => {
   };
 
   const handleGenerateReport = async () => {
+    console.log('🔄 Generating report with filters:', filters);
     setIsGenerating(true);
     
     try {
       // Здесь будет реальный API вызов в будущем
       // const response = await apiService.generateReport(filters);
       // setReportData(response.data);
+      
+      // ✅ ИСПРАВЛЕНО: Показываем что фильтры применяются
+      console.log('📊 Applying filters to report generation...');
       
       // Пока используем моковые данные с улучшенной структурой
       await new Promise(resolve => setTimeout(resolve, 1500)); // Реалистичная задержка

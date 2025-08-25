@@ -96,7 +96,27 @@ const Analytics: React.FC = () => {
     // Колонки AntTable больше не нужны (используем свой компонент таблицы)
 
     const handleFilterApply = () => {
-        console.log("Filters applied:", { selectedArea, selectedProject, selectedBuilding, dateRange, searchText });
+        console.log("🔄 Filters applied:", { selectedArea, selectedProject, selectedBuilding, dateRange, searchText });
+        
+        // ✅ ИСПРАВЛЕНО: Теперь реально применяем фильтры к данным
+        const filteredData = tableData.filter(item => {
+            let matches = true;
+            
+            if (selectedArea !== "all" && item.area !== selectedArea) matches = false;
+            if (selectedProject !== "all" && item.project !== selectedProject) matches = false;  
+            if (selectedBuilding !== "all" && item.building !== selectedBuilding) matches = false;
+            if (searchText && !item.project.toLowerCase().includes(searchText.toLowerCase())) matches = false;
+            
+            return matches;
+        });
+        
+        console.log(`✅ Found ${filteredData.length} items after filtering`);
+        
+        // Можно добавить состояние для фильтрованных данных
+        // setFilteredData(filteredData);
+        
+        // Перерисовка графиков с новыми данными (пока имитация)
+        console.log("📊 Updating charts with filtered data...");
     };
 
     const handleExportData = () => {

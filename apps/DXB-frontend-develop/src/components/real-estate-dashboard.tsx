@@ -79,11 +79,20 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
         filterSummary.push(`Price: ${priceRange}`);
       }
       
-      // ✅ ИСПРАВЛЕНО: показываем результат в UI вместо alert
+      // ✅ ИСПРАВЛЕНО: показываем результат в UI вместо alert  
       console.log(`✅ Фильтры применены! ${filterSummary.join(', ')}`);
       
-      // Можно добавить состояние для отображения примененных фильтров
-      // setAppliedFilters(filterSummary);
+      // 🔄 Имитируем загрузку новых данных (в реальности будет API вызов)
+      if (filterSummary.length > 0) {
+        console.log("📊 Updating dashboard data with filters...");
+        setAppliedFilters(filterSummary); // ✅ ДОБАВЛЕНО: обновляем активные фильтры
+        // В реальности здесь будет:
+        // const newData = await apiService.getFilteredProperties(searchParams);
+        // setProperties(newData);
+        // setStats(calculateStats(newData));
+      } else {
+        setAppliedFilters([]); // ✅ ДОБАВЛЕНО: очищаем если фильтров нет
+      }
       
     } catch (error) {
       console.error('Filter error:', error);
@@ -100,6 +109,25 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
           {/* Breadcrumb */}
           {/* Фильтры */}
           <MainFilters onSearch={handleSearch} />
+          
+          {/* ✅ ДОБАВЛЕНО: Индикатор активных фильтров */}
+          {appliedFilters.length > 0 && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-blue-800">
+                <span className="font-medium">🔍 Активные фильтры:</span>
+                <span>{appliedFilters.join(' • ')}</span>
+                <button 
+                  onClick={() => {
+                    setAppliedFilters([]);
+                    console.log('🧹 Filters cleared');
+                  }}
+                  className="ml-auto text-blue-600 hover:text-blue-800 underline"
+                >
+                  Очистить
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-2">
