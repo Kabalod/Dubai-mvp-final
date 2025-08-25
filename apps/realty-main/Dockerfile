@@ -32,4 +32,4 @@ ENV DJANGO_SETTINGS_MODULE=realty.settings
 EXPOSE 8000
 
 # Run migrations, load mock data, and start server
-CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py load_mock_data && python manage.py collectstatic --noinput && gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
+CMD ["sh", "-c", "python manage.py setup_database && python manage.py collectstatic --noinput && gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
