@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . .
 
 # Verify that realty-main exists
-RUN ls -la && ls -la apps/ && ls -la apps/realty-main/
+RUN ls && ls apps/ && ls apps/realty-main/
 
 # Move to realty-main directory
 WORKDIR /app/apps/realty-main
