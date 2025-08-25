@@ -24,35 +24,11 @@ RUN groupadd -r django && useradd -r -g django django
 WORKDIR /app
 
 # Копирование requirements (для кеширования слоёв)
-COPY requirements.txt* ./
+COPY requirements.txt ./
 
 # Установка Python зависимостей
 RUN pip install --no-cache-dir --upgrade pip==25.2 \
-    && pip install --no-cache-dir \
-        # Database
-        "psycopg[binary,pool]==3.2.9" \
-        dj-database-url==2.3.0 \
-        # Django Core
-        django==4.2.17 \
-        djangorestframework==3.15.2 \
-        # Authentication
-        djangorestframework-simplejwt==5.3.0 \
-        # Validation (required by settings.py)
-        marshmallow==3.21.3 \
-        # CORS & Security
-        django-cors-headers==4.6.0 \
-        # Email
-        django-anymail==13.0.0 \
-        # Configuration (совместимая)
-        environs==11.2.1 \
-        # Additional (only if needed)
-        python-dateutil==2.9.0.post0 \
-        pillow==11.1.0 \
-        whitenoise==6.8.2 \
-        # Cache backend (для PROD совместимости)
-        diskcache==5.6.3 \
-        # Monitoring
-        prometheus-client==0.20.0 \
+    && pip install --no-cache-dir -r requirements.txt \
     && pip cache purge
 
 # Копирование кода приложения

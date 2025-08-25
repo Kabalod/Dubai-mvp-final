@@ -1,8 +1,11 @@
 *
 
 !realty/
+!api/
+!tests/
 !deploy/
 !requirements*.txt
+!pyproject.toml
 !tailwind.config.js
 !package*.json
 !manage.py

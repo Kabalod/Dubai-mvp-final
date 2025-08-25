@@ -1,12 +1,10 @@
-version: '3.8'
-
 # ========================================
 # MVP архитектура для быстрого релиза
 # Только основные сервисы без AI
 # ========================================
 
 # Загрузка переменных окружения
-env_file: .env.mvp
+# env_file: .env.mvp
 
 services:
   # ========================================
@@ -49,36 +47,32 @@ services:
     restart: unless-stopped
 
   # ========================================
-  # Парсер PropertyFinder (отдельный сервер)
+  # Парсер PropertyFinder (отдельный сервер) - отключен для MVP
   # ========================================
-  parser-service:
-    build:
-      context: ./apps/pfimport-main
-      dockerfile: Dockerfile
-    container_name: mvp-parser
-    ports:
-      - "${PARSER_PORT:-8002}:8000"
-    volumes:
-      - ./apps/pfimport-main:/app
-      - ./shared-data:/shared-data  # Общая папка для JSON файлов
-    environment:
-      - DEBUG=1
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,parser-service
-      - SECRET_KEY=${SECRET_KEY:-mvp-secret-key-change-in-production}
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
+  # parser-service:
+  #   image: dubai_mvp-parser-service:latest
+  #   container_name: mvp-parser
+  #   ports:
+  #     - "${PARSER_PORT:-8002}:8000"
+  #   volumes:
+  #     - ./apps/pfimport-main:/app
+  #     - ./shared-data:/shared-data  # Общая папка для JSON файлов
+  #   environment:
+  #     - DEBUG=1
+  #     - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,parser-service
+  #     - SECRET_KEY=${SECRET_KEY:-mvp-secret-key-change-in-production}
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+  #     interval: 60s
+  #     timeout: 10s
+  #     retries: 3
 
   # ========================================
   # Основной API сервер (Django)
   # ========================================
   api-service:
-    build:
-      context: ./apps/realty-main
-      dockerfile: Dockerfile
+    image: dubai_mvp-api-service:latest
     container_name: mvp-api
     volumes:
       - ./apps/realty-main:/app
@@ -108,9 +102,7 @@ services:
   # React Frontend
   # ========================================
   frontend:
-    build:
-      context: ./apps/DXB-frontend-develop
-      dockerfile: Dockerfile
+    image: dubai_mvp-frontend:latest
     container_name: mvp-frontend
     ports:
       - "3000:80"
@@ -143,7 +135,6 @@ services:
     depends_on:
       - api-service
       - frontend
-      - parser-service
     restart: unless-stopped
 
   # ========================================

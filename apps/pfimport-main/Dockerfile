@@ -32,7 +32,7 @@ RUN useradd --create-home --shell /bin/bash --uid 1000 app \
     && chown -R app:app /shared-data
 
 # Создание Django superuser script (опционально)
-RUN echo '#!/bin/bash\npython manage.py migrate\npython manage.py collectstatic --noinput\nexec "$@"' > /app/entrypoint.sh \
+RUN echo '#!/bin/bash\npython manage.py migrate\nexec "$@"' > /app/entrypoint.sh \
     && chmod +x /app/entrypoint.sh \
     && chown app:app /app/entrypoint.sh
 
