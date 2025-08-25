@@ -1,33 +1,34 @@
-# Simple Dockerfile for Railway deployment
-# This file is used by Railway to deploy the backend
+# Railway MVP Dockerfile v3.0 - COMPLETE REBUILD REQUIRED
+# Version: 3.0 - Force Railway to rebuild completely
+# Build: 2025-08-25-18-00 - Force Railway to rebuild
+# This is a completely new Dockerfile structure
 
 FROM python:3.11-slim
 
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        libpq-dev \
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set work directory
 WORKDIR /app
 
-# Copy requirements first for caching
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
-COPY . .
+# Copy Django app
+COPY manage.py .
+COPY realty/ ./realty/
 
 # Set environment variables
+ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=realty.settings
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
 
 # Expose port
 EXPOSE 8000
 
-# Run Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Run migrations and start server
+CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py collectstatic --noinput && gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
