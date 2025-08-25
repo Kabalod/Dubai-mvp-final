@@ -9,8 +9,16 @@ COPY . /repo
 # Переходим в директорию бэкенда внутри монорепо
 WORKDIR /repo/apps/realty-main
 
-# Install deps (lean: rely on backend Dockerfile structure)
-RUN pip install --no-cache-dir --upgrade pip==25.2 \
+# System deps required for psycopg and builds
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install python deps
+RUN pip install --no-cache-dir --upgrade pip==25.2 setuptools wheel \
     && pip install --no-cache-dir -r api/requirements.txt \
     && pip install --no-cache-dir \
         djangorestframework==3.15.2 \
@@ -18,7 +26,7 @@ RUN pip install --no-cache-dir --upgrade pip==25.2 \
         django-cors-headers==4.6.0 \
         environs==11.2.1 \
         dj-database-url==2.3.0 \
-        psycopg[binary,pool]==3.2.9 \
+        'psycopg[binary,pool]==3.2.9' \
         whitenoise==6.8.2
 
 ENV DJANGO_SETTINGS_MODULE=realty.settings 
