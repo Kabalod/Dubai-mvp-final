@@ -3,7 +3,6 @@ from email.utils import parseaddr
 from pathlib import Path
 
 from environs import Env
-from marshmallow.validate import Email
 
 # 0. Setup
 # --------------------------------------------------------------------------------------------
@@ -90,7 +89,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DEFAULT_FROM_EMAIL = env.str(
     "DEFAULT_FROM_EMAIL",
     default="tobidegnon@proton.me",
-    validate=lambda v: Email()(parseaddr(v)[1]),
 )
 
 # Email backend can be overridden via env. Default:
