@@ -1,6 +1,7 @@
-# Railway MVP Dockerfile v3.0 - COMPLETE REBUILD REQUIRED
-# Version: 3.0 - Force Railway to rebuild completely
-# Build: 2025-08-25-18-00 - Force Railway to rebuild
+# Railway MVP Dockerfile v3.1 - COMPLETE REBUILD REQUIRED
+# Version: 3.1 - Force Railway to rebuild completely
+# Build: 2025-08-25-18-30 - Force Railway to rebuild NOW
+# Timestamp: 2025-08-25T18:30:00Z
 # This is a completely new Dockerfile structure
 
 FROM python:3.11-slim

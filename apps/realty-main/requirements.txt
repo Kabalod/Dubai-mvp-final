@@ -1,6 +1,7 @@
-# Complete Railway requirements for Dubai MVP v2.3
-# Version: 2.3 - Fixed anymail version compatibility
-# Build: 2025-08-25 - Force Railway to rebuild
+# Complete Railway requirements for Dubai MVP v2.4
+# Version: 2.4 - Force Railway rebuild with timestamp
+# Build: 2025-08-25-18-30 - Force Railway to rebuild NOW
+# Timestamp: 2025-08-25T18:30:00Z
 django>=4.2
 djangorestframework>=3.15
 djangorestframework-simplejwt>=5.3
