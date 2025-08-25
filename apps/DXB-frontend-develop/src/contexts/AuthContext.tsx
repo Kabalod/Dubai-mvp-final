@@ -13,6 +13,8 @@ interface AuthContextType {
     register: (userData: RegisterData) => Promise<void>;
     logout: () => void;
     checkAuth: () => void;
+    requestPasswordReset: (email: string) => Promise<void>;
+    confirmPasswordReset: (email: string, password1: string, password2: string, token?: string) => Promise<void>;
 }
 
 interface RegisterData {
@@ -150,7 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         } catch (error: any) {
             console.error('Registration error:', error);
             
-            // Extract error message
+            // ✅ УЛУЧШЕННАЯ обработка ошибок регистрации
             let errorMessage = 'Registration failed';
             if (error.response?.data) {
                 const errors = error.response.data;
@@ -160,7 +162,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                     const errorMessages = [];
                     for (const [field, messages] of Object.entries(errors)) {
                         if (Array.isArray(messages)) {
-                            errorMessages.push(`${field}: ${messages.join(', ')}`);
+                            // Специальная обработка для распространенных ошибок
+                            if (field === 'email' && messages.some(msg => msg.includes('already exists'))) {
+                                errorMessages.push('Пользователь с таким email уже зарегистрирован');
+                            } else if (field === 'username' && messages.some(msg => msg.includes('already exists'))) {
+                                errorMessages.push('Пользователь с таким именем уже существует');
+                            } else {
+                                errorMessages.push(`${field}: ${messages.join(', ')}`);
+                            }
                         } else {
                             errorMessages.push(`${field}: ${messages}`);
                         }
@@ -196,6 +205,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const requestPasswordReset = async (email: string): Promise<void> => {
+        setIsLoading(true);
+        
+        try {
+            await apiService.requestPasswordReset(email);
+            console.log('Password reset email sent successfully');
+            
+        } catch (error: any) {
+            console.error('Password reset request error:', error);
+            
+            let errorMessage = 'Failed to send password reset email';
+            if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            throw new Error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const confirmPasswordReset = async (email: string, password1: string, password2: string, token?: string): Promise<void> => {
+        setIsLoading(true);
+        
+        try {
+            await apiService.confirmPasswordReset(email, password1, password2, token);
+            console.log('Password reset confirmed successfully');
+            
+        } catch (error: any) {
+            console.error('Password reset confirm error:', error);
+            
+            let errorMessage = 'Failed to reset password';
+            if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            throw new Error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // ✅ ИСПРАВЛЕНО: проверяем И токен И пользователя
     const isAuthenticated = !!user && apiService.isAuthenticated();
 
@@ -207,6 +262,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         register,
         logout,
         checkAuth,
+        requestPasswordReset,
+        confirmPasswordReset,
     };
 
     return (

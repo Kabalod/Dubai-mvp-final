@@ -24,11 +24,12 @@ enum Steps {
 
 const LoginForm: React.FC = () => {
     const navigate = useNavigate();
-    const { login } = useAuth(); // ✅ ДОБАВЛЕНО: используем AuthContext  
+    const { login, requestPasswordReset, confirmPasswordReset } = useAuth(); // ✅ ДОБАВЛЕНО: методы восстановления пароля
     const [currentStep, setCurrentStep] = useState(Steps.Login);
     const [loginLoading, setLoginLoading] = useState(false);
     const [recoveryLoading, setRecoveryLoading] = useState(false);
     const [resetLoading, setResetLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string>(''); // ✅ ДОБАВЛЕНО: состояние для ошибок
 
     const [email, setEmail] = useState("");
     const [timeToResend, setTimeToResend] = useState(45);
@@ -46,7 +47,7 @@ const LoginForm: React.FC = () => {
             
         } catch (error: any) {
             console.error('❌ Login failed:', error.message);
-            // Показываем ошибку в консоли, но не блокируем UI
+            setErrorMessage(error.message || 'Login failed'); // ✅ ДОБАВЛЕНО: показываем ошибку пользователю
         } finally {
             setLoginLoading(false);
         }
@@ -68,31 +69,17 @@ const LoginForm: React.FC = () => {
         try {
             setEmail(values.email!);
             setRecoveryLoading(true);
+            setErrorMessage('');
             
-            // Отправляем запрос на сброс пароля
-            const response = await fetch(`${API_BASE_URL}/api/auth/password/reset/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken') || '',
-                },
-                body: JSON.stringify({
-                    email: values.email,
-                }),
-            });
-
-            if (response.ok) {
-                console.log('Password reset email sent');
-                // ✅ ИСПРАВЛЕНО: убрали message.success
-                setCurrentStep(Steps.Confirm);
-            } else {
-                const errorData = await response.json();
-                console.error('Password reset failed:', errorData);
-                // ✅ ИСПРАВЛЕНО: убрали message.error
-            }
-        } catch (error) {
-            console.error('Password reset error:', error);
-            // ✅ ИСПРАВЛЕНО: убрали message.error
+            // ✅ ИСПРАВЛЕНО: Используем AuthContext вместо прямого fetch
+            await requestPasswordReset(values.email!);
+            
+            console.log('✅ Password reset email sent via AuthContext');
+            setCurrentStep(Steps.Confirm);
+            
+        } catch (error: any) {
+            console.error('❌ Password reset failed:', error.message);
+            setErrorMessage(error.message || 'Failed to send reset email');
         } finally {
             setRecoveryLoading(false);
         }
@@ -104,33 +91,18 @@ const LoginForm: React.FC = () => {
 
     const handleReset = async (values: any) => {
         try {
-            // Отправляем новый пароль
             setResetLoading(true);
-            const response = await fetch(`${API_BASE_URL}/api/auth/password/reset/confirm/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken') || '',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password1: values.password,
-                    password2: values.confirmPassword,
-                }),
-            });
-
-            if (response.ok) {
-                console.log('Password reset successful');
-                // ✅ ИСПРАВЛЕНО: убрали message.success
-                setCurrentStep(Steps.Success);
-            } else {
-                const errorData = await response.json();
-                console.error('Password reset failed:', errorData);
-                // ✅ ИСПРАВЛЕНО: убрали message.error
-            }
-        } catch (error) {
-            console.error('Password reset error:', error);
-            // ✅ ИСПРАВЛЕНО: убрали message.error
+            setErrorMessage('');
+            
+            // ✅ ИСПРАВЛЕНО: Используем AuthContext вместо прямого fetch
+            await confirmPasswordReset(email, values.password, values.confirmPassword);
+            
+            console.log('✅ Password reset confirmed via AuthContext');
+            setCurrentStep(Steps.Success);
+            
+        } catch (error: any) {
+            console.error('❌ Password reset confirmation failed:', error.message);
+            setErrorMessage(error.message || 'Failed to reset password');
         } finally {
             setResetLoading(false);
         }

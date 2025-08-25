@@ -234,6 +234,31 @@ class ApiService {
     }
 
     // ========================================
+    // Password Reset API
+    // ========================================
+
+    async requestPasswordReset(email: string) {
+        console.log('🔑 Requesting password reset for:', email);
+        const response = await this.api.post('/auth/password/reset/', {
+            email
+        });
+        console.log('🔑 Password reset requested:', response.data);
+        return response.data;
+    }
+
+    async confirmPasswordReset(email: string, password1: string, password2: string, token?: string) {
+        console.log('🔑 Confirming password reset for:', email);
+        const response = await this.api.post('/auth/password/reset/confirm/', {
+            email,
+            password1,
+            password2,
+            token // Если бекенд требует токен из email
+        });
+        console.log('🔑 Password reset confirmed:', response.data);
+        return response.data;
+    }
+
+    // ========================================
     // Profile API
     // ========================================
 
