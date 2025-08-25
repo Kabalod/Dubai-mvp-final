@@ -67,7 +67,21 @@ const Reports: React.FC = () => {
 
   // Функция для генерации PDF
   const handleDownloadPDF = async () => {
-    if (!reportRef.current || !reportData) return;
+    console.log('🔄 PDF Download clicked!');
+    console.log('📊 Report data exists:', !!reportData);
+    console.log('📋 Report ref exists:', !!reportRef.current);
+    
+    if (!reportRef.current) {
+      console.error('❌ No report ref found');
+      alert('❌ Error: Report element not found. Please generate a report first.');
+      return;
+    }
+    
+    if (!reportData) {
+      console.error('❌ No report data found');
+      alert('❌ Error: No report data. Please generate a report first.');
+      return;
+    }
     
     setIsDownloading(true);
     try {
@@ -501,12 +515,20 @@ const Reports: React.FC = () => {
               <div className="text-center pt-6 border-t">
                 <Button 
                   className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3"
-                  onClick={handleDownloadPDF}
-                  disabled={isDownloading}
+                  onClick={() => {
+                    console.log('🔄 PDF Download button clicked!');
+                    handleDownloadPDF();
+                  }}
+                  disabled={isDownloading || !reportData}
                 >
                   <FileDown className="h-4 w-4 mr-2" />
                   {isDownloading ? 'Generating PDF...' : 'Download PDF Report'}
                 </Button>
+                {!reportData && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Please generate a report first
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

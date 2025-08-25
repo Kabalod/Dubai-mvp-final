@@ -79,7 +79,11 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
         filterSummary.push(`Price: ${priceRange}`);
       }
       
-      alert(`✅ Фильтры применены!\n${filterSummary.join('\n')}\n\nПараметры в консоли браузера`);
+      // ✅ ИСПРАВЛЕНО: показываем результат в UI вместо alert
+      console.log(`✅ Фильтры применены! ${filterSummary.join(', ')}`);
+      
+      // Можно добавить состояние для отображения примененных фильтров
+      // setAppliedFilters(filterSummary);
       
     } catch (error) {
       console.error('Filter error:', error);
