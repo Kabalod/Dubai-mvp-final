@@ -96,7 +96,9 @@ DEFAULT_FROM_EMAIL = env.str(
 # Email backend can be overridden via env. Default:
 EMAIL_BACKEND = env.str(
     "EMAIL_BACKEND",
-    default="django.core.mail.backends.console.EmailBackend"
+    default=(
+        "anymail.backends.sendgrid.EmailBackend" if PROD else "django.core.mail.backends.console.EmailBackend"
+    ),
 )
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
@@ -118,6 +120,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
+    "anymail",
 ]
 
 LOCAL_APPS = [
@@ -495,3 +498,12 @@ CORS_ALLOWED_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# django-anymail
+if PROD:
+    ANYMAIL = {
+        "SENDGRID_API_KEY": env.str("SENDGRID_API_KEY", default=None),
+        "SENDGRID_GENERATE_MESSAGE_ID": True,
+        "SENDGRID_MERGE_FIELD_FORMAT": "-{}-",
+        "SENDGRID_API_URL": "https://api.sendgrid.com/v3/",
+    }

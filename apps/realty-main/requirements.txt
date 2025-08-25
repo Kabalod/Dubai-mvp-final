@@ -8,3 +8,4 @@ environs[django]>=11.2
 whitenoise>=6.8
 anymail[sendgrid]>=10.0
 marshmallow>=3.20
+gunicorn>=21.2
