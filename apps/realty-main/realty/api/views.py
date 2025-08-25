@@ -17,6 +17,8 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.http import HttpResponseRedirect
+from django.core.cache import cache
+from django.db.models import Q
 
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -135,6 +137,8 @@ class SendOTPView(APIView):
         except Exception:
             # В MVP режиме не падаем 500, а возвращаем код без сохранения
             stored = False
+            # Сохраняем код в кэше как мягкий фоллбек (10 минут)
+            cache.set(f"otp:{email}", otp_code, timeout=600)
         
         # Для MVP возвращаем код в ответе (в продакшн отправлять на email)
         return Response({
@@ -194,11 +198,49 @@ class VerifyOTPView(APIView):
             })
             
         except OTPCode.DoesNotExist:
+            # Пробуем мягкий фоллбек из кэша
+            cached_code = cache.get(f"otp:{email}")
+            if cached_code and cached_code == code:
+                user, created = User.objects.get_or_create(
+                    email=email, defaults={'username': email}
+                )
+                refresh = RefreshToken.for_user(user)
+                # Использованный код очищаем из кэша
+                cache.delete(f"otp:{email}")
+                return Response({
+                    'message': 'OTP verified successfully (cache)',
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                    'user': {
+                        'id': user.id,
+                        'email': user.email,
+                        'username': user.username,
+                        'is_new_user': created
+                    }
+                })
             return Response({
                 'error': 'Invalid or expired OTP code'
             }, status=status.HTTP_400_BAD_REQUEST)
         except Exception:
-            # На любые внутренние ошибки БД не возвращаем 500, а даем предсказуемый ответ MVP
+            # На внутренние ошибки БД пробуем фоллбек кэша
+            cached_code = cache.get(f"otp:{email}")
+            if cached_code and cached_code == code:
+                user, created = User.objects.get_or_create(
+                    email=email, defaults={'username': email}
+                )
+                refresh = RefreshToken.for_user(user)
+                cache.delete(f"otp:{email}")
+                return Response({
+                    'message': 'OTP verified successfully (cache)',
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                    'user': {
+                        'id': user.id,
+                        'email': user.email,
+                        'username': user.username,
+                        'is_new_user': created
+                    }
+                })
             return Response({
                 'error': 'Invalid or expired OTP code'
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -455,7 +497,8 @@ class PropertyDetailView(APIView):
     permission_classes = (permissions.AllowAny,)
     
     def get(self, request, listing_id):
-        
+        # Параметры поиска (если будут использоваться позже)
+        search_params = request.query_params
         listing_type = search_params.get('listing_type', '')
         search_query = search_params.get('search', '')
         property_type = search_params.get('property_type', '')
