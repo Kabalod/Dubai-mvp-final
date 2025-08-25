@@ -1,21 +1,19 @@
 # Root Dockerfile for Railway monorepo: builds backend from apps/realty-main
-# Simplified and optimized for Railway deployment
+# Optimized for Railway deployment with minimal resource usage
 
 FROM python:3.11-slim
 
-# Install system dependencies
+# Install system dependencies in one layer with minimal packages
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        build-essential \
+        gcc \
         libpq-dev \
         curl \
-        gcc \
-        g++ \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
 # Upgrade pip and install build tools
-RUN pip install --no-cache-dir --upgrade pip==25.2 setuptools wheel
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # Set working directory
 WORKDIR /app
@@ -45,6 +43,6 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/api/health/ || exit 1
 
 # Run Django with gunicorn for production
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "30", "realty.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "30", "realty.wsgi:application"]
 
 
