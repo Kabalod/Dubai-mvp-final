@@ -6,6 +6,7 @@ import CustomButton from '@/components/CustomButton/CustomButton';
 import styles from './SignUpForm.module.scss';
 import { UserOutlined, MailOutlined, LockOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext'; // ✅ ДОБАВЛЕНО: используем AuthContext
 import { API_BASE_URL } from '@/config';
 
 enum FormSteps {
