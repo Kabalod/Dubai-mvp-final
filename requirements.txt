@@ -1,5 +1,5 @@
-# Complete Railway requirements for Dubai MVP v2.2
-# Version: 2.2 - Force Railway rebuild
+# Complete Railway requirements for Dubai MVP v2.3
+# Version: 2.3 - Fixed anymail version compatibility
 # Build: 2025-08-25 - Force Railway to rebuild
 django>=4.2
 djangorestframework>=3.15
@@ -9,5 +9,5 @@ django-cors-headers>=4.7
 environs>=11.2
 gunicorn>=21.2
 dj-database-url>=2.3
-anymail[sendgrid]>=13.0
+django-anymail[sendgrid]>=10.0
 marshmallow>=3.20
