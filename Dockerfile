@@ -2,10 +2,12 @@
 
 FROM python:3.11-slim AS base
 
-WORKDIR /app
+# Копируем весь репозиторий, затем переключимся в папку backend
+WORKDIR /repo
+COPY . /repo
 
-# Copy backend app into image
-COPY apps/realty-main/ /app/
+# Переходим в директорию бэкенда внутри монорепо
+WORKDIR /repo/apps/realty-main
 
 # Install deps (lean: rely on backend Dockerfile structure)
 RUN pip install --no-cache-dir --upgrade pip==25.2 \
@@ -25,6 +27,7 @@ ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
+# Не запускаем миграции на старте (пустая БД / не нужны миграции)
+CMD ["sh", "-c", "python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
 
 
