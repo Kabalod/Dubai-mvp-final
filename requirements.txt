@@ -1,8 +1,11 @@
-# Ultra-minimal Railway requirements
+# Complete Railway requirements for Dubai MVP
 django>=4.2
 djangorestframework>=3.15
+djangorestframework-simplejwt>=5.3
 psycopg[binary]>=3.2
 django-cors-headers>=4.7
 environs>=11.2
 gunicorn>=21.2
 dj-database-url>=2.3
+anymail[sendgrid]>=13.0
+marshmallow>=3.20

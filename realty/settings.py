@@ -118,10 +118,9 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     # Django REST Framework for MVP API
     "rest_framework",
-    # Temporarily disabled for Railway MVP
-    # "rest_framework_simplejwt",
-    # "rest_framework_simplejwt.token_blacklist",
-    # "anymail",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "anymail",
 ]
 
 LOCAL_APPS = [
