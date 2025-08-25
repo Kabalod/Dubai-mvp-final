@@ -3,18 +3,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Copy requirements first for caching
+COPY requirements.txt .
+
+# Install dependencies from requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
 # Copy only essential files
 COPY manage.py .
 COPY realty/ ./realty/
-
-# Install only core dependencies
-RUN pip install --no-cache-dir \
-    django>=4.2 \
-    djangorestframework>=3.15 \
-    psycopg[binary]>=3.2 \
-    django-cors-headers>=4.7 \
-    environs>=11.2 \
-    gunicorn>=21.2
 
 # Environment
 ENV DJANGO_SETTINGS_MODULE=realty.settings
