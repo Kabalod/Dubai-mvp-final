@@ -1,7 +1,7 @@
 # Root Dockerfile for Railway monorepo: builds backend from apps/realty-main
-# Optimized for Railway deployment with multi-stage build
+# Simplified and optimized for Railway deployment
 
-FROM python:3.11-slim AS base
+FROM python:3.11-slim
 
 # Install system dependencies
 RUN apt-get update \
@@ -26,7 +26,7 @@ COPY apps/realty-main/requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy the entire realty-main directory
 COPY apps/realty-main/ .
 
 # Set environment variables
