@@ -129,7 +129,7 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
 
     const handleSearch = useCallback(() => {
         onSearch(filtersState);
-    }, [filtersState, onSearch]);
+    }, [filtersState]); // ✅ ИСПРАВЛЕНО: убрали onSearch из зависимостей
 
     // Новые обработчики для расширенных фильтров
     const handlePropertyTypeChange = (value: string) => {
@@ -179,9 +179,9 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
     };
 
     useEffect(() => {
-        // Инициализация фильтров при монтировании
+        // ✅ ИСПРАВЛЕНО: инициализация только при монтировании, без onSearch в зависимостях
         onSearch(initialQueryState);
-    }, [onSearch]);
+    }, []); // убрали onSearch из зависимостей для предотвращения бесконечного цикла
 
     return (
         <section className={styles.container}>
