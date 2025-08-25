@@ -6,10 +6,10 @@ const normalizeBase = (url: string) => url.replace(/\/$/, "");
 // Production/Development API base URL configuration
 const isDevelopment = import.meta.env.MODE === 'development';
 
-// ✅ ИСПРАВЛЕНО: в продакшне используем nginx прокси для избежания CORS
+// ✅ ИСПРАВЛЕНО: в продакшне используем URL backend API на Railway
 const frontendApiFromEnv = isDevelopment
     ? 'http://localhost:8000'  // Local development
-    : '';  // Production: используем пустую строку для прокси через nginx (/api/*)
+    : 'https://workerproject-production.up.railway.app';  // Production: backend API на Railway
 
 export const API_BASE_URL: string = normalizeBase(String(frontendApiFromEnv));
 
@@ -18,7 +18,7 @@ console.log('🔧 API_BASE_URL:', API_BASE_URL);
 
 // GraphQL endpoint (defaults to `${API_BASE_URL}/graphql`)
 export const GRAPHQL_API_URL: string =
-    (import.meta.env.VITE_GRAPHQL_API_URL as string) || "/graphql";
+    (import.meta.env.VITE_GRAPHQL_API_URL as string) || `${API_BASE_URL}/graphql`;
 
 // Memory LLM API base (defaults to `${API_BASE_URL}/memory`)
 export const MEMORY_API_URL: string =

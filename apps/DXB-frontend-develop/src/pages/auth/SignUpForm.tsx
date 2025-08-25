@@ -8,6 +8,7 @@ import { UserOutlined, MailOutlined, LockOutlined, CheckCircleOutlined } from '@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext'; // ✅ ДОБАВЛЕНО: используем AuthContext
 import { API_BASE_URL } from '@/config';
+import { apiService } from '../../services/api';
 
 enum FormSteps {
     Join = 'join',
@@ -51,30 +52,17 @@ const SignUpForm: React.FC = () => {
             localStorage.setItem('signup-email', values.email as string);
             console.log('Email set to state:', values.email);
             
-            console.log('About to send OTP request to: /api/auth/send-otp/');
+            console.log('About to send OTP request via apiService');
             setSendingOtp(true);
             
-            const response = await fetch('/api/auth/send-otp/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email: values.email }),
-            });
-            
-            console.log('Response received:', response);
-            console.log('Response status:', response.status);
-            
-            const data = await response.json();
-            console.log('Response data:', data);
-            
-            if (response.ok) {
-                console.log('OTP sent successfully, moving to Confirm step');
+            try {
+                const data = await apiService.sendOTP(values.email);
+                console.log('OTP sent successfully:', data);
                 setCurrentStep(FormSteps.Confirm);
                 setResendCooldown(60);
-            } else {
-                console.error('Failed to send OTP:', data.error);
-                // ✅ ИСПРАВЛЕНО: убрали message.error
+            } catch (error) {
+                console.error('Failed to send OTP:', error);
+                message.error('Failed to send OTP. Please try again.');
             }
         } catch (err) {
             console.error('Error in handleSignUp:', err);
@@ -93,28 +81,12 @@ const SignUpForm: React.FC = () => {
             console.log('OTP Code:', otpCode);
             console.log('Email:', email);
             
-            console.log('About to verify OTP: /api/auth/verify-otp/');
+            console.log('About to verify OTP via apiService');
             
             setVerifyingOtp(true);
-            const response = await fetch('/api/auth/verify-otp/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    email: email,
-                    code: otpCode 
-                }),
-            });
-            
-            console.log('Verification response:', response);
-            console.log('Response status:', response.status);
-            
-            const data = await response.json();
-            console.log('Verification data:', data);
-            
-            if (response.ok) {
-                console.log('OTP verified successfully');
+            try {
+                const data = await apiService.verifyOTP(email, otpCode);
+                console.log('OTP verified successfully:', data);
                 
                 // Сохраняем токены
                 if (data.tokens) {
@@ -125,9 +97,9 @@ const SignUpForm: React.FC = () => {
                 
                 // Переходим к следующему шагу
                 setCurrentStep(FormSteps.Details);
-            } else {
-                console.error('OTP verification failed:', data.error);
-                // ✅ ИСПРАВЛЕНО: убрали message.error
+            } catch (error) {
+                console.error('OTP verification failed:', error);
+                message.error('Invalid OTP code. Please try again.');
             }
         } catch (err) {
             console.error('Error in handleValidation:', err);
@@ -153,36 +125,24 @@ const SignUpForm: React.FC = () => {
                 return;
             }
             
-            console.log('About to send fetch request...');
+            console.log('About to send registration request via apiService...');
             setSubmitting(true);
             
-            const response = await fetch('/api/auth/register/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
+            try {
+                const responseData = await apiService.register({
                     email: effectiveEmail,
                     password: values.password,
                     username: effectiveEmail, // Используем email как username
                     first_name: values.name.split(' ')[0] || '',
                     last_name: values.name.split(' ').slice(1).join(' ') || '',
-                }),
-            });
-
-            console.log('Response received:', response);
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-
-            if (response.ok) {
-                const responseData = await response.json();
+                });
+                
                 console.log('Registration successful!', responseData);
-                // ✅ ИСПРАВЛЕНО: убрали message.success
+                message.success('Registration successful!');
                 navigate("/");
-            } else {
-                const errorData = await response.json();
-                console.error('Registration failed:', errorData);
-                // ✅ ИСПРАВЛЕНО: убрали message.error
+            } catch (error) {
+                console.error('Registration failed:', error);
+                message.error('Registration failed. Please try again.');
             }
         } catch (error) {
             console.error('Registration error:', error);
@@ -217,19 +177,13 @@ const SignUpForm: React.FC = () => {
             }
 
             console.log('Resend OTP to:', email);
-            const response = await fetch('/api/auth/send-otp/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-            });
-
-            const data = await response.json().catch(() => ({}));
-            if (response.ok) {
-                // ✅ ИСПРАВЛЕНО: убрали message.success
+            try {
+                await apiService.sendOTP(email);
+                message.success('OTP code resent successfully!');
                 setResendCooldown(60);
-            } else {
-                console.error('Failed to resend OTP:', data?.error);
-                // ✅ ИСПРАВЛЕНО: убрали message.error
+            } catch (error) {
+                console.error('Failed to resend OTP:', error);
+                message.error('Failed to resend OTP. Please try again.');
             }
         } catch (err) {
             console.error('Resend OTP error:', err);
