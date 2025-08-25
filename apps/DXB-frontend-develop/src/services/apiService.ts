@@ -71,16 +71,29 @@ class ApiService {
     // Authentication Methods
     // ========================================
 
-    async login(username: string, password: string) {
+    async login(email: string, password: string) {
+        console.log('🔑 ApiService login attempt with email:', email);
+        
         const response = await this.api.post('/auth/login/', {
-            username,
+            username: email, // ✅ ИСПРАВЛЕНО: бекенд ожидает username, но передаем email
             password,
         });
 
-        if (response.data.tokens) {
+        console.log('🔑 Login response from backend:', response.data);
+
+        // ✅ ИСПРАВЛЕНО: поддерживаем разные форматы ответа от бекенда
+        if (response.data?.access) {
+            // Новый формат: { access, refresh, user }
+            localStorage.setItem('accessToken', response.data.access);
+            localStorage.setItem('refreshToken', response.data.refresh);
+            localStorage.setItem('user', JSON.stringify(response.data.user));
+            console.log('✅ Tokens saved (new format)');
+        } else if (response.data?.tokens) {
+            // Старый формат: { tokens: { access, refresh }, user }
             localStorage.setItem('accessToken', response.data.tokens.access);
             localStorage.setItem('refreshToken', response.data.tokens.refresh);
             localStorage.setItem('user', JSON.stringify(response.data.user));
+            console.log('✅ Tokens saved (old format)');
         }
 
         return response.data;

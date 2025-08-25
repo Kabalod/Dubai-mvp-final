@@ -5,6 +5,7 @@ import CustomInput from "@/components/CustomInput/CustomInput";
 import CustomButton from "@/components/CustomButton/CustomButton";
 import { t } from "@lingui/macro";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext"; // ✅ ДОБАВЛЕНО: используем AuthContext
 import { API_BASE_URL } from "@/config";
 
 type LoginFormType = {
@@ -23,6 +24,7 @@ enum Steps {
 
 const LoginForm: React.FC = () => {
     const navigate = useNavigate();
+    const { login } = useAuth(); // ✅ ДОБАВЛЕНО: используем AuthContext  
     const [currentStep, setCurrentStep] = useState(Steps.Login);
     const [loginLoading, setLoginLoading] = useState(false);
     const [recoveryLoading, setRecoveryLoading] = useState(false);
@@ -33,53 +35,18 @@ const LoginForm: React.FC = () => {
 
     const onFinish = async (values: any) => {
         try {
-            console.log("Login attempt with:", values);
+            console.log("🔑 Login attempt via AuthContext with:", values.email);
             setLoginLoading(true);
             
-            // Отправляем данные на Django бэкенд
-            const response = await fetch(`${API_BASE_URL}/api/auth/login/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    username: values.email, // Backend ожидает username
-                    password: values.password,
-                }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('✅ Login response data:', data);
-                
-                if (data?.access) {
-                    // ✅ ИСПРАВЛЕНО: сохраняем токены и данные пользователя
-                    localStorage.setItem('accessToken', data.access);
-                    if (data.refresh) localStorage.setItem('refreshToken', data.refresh);
-                    if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
-                    
-                    console.log('✅ Login successful, tokens and user saved!');
-                    navigate("/");
-                    window.location.reload(); // Перезагружаем для обновления AuthContext
-                } else if (data?.tokens) {
-                    // Fallback для старого формата
-                    localStorage.setItem('accessToken', data.tokens.access);
-                    localStorage.setItem('refreshToken', data.tokens.refresh);
-                    console.log('✅ Login successful (old format)!');
-                    navigate("/");
-                    window.location.reload();
-                } else {
-                    console.error('❌ No tokens in response');
-                    // ✅ ИСПРАВЛЕНО: убрали message.error
-                }
-            } else {
-                const errorData = await response.json();
-                console.error('Login failed:', errorData);
-                // ✅ ИСПРАВЛЕНО: убрали message.error
-            }
-        } catch (error) {
-            console.error('Login error:', error);
-            // ✅ ИСПРАВЛЕНО: убрали message.error
+            // ✅ ИСПРАВЛЕНО: Используем AuthContext вместо прямого fetch
+            await login(values.email, values.password);
+            
+            console.log('✅ Login successful via AuthContext!');
+            navigate("/");
+            
+        } catch (error: any) {
+            console.error('❌ Login failed:', error.message);
+            // Показываем ошибку в консоли, но не блокируем UI
         } finally {
             setLoginLoading(false);
         }
