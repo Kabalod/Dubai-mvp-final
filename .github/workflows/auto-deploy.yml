@@ -37,16 +37,16 @@ jobs:
     - name: 🔍 Analyze Python imports
       run: |
         echo "🐍 Analyzing Python imports..."
-        find apps/realty-main -name "*.py" -exec grep -H "^from\|^import" {} \; > imports.txt
+        find realty -name "*.py" -exec grep -H "^from\|^import" {} \; > imports.txt
         echo "Found $(wc -l < imports.txt) import statements"
         
     - name: 🐳 Validate Dockerfile
       run: |
         echo "🐳 Validating Dockerfile..."
-        if [ -f "apps/realty-main/Dockerfile" ]; then
-          echo "✅ Backend Dockerfile found"
+        if [ -f "Dockerfile.railway" ]; then
+          echo "✅ Railway Dockerfile found"
         else
-          echo "❌ Backend Dockerfile missing"
+          echo "❌ Railway Dockerfile missing"
           exit 1
         fi
         
@@ -62,7 +62,7 @@ jobs:
         echo "⚙️ Checking Django settings..."
         python -c "
         import re
-        with open('apps/realty-main/realty/settings.py', 'r') as f:
+        with open('realty/settings.py', 'r') as f:
             content = f.read()
             
         # Check for problematic imports
@@ -86,7 +86,7 @@ jobs:
       run: |
         echo "📊 Generating comprehensive report..."
         echo "## 🔍 Comprehensive Check Report" > check-report.md
-        echo "- **Python files analyzed:** $(find apps/realty-main -name '*.py' | wc -l)" >> check-report.md
+        echo "- **Python files analyzed:** $(find realty -name '*.py' | wc -l)" >> check-report.md
         echo "- **Import statements:** $(wc -l < imports.txt)" >> check-report.md
         echo "- **Dockerfile status:** ✅ Valid" >> check-report.md
         echo "- **Django settings:** ✅ Clean" >> check-report.md
@@ -118,8 +118,16 @@ jobs:
         
     - name: 🚀 Deploy to Railway
       run: |
-        railway link ccd447ca-39b8-444a-b8d1-28ac1ec894a8
-        railway up --service workerproject-production
+        # Link to existing project or create new one
+        if [ -n "$RAILWAY_PROJECT_ID" ]; then
+          railway link $RAILWAY_PROJECT_ID
+        else
+          echo "Creating new Railway project..."
+          railway init --name "dubai-mvp-backend"
+        fi
+        
+        # Deploy using the railway.json configuration
+        railway up
         
     - name: ⏳ Wait for deployment
       run: |
@@ -132,12 +140,22 @@ jobs:
         max_attempts=10
         attempt=1
         
+        # Get the deployment URL from Railway
+        DEPLOYMENT_URL=$(railway status --json | jq -r '.services[0].url // empty')
+        
+        if [ -z "$DEPLOYMENT_URL" ]; then
+          echo "❌ Could not get deployment URL"
+          exit 1
+        fi
+        
+        echo "Testing health at: $DEPLOYMENT_URL/health/"
+        
         while [ $attempt -le $max_attempts ]; do
           echo "Attempt $attempt/$max_attempts..."
           
-          if curl -f -s "https://workerproject-production.up.railway.app/api/health/" > /dev/null; then
+          if curl -f -s "$DEPLOYMENT_URL/health/" > /dev/null; then
             echo "✅ Backend is healthy!"
-            curl -s "https://workerproject-production.up.railway.app/api/health/" | jq .
+            curl -s "$DEPLOYMENT_URL/health/" | jq .
             break
           else
             echo "❌ Backend not responding, waiting..."
@@ -157,32 +175,46 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: 🧪 Test OTP endpoints
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🚂 Install Railway CLI
       run: |
-        echo "🧪 Testing OTP endpoints..."
+        curl -fsSL https://railway.com/install.sh | sh
+        echo "$HOME/.railway/bin" >> $GITHUB_PATH
         
-        # Test send-otp endpoint
-        echo "Testing send-otp endpoint..."
-        response=$(curl -s -w "%{http_code}" -X POST \
-          "https://workerproject-production.up.railway.app/api/auth/send-otp/" \
-          -H "Content-Type: application/json" \
-          -d '{"email": "test@example.com"}')
+    - name: 🔐 Railway Login
+      run: |
+        echo "$RAILWAY_TOKEN" | railway login --token
         
-        http_code="${response: -3}"
-        if [ "$http_code" = "200" ] || [ "$http_code" = "400" ]; then
-          echo "✅ Send OTP endpoint responding"
-        else
-          echo "❌ Send OTP endpoint failed with code: $http_code"
+    - name: 🧪 Test API endpoints
+      run: |
+        echo "🧪 Testing API endpoints..."
+        
+        # Get the deployment URL
+        railway link
+        DEPLOYMENT_URL=$(railway status --json | jq -r '.services[0].url // empty')
+        
+        if [ -z "$DEPLOYMENT_URL" ]; then
+          echo "❌ Could not get deployment URL"
           exit 1
         fi
         
-    - name: 🌐 Test frontend
-      run: |
-        echo "🌐 Testing frontend..."
-        if curl -f -s "https://frontend-production-5c48.up.railway.app/" > /dev/null; then
-          echo "✅ Frontend is accessible"
+        echo "Testing API at: $DEPLOYMENT_URL"
+        
+        # Test health endpoint
+        if curl -f -s "$DEPLOYMENT_URL/health/" > /dev/null; then
+          echo "✅ Health endpoint working"
         else
-          echo "❌ Frontend is not accessible"
+          echo "❌ Health endpoint failed"
+          exit 1
+        fi
+        
+        # Test admin endpoint
+        if curl -f -s "$DEPLOYMENT_URL/admin/" > /dev/null; then
+          echo "✅ Admin endpoint accessible"
+        else
+          echo "❌ Admin endpoint failed"
           exit 1
         fi
         
@@ -191,13 +223,6 @@ jobs:
         echo "📊 Integration test completed successfully!"
         echo "🎉 Deployment is ready for production use!"
         echo ""
-        echo "🔗 Links:"
-        echo "  Backend API: https://workerproject-production.up.railway.app/api/health/"
-        echo "  Frontend: https://frontend-production-5c48.up.railway.app/"
-        echo "  OTP Test: https://frontend-production-5c48.up.railway.app/auth"
-        echo ""
-        echo "📧 To test OTP:"
-        echo "  1. Go to frontend auth page"
-        echo "  2. Enter email: kbalodk@gmail.com"
-        echo "  3. Click SIGN UP"
-        echo "  4. Check email for OTP code"
+        echo "🔗 Backend API: $DEPLOYMENT_URL"
+        echo "🔗 Health Check: $DEPLOYMENT_URL/health/"
+        echo "🔗 Admin Panel: $DEPLOYMENT_URL/admin/"

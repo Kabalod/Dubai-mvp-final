@@ -1,7 +1,27 @@
-# Minimal Railway requirements for Dubai MVP v3.0
-# Version: 3.0 - Ultra-simplified for Railway
-# Build: 2025-08-25 - Force Railway to rebuild
+# Railway requirements for Dubai MVP v3.0
+# Version: 3.0 - Fixed missing dependencies
+# Build: 2025-08-25 - Railway deployment ready
+
+# Core Django
 django>=4.2
 djangorestframework>=3.15
 django-cors-headers>=4.7
+
+# Production server
 gunicorn>=21.2
+
+# Environment and configuration
+environs>=9.5.0
+marshmallow>=3.20.0
+
+# Database
+psycopg[binary]>=3.2
+
+# File handling
+Pillow>=10.0.0
+
+# Caching (optional)
+diskcache>=5.6.0
+
+# Redis support
+redis>=5.0.0

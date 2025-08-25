@@ -1,60 +1,117 @@
 # Git
 .git
 .gitignore
-
-# Python
-__pycache__/
-*.py[cod]
-*.so
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-static/
-
-# Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
+.gitattributes
 
 # Documentation
 docs/
 *.md
 README*
 
-# Tests
-tests/
-test_*
-*_test.py
-
-# Development
+# Development files
 .env
-.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database
+*.sqlite3
+*.db
+
+# Media and static (will be created in container)
+media/
+static/
+staticfiles/
+
+# Node modules (for frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backup files
+backups/
 *.bak
 *.backup
 
-# Apps (исключаем только ненужные)
-apps/DXB-frontend-develop/
-apps/pfimport-main/
-apps/realty-main/OLD/
-Storybook/
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Railway
+railway.json
+railway.toml
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Linting
+.flake8
+.pylintrc
+.black
+.isort.cfg
+
+# Scripts
+*.ps1
+*.sh
+*.bat

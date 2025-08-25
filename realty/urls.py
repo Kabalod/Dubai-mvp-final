@@ -64,6 +64,8 @@ urlpatterns = [
     # ),
     # Локальный health-check пакетом optional
     *([path("health/", MainView.as_view())] if MainView else []),
+    # Simple health check for Railway
+    path("health/", include("realty.views")),
     # Отключено для MVP: allauth не используется
     # path("accounts/", include("allauth.urls")),
     path("api/", include("realty.api.urls")),

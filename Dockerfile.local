@@ -1,4 +1,4 @@
-# Railway-optimized Dockerfile
+# Local development Dockerfile for Dubai MVP
 FROM python:3.11-slim
 
 # Install system dependencies
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy only essential files first
+# Copy requirements first for better caching
 COPY requirements.txt .
 
 # Install Python dependencies
@@ -19,21 +19,24 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy Django project files
 COPY manage.py .
 COPY realty/ ./realty/
+COPY apps/ ./apps/
 
 # Create necessary directories
 RUN mkdir -p /app/static /app/media /app/logs
 
-# Set environment
+# Set environment variables for development
 ENV DJANGO_SETTINGS_MODULE=realty.settings
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV DEBUG=1
 ENV PORT=8000
 
+# Expose port
 EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health/ || exit 1
 
-# Production startup with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120", "realty.wsgi:application"]
+# Development server with auto-reload
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
