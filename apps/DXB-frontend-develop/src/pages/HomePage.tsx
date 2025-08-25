@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { DataSourceSelector } from '../components/data-source-selector';
 import { RealEstateDashboard } from '../components/real-estate-dashboard';
-import { api, type PropertyStats, type Property } from '../utils/api';
+import { apiService } from '../services/apiService';
+import { type PropertyStats, type Property } from '../utils/api';
 
 const HomePage: React.FC = () => {
   const [activeSource, setActiveSource] = useState<string>("DLD");

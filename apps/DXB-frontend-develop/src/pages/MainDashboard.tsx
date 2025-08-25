@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { RealEstateDashboard } from '../components/real-estate-dashboard';
-import { api, type PropertyStats, type Property } from '../utils/api';
+import { apiService } from '../services/apiService';
+import { type PropertyStats, type Property } from '../utils/api';
 
 const MainDashboard: React.FC = () => {
   const [stats, setStats] = useState<PropertyStats | null>(null);

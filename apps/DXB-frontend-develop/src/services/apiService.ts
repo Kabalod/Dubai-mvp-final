@@ -9,8 +9,13 @@ class ApiService {
     private api: AxiosInstance;
 
     constructor() {
+        // ✅ ИСПРАВЛЕНО: в продакшне используем прокси через nginx для избежания CORS
+        const baseURL = process.env.NODE_ENV === 'production' 
+            ? '/api' // использует прокси nginx
+            : `${API_BASE_URL}/api`;
+            
         this.api = axios.create({
-            baseURL: `${API_BASE_URL}/api`,
+            baseURL: baseURL,
             timeout: 30000,
             headers: {
                 'Content-Type': 'application/json',
@@ -18,7 +23,7 @@ class ApiService {
             },
         });
 
-        console.log('🔧 ApiService initialized with baseURL:', `${API_BASE_URL}/api`);
+        console.log('🔧 ApiService initialized with baseURL:', baseURL);
 
         // Request interceptor to add auth token
         this.api.interceptors.request.use(
