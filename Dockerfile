@@ -1,25 +1,30 @@
-# Ultra-minimal Dockerfile for Railway
-# Version: 2.0 - Fixed dj-database-url dependency
+# Railway MVP Dockerfile v2.0 - Force rebuild
 FROM python:3.11-slim
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
 WORKDIR /app
 
-# Copy requirements first for caching
+# Copy requirements and install Python dependencies
 COPY requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies from requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy only essential files
+# Copy Django app
 COPY manage.py .
 COPY realty/ ./realty/
 
-# Environment
+# Set environment variables
+ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=realty.settings
-ENV PYTHONUNBUFFERED=1
-ENV PORT=8000
 
+# Expose port
 EXPOSE 8000
 
-# Simple startup
-CMD ["gunicorn", "realty.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "60"]
+# Run migrations and start server
+CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py collectstatic --noinput && gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
