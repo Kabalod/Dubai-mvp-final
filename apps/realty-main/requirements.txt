@@ -1,8 +1,22 @@
-Django>=5.1
-djangorestframework>=3.15
-django-cors-headers>=4.7
-psycopg[binary,pool]>=3.2
-environs[django]>=11.2
-whitenoise[brotli]>=6.8
-django-health-check>=1.0
-django-debug-toolbar>=4.0
+# Core Django
+Django>=5.1,<5.2
+djangorestframework>=3.15,<4.0
+django-cors-headers>=4.7,<5.0
+
+# Database
+psycopg[binary,pool]>=3.2,<4.0
+
+# Environment and configuration
+environs[django]>=11.2,<12.0
+
+# Static files and compression
+whitenoise[brotli]>=6.8,<7.0
+
+# Health checks
+django-health-check>=1.0,<2.0
+
+# Development tools (optional for production)
+django-debug-toolbar>=4.0,<5.0
+
+# Additional production dependencies
+gunicorn>=21.0,<22.0

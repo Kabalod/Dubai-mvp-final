@@ -1,14 +1,13 @@
-# Скрипт проверки портов для Memory LLM
-Write-Host "🔍 Проверка портов для Memory LLM..." -ForegroundColor Cyan
+# Скрипт проверки портов для Dubai MVP
+Write-Host "🔍 Проверка портов для Dubai MVP..." -ForegroundColor Cyan
 
-# Портты, которые мы используем
+# Портты, которые мы используем для MVP
 $ports = @{
-    "Grafana" = 3002
-    "Prometheus" = 9090
-    "Nginx" = 80
-    "Memory Service" = 8081
-    "PostgreSQL" = 5433
+    "Frontend (React)" = 3000
+    "Backend (Django)" = 8000
+    "PostgreSQL" = 5432
     "Redis" = 6379
+    "Storybook" = 3003
 }
 
 $usedPorts = @()
@@ -41,7 +40,7 @@ if ($usedPorts.Count -gt 0) {
     
     Write-Host "`n💡 Рекомендации:" -ForegroundColor Yellow
     foreach ($used in $usedPorts) {
-        Write-Host "  $($used.Service): измените порт в .env.ports или остановите процесс PID $($used.PID)" -ForegroundColor Yellow
+        Write-Host "  $($used.Service): измените порт в конфигурации или остановите процесс PID $($used.PID)" -ForegroundColor Yellow
     }
 } else {
     Write-Host "`n✅ Все порты свободны!" -ForegroundColor Green
@@ -53,4 +52,4 @@ if ($freePorts.Count -gt 0) {
 }
 
 Write-Host "`n🚀 Для запуска используйте:" -ForegroundColor Cyan
-Write-Host "  docker compose --env-file .env.production -f docker-compose.monitoring.yml up -d" -ForegroundColor White
+Write-Host "  docker compose -f docker-compose.mvp.yml up -d" -ForegroundColor White

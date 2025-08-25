@@ -1,17 +1,53 @@
+# Docker ignore file for realty-main backend
+# Include only essential files for Railway deployment
+
+# Exclude everything by default
 *
 
+# Include Django app
 !realty/
+!realty/**/*
+
+# Include API
 !api/
+!api/**/*
+
+# Include tests
 !tests/
+!tests/**/*
+
+# Include deployment files
 !deploy/
+!deploy/**/*
+
+# Include configuration files
 !requirements*.txt
 !pyproject.toml
-!tailwind.config.js
-!package*.json
 !manage.py
+!start_production.py
 
-**/*~
-**/*.log
+# Include static and media files
+!static/
+!media/
+!templates/
+
+# Include migrations
+!realty/migrations/
+!realty/migrations/**/*
+
+# Exclude cache and temporary files
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
 **/.DS_Store
 **/Thumbs.db
-**/__pycache__/
+
+# Exclude logs
+**/*.log
+
+# Exclude IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
