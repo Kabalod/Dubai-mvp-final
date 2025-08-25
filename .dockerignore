@@ -53,5 +53,8 @@ test_*
 *.bak
 *.backup
 
-# Apps (копируем только realty)
-apps/
+# Apps (исключаем только ненужные)
+apps/DXB-frontend-develop/
+apps/pfimport-main/
+apps/realty-main/OLD/
+Storybook/
