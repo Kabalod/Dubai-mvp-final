@@ -14,12 +14,8 @@ COPY requirements.txt .
 COPY manage.py .
 COPY realty/ ./realty/
 
-# Install only core dependencies
-RUN pip install --no-cache-dir \
-    django>=5.1 \
-    djangorestframework>=3.15 \
-    psycopg[binary]>=3.2 \
-    django-cors-headers>=4.7
+# Install dependencies from requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Set environment variables
 ENV DJANGO_SETTINGS_MODULE=realty.settings
