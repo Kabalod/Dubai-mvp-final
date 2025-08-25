@@ -1,4 +1,6 @@
-# Complete Railway requirements for Dubai MVP
+# Complete Railway requirements for Dubai MVP v2.2
+# Version: 2.2 - Force Railway rebuild
+# Build: 2025-08-25 - Force Railway to rebuild
 django>=4.2
 djangorestframework>=3.15
 djangorestframework-simplejwt>=5.3

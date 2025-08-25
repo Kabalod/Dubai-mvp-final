@@ -1,4 +1,6 @@
-# Railway MVP Dockerfile v2.0 - Force rebuild
+# Railway MVP Dockerfile v2.2 - Force Railway rebuild
+# Version: 2.2 - Updated requirements.txt with dj-database-url
+# Build: 2025-08-25 - Force Railway to rebuild
 FROM python:3.11-slim
 
 # Install system dependencies
