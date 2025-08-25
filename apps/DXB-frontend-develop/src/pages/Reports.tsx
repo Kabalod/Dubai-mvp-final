@@ -71,10 +71,18 @@ const Reports: React.FC = () => {
     console.log('📊 Report data exists:', !!reportData);
     console.log('📋 Report ref exists:', !!reportRef.current);
     
+    // ✅ ИСПРАВЛЕНО: Ждем пока элемент отрендерится в DOM
     if (!reportRef.current) {
-      console.error('❌ No report ref found');
-      // ✅ ИСПРАВЛЕНО: убрали alert, только console.error
-      return;
+      console.log('⏳ Report ref not found, waiting for DOM render...');
+      // Даем React время отрендерить элемент с reportData
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      if (!reportRef.current) {
+        console.error('❌ Report ref still not found after wait');
+        return;
+      }
+      
+      console.log('✅ Report ref found after wait!');
     }
     
     // ✅ ИСПРАВЛЕНО: Создаем reportData если его нет - автоматически генерируем отчет
