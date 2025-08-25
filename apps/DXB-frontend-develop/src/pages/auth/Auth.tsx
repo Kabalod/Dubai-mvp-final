@@ -37,7 +37,7 @@ const Auth: React.FC = () => {
     const handleGoogleLogin = async () => {
         try {
             setGoogleLoading(true);
-            console.log('🔄 Attempting Google OAuth login to:', `${API_BASE_URL}/auth/google/login/`);
+            console.log('🔄 Attempting Google OAuth login to:', `${API_BASE_URL}/api/auth/google/login/`);
             
             const resp = await fetch(`${API_BASE_URL}/api/auth/google/login/`, {
                 method: 'GET',
@@ -45,6 +45,7 @@ const Auth: React.FC = () => {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // ✅ ДОБАВЛЕНО для CORS
             });
             
             console.log('📡 Response status:', resp.status);

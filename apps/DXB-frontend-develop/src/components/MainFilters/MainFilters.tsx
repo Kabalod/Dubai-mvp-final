@@ -241,7 +241,7 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
                             key: 'advanced',
                             label: (
                                 <Space>
-                                    <Trans id="filters.advanced">Advanced Filters</Trans>
+                                    <span>Advanced Filters</span>
                                     {getActiveFiltersCount() > 0 && (
                                         <span className={styles.filterCount}>
                                             ({getActiveFiltersCount()} active)

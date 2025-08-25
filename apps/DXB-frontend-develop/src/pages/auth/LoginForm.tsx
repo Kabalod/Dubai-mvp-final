@@ -50,12 +50,28 @@ const LoginForm: React.FC = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                if (data?.tokens) {
+                console.log('✅ Login response data:', data);
+                
+                if (data?.access) {
+                    // ✅ ИСПРАВЛЕНО: сохраняем токены и данные пользователя
+                    localStorage.setItem('accessToken', data.access);
+                    if (data.refresh) localStorage.setItem('refreshToken', data.refresh);
+                    if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    console.log('✅ Login successful, tokens and user saved!');
+                    navigate("/");
+                    window.location.reload(); // Перезагружаем для обновления AuthContext
+                } else if (data?.tokens) {
+                    // Fallback для старого формата
                     localStorage.setItem('accessToken', data.tokens.access);
                     localStorage.setItem('refreshToken', data.tokens.refresh);
+                    console.log('✅ Login successful (old format)!');
+                    navigate("/");
+                    window.location.reload();
+                } else {
+                    console.error('❌ No tokens in response');
+                    message.error('Login failed - no authentication tokens received');
                 }
-                console.log('Login successful!');
-                navigate("/");
             } else {
                 const errorData = await response.json();
                 console.error('Login failed:', errorData);
