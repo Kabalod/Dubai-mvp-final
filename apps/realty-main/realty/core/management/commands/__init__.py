@@ -1,1 +1,1 @@
-# Commands module
+# Commands package for Dubai MVP
