@@ -32,7 +32,7 @@ _dj_allowed_hosts = env.list("DJANGO_ALLOWED_HOSTS", default=None, subcast=str)
 if _dj_allowed_hosts is None:
     _dj_allowed_hosts = env.list(
         "ALLOWED_HOSTS",
-        default=["*"] if DEBUG else ["localhost", "127.0.0.1", "workerproject-production.up.railway.app"],
+        default=["*"] if DEBUG else ["localhost", "127.0.0.1", "backend-production-dbb4.up.railway.app"],
         subcast=str,
     )
 ALLOWED_HOSTS = _dj_allowed_hosts
