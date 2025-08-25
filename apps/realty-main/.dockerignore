@@ -1,53 +1,40 @@
-# Docker ignore file for realty-main backend
-# Include only essential files for Railway deployment
+# Simple .dockerignore for realty-main
+# Exclude only obvious unnecessary files
 
-# Exclude everything by default
-*
+# Git
+.git
+.gitignore
 
-# Include Django app
-!realty/
-!realty/**/*
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
 
-# Include API
-!api/
-!api/**/*
-
-# Include tests
-!tests/
-!tests/**/*
-
-# Include deployment files
-!deploy/
-!deploy/**/*
-
-# Include configuration files
-!requirements*.txt
-!pyproject.toml
-!manage.py
-!start_production.py
-
-# Include static and media files
-!static/
-!media/
-!templates/
-
-# Include migrations
-!realty/migrations/
-!realty/migrations/**/*
-
-# Exclude cache and temporary files
-**/__pycache__/
-**/*.pyc
-**/*.pyo
-**/*.pyd
-**/.DS_Store
-**/Thumbs.db
-
-# Exclude logs
-**/*.log
-
-# Exclude IDE files
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Documentation
+*.md
+docs/
+README*
+
+# Other apps (not needed for backend)
+apps/DXB-frontend-develop/
+apps/DXB--frontend-develop/
+apps/pfimport-main/
+Storybook/
+sorce/
+
+# Other services
+services/
+infrastructure/
+configs/
+monitoring/

@@ -1,58 +1,33 @@
-# 🐳 Оптимизированный Dockerfile для Django Backend
-# Версия: Production-Ready MVP
-# Дата: 2025-01-23
+# Simple Dockerfile for Railway deployment
+# This file is used by Railway to deploy the backend
 
-FROM python:3.11-slim AS base
+FROM python:3.11-slim
 
-# Метаданные
-LABEL maintainer="kbalodk@gmail.com"
-LABEL description="Dubai MVP Backend - OTP Authentication System"
-LABEL version="1.0.0"
-
-# Системные зависимости
+# Install system dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        build-essential \
         libpq-dev \
-        curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Создание пользователя для безопасности
-RUN groupadd -r django && useradd -r -g django django
-
-# Рабочая директория
+# Set working directory
 WORKDIR /app
 
-# Копирование requirements (для кеширования слоёв)
-COPY requirements.txt ./
+# Copy requirements first for caching
+COPY requirements.txt .
 
-# Установка Python зависимостей
-RUN pip install --no-cache-dir --upgrade pip==25.2 \
-    && pip install --no-cache-dir -r requirements.txt \
-    && pip cache purge
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Копирование кода приложения
+# Copy application code
 COPY . .
 
-# Установка прав доступа
-RUN chown -R django:django /app \
-    && chmod +x /app/manage.py
-
-# Переключение на непривилегированного пользователя
-USER django
-
-# Переменные окружения
-ENV PYTHONPATH=/app
+# Set environment variables
+ENV DJANGO_SETTINGS_MODULE=realty.settings
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV DJANGO_SETTINGS_MODULE=realty.settings
 
-# Порт
+# Expose port
 EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health/ || exit 1
-
-# Команда запуска: миграции + сбор статики + запуск
-CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8000"]
+# Run Django
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

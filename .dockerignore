@@ -1,5 +1,5 @@
-# Minimal .dockerignore for Railway
-# Only exclude obvious unnecessary files
+# Minimal .dockerignore - only exclude obvious files
+# DO NOT exclude apps/realty-main - it's required for build
 
 # Git
 .git
@@ -8,14 +8,10 @@
 
 # Node.js
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Python cache
 __pycache__/
 *.pyc
-*.pyo
 
 # IDE
 .vscode/
@@ -28,12 +24,7 @@ Thumbs.db
 # Logs
 *.log
 
-# Documentation
-*.md
-docs/
-README*
-
-# Frontend apps (exclude but keep realty-main)
+# Frontend apps (exclude but NEVER exclude realty-main)
 apps/DXB-frontend-develop/
 apps/DXB--frontend-develop/
 Storybook/
@@ -46,5 +37,5 @@ infrastructure/
 configs/
 monitoring/
 
-# IMPORTANT: Never exclude realty-main
-# apps/realty-main/ is required for backend build
+# CRITICAL: apps/realty-main/ MUST be included
+# Never exclude this directory
