@@ -1,6 +1,6 @@
 import styles from "./MainFilters.module.scss";
 import { Flex, Row, Segmented, InputNumber, Space, Collapse } from "antd";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Ordering, TransactionTypeEnum } from "@/api/schema";
 import { Trans } from "@lingui/react/macro";
 import {
@@ -90,6 +90,7 @@ export const initialQueryState: IMainQuery = {
 const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
     const [filtersState, setFiltersState] =
         useState<IMainQuery>(initialQueryState);
+    const isInitialized = useRef(false); // ✅ Предотвращает бесконечный цикл при инициализации
 
     const handleTransactionTypeChange = (val: TransactionTypeEnum) => {
         const nextVal: IMainQuery = {
@@ -128,8 +129,9 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
     };
 
     const handleSearch = useCallback(() => {
+        console.log('🔍 Filter search triggered with:', filtersState);
         onSearch(filtersState);
-    }, [filtersState]); // ✅ ИСПРАВЛЕНО: убрали onSearch из зависимостей
+    }, [filtersState, onSearch]); // ✅ ИСПРАВЛЕНО: вернули onSearch в зависимости для кнопок
 
     // Новые обработчики для расширенных фильтров
     const handlePropertyTypeChange = (value: string) => {
@@ -179,9 +181,13 @@ const MainFilters: React.FC<MainFilterProps> = ({ onSearch }) => {
     };
 
     useEffect(() => {
-        // ✅ ИСПРАВЛЕНО: инициализация только при монтировании, без onSearch в зависимостях
-        onSearch(initialQueryState);
-    }, []); // убрали onSearch из зависимостей для предотвращения бесконечного цикла
+        // ✅ ИСПРАВЛЕНО: инициализация только один раз при монтировании
+        if (!isInitialized.current) {
+            console.log('🚀 MainFilters initialized with:', initialQueryState);
+            onSearch(initialQueryState);
+            isInitialized.current = true;
+        }
+    }, [onSearch]); // теперь безопасно, так как инициализация только один раз
 
     return (
         <section className={styles.container}>

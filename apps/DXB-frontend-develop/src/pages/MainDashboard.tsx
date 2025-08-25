@@ -32,14 +32,14 @@ const MainDashboard: React.FC = () => {
           
           // ✅ FALLBACK: моковые данные для демонстрации
           setStats({
-            total_properties: 15432,
-            total_buildings: 890, 
-            total_deals: 2156,
-            average_price: 2850000,
-            median_price: 2450000,
-            avg_price_per_sqm: 12500,
-            price_range: { min: 450000, max: 25000000 },
-            market_volume: { deals: 2156, total_volume: 82500000 },
+            totalProperties: 15432,
+            totalBuildings: 890,
+            totalDeals: 2156,
+            averagePrice: 2850000,
+            medianPrice: 2450000,
+            avgPricePerSqm: 12500,
+            priceRange: { min: 450000, max: 25000000 },
+            marketVolume: { deals: 2156, total_volume: 82500000 },
             liquidity: 85.5,
             roi: 12.8
           });
