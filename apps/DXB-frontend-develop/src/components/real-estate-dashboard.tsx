@@ -41,6 +41,9 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
   const [appliedFilters, setAppliedFilters] = useState<string[]>([]); // ✅ ИСПРАВЛЕНО: добавлено отсутствующее состояние
   const [filteredProperties, setFilteredProperties] = useState(properties); // ✅ ДОБАВЛЕНО: состояние для отфильтрованных объектов
   const [filteredStats, setFilteredStats] = useState(stats); // ✅ ДОБАВЛЕНО: локальные статистики для фильтрации
+  const [activeTab, setActiveTab] = useState<'sales' | 'rental'>('sales'); // ✅ ДОБАВЛЕНО: состояние для табов
+  const [activePeriod, setActivePeriod] = useState('1 week'); // ✅ ДОБАВЛЕНО: состояние для периода
+  const [searchQuery, setSearchQuery] = useState(''); // ✅ ДОБАВЛЕНО: состояние для поиска
   
   // ✅ ДОБАВЛЕНО: обновляем отфильтрованные объекты при изменении properties
   React.useEffect(() => {
@@ -205,10 +208,24 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
 
             {/* Navigation Tabs */}
             <div className="flex items-center space-x-6">
-              <Button variant="ghost" className="text-gray-900 border-b-2 border-blue-500 rounded-none pb-2">
+              <Button 
+                variant="ghost" 
+                className={`rounded-none pb-2 ${activeTab === 'sales' ? 'text-gray-900 border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-900'}`}
+                onClick={() => {
+                  setActiveTab('sales');
+                  console.log('🔄 Switched to Sales tab');
+                }}
+              >
                 Sales
               </Button>
-              <Button variant="ghost" className="text-gray-500 hover:text-gray-900">
+              <Button 
+                variant="ghost" 
+                className={`rounded-none pb-2 ${activeTab === 'rental' ? 'text-gray-900 border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-900'}`}
+                onClick={() => {
+                  setActiveTab('rental');
+                  console.log('🔄 Switched to Rental tab');
+                }}
+              >
                 Rental
               </Button>
             </div>
@@ -217,43 +234,63 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
             <div className="flex items-center space-x-4">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input placeholder="Search by area, project or building" className="pl-10 pr-10 bg-gray-100 border-0" />
-                <X className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer" />
+                <Input 
+                  placeholder="Search by area, project or building" 
+                  className="pl-10 pr-10 bg-gray-100 border-0"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <X 
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer hover:text-gray-600" 
+                  onClick={() => {
+                    setSearchQuery('');
+                    console.log('🧹 Search cleared');
+                  }}
+                />
               </div>
-              <Button variant="outline" className="bg-gray-100 border-0">
+              <Button 
+                variant="outline" 
+                className="bg-gray-100 border-0 hover:bg-gray-200"
+                onClick={() => console.log('🏠 Bedrooms filter clicked')}
+              >
                 3 Beds
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
-              <Button variant="outline" className="bg-gray-100 border-0">
+              <Button 
+                variant="outline" 
+                className="bg-gray-100 border-0 hover:bg-gray-200"
+                onClick={() => console.log('⚙️ More filters clicked')}
+              >
                 More
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
-              <Button className="bg-blue-500 hover:bg-blue-600">SEARCH</Button>
+              <Button 
+                className="bg-blue-500 hover:bg-blue-600"
+                onClick={() => {
+                  console.log('🔍 Search button clicked with query:', searchQuery);
+                  // Здесь можно добавить логику поиска
+                }}
+              >
+                SEARCH
+              </Button>
             </div>
 
             {/* Time Period Selector */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-500">
-                YTD
-              </Button>
-              <Button variant="ghost" className="text-blue-500 border-b-2 border-blue-500 rounded-none pb-1">
-                1 week
-              </Button>
-              <Button variant="ghost" className="text-gray-500">
-                1 Month
-              </Button>
-              <Button variant="ghost" className="text-gray-500">
-                3 Month
-              </Button>
-              <Button variant="ghost" className="text-gray-500">
-                6 Month
-              </Button>
-              <Button variant="ghost" className="text-gray-500">
-                1 Year
-              </Button>
-              <Button variant="ghost" className="text-gray-500">
-                3 Years
-              </Button>
+              {['YTD', '1 week', '1 Month', '3 Month', '6 Month', '1 Year', '3 Years'].map((period) => (
+                <Button 
+                  key={period}
+                  variant="ghost" 
+                  className={`${activePeriod === period ? 'text-blue-500 border-b-2 border-blue-500 rounded-none pb-1' : 'text-gray-500 hover:text-gray-700'}`}
+                  onClick={() => {
+                    setActivePeriod(period);
+                    console.log('📅 Period changed to:', period);
+                    // Здесь можно добавить логику обновления данных по периоду
+                  }}
+                >
+                  {period}
+                </Button>
+              ))}
             </div>
 
             {/* Overview Section */}

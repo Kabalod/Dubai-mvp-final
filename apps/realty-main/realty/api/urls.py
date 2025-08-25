@@ -28,6 +28,8 @@ urlpatterns = [
     path("properties/<str:listing_id>/", views.PropertyDetailView.as_view(), name="property_detail"),
     path("areas/", views.AreasListView.as_view(), name="areas_list"),
     path("stats/", views.PropertyStatsView.as_view(), name="property_stats"),
+    # Alias для совместимости: /api/analytics/ → статистика
+    path("analytics/", views.PropertyStatsView.as_view(), name="property_stats_alias"),
     
     # Admin Views
     path("admin/users/", views.UserProfileAdminView.as_view(), name="admin_users"),
