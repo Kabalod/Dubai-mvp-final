@@ -6,9 +6,10 @@ import { CheckCircle, Building2 } from "lucide-react"
 interface DataSourceSelectorProps {
   activeSource?: string
   onSourceChange?: (source: string) => void
+  loading?: boolean
 }
 
-export function DataSourceSelector({ activeSource = "DLD", onSourceChange }: DataSourceSelectorProps) {
+export function DataSourceSelector({ activeSource = "DLD", onSourceChange, loading = false }: DataSourceSelectorProps) {
   const propertyTypes = ["All", "Apartments", "Villas", "Land", "Commercial"]
 
   return (
@@ -20,8 +21,13 @@ export function DataSourceSelector({ activeSource = "DLD", onSourceChange }: Dat
             activeSource === "DLD" 
               ? "border-primary bg-blue-50 shadow-md" 
               : "border-border bg-card hover:border-accent"
-          }`}
-          onClick={() => onSourceChange?.("DLD")}
+          } ${loading ? "opacity-60 pointer-events-none" : ""}`}
+          onClick={() => {
+            if (!loading) {
+              console.log('🏢 DLD source selected');
+              onSourceChange?.("DLD");
+            }
+          }}
         >
           <CardContent className="p-8">
             <div className="flex items-start justify-between mb-6">
@@ -89,8 +95,13 @@ export function DataSourceSelector({ activeSource = "DLD", onSourceChange }: Dat
             activeSource === "Marketplace" 
               ? "border-primary bg-blue-50 shadow-md" 
               : "border-border bg-card hover:border-accent"
-          }`}
-          onClick={() => onSourceChange?.("Marketplace")}
+          } ${loading ? "opacity-60 pointer-events-none" : ""}`}
+          onClick={() => {
+            if (!loading) {
+              console.log('🏪 Marketplace source selected');  
+              onSourceChange?.("Marketplace");
+            }
+          }}
         >
           <CardContent className="p-8">
             <div className="flex items-start justify-between mb-6">

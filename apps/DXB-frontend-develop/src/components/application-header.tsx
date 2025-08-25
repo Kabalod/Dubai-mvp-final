@@ -21,7 +21,7 @@ interface ApplicationHeaderProps {
 export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderProps) {
   const navigate = useNavigate()
   const { user } = useAuth()
-  const navigationItems = ["Main", "Analytics", "Reports", "Payments", "Pricing"]
+  const navigationItems = ["Main", "Analytics", "Reports", "Pricing"]
 
   const handleLogout = () => {
     apiService.clearAuth();
@@ -47,7 +47,6 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                             case 'Main': return '/';
                             case 'Analytics': return '/analytics';
                             case 'Reports': return '/reports';
-                            case 'Payments': return '/payment';
                             case 'Pricing': return '/pricing';
                             default: return '/';
                         }

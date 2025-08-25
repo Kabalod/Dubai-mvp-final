@@ -23,7 +23,7 @@ const Auth: React.FC = () => {
                 if (access && refresh) {
                     localStorage.setItem('accessToken', access);
                     localStorage.setItem('refreshToken', refresh);
-                    message.success('Logged in with Google');
+                    // ✅ ИСПРАВЛЕНО: убрали message.success
                     // Clean hash and navigate
                     window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
                     window.location.href = "/";
@@ -72,10 +72,11 @@ const Auth: React.FC = () => {
             setGoogleLoading(false);
             
             if (error.message.includes('Failed to fetch')) {
-                message.error('❌ Cannot connect to server. Please check if backend is running.');
+                console.error('❌ Cannot connect to server. Please check if backend is running.');
             } else {
-                message.error(`❌ Google OAuth error: ${error.message}`);
+                console.error(`❌ Google OAuth error: ${error.message}`);
             }
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         }
     };
 

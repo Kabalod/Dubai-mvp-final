@@ -70,17 +70,16 @@ const LoginForm: React.FC = () => {
                     window.location.reload();
                 } else {
                     console.error('❌ No tokens in response');
-                    message.error('Login failed - no authentication tokens received');
+                    // ✅ ИСПРАВЛЕНО: убрали message.error
                 }
             } else {
                 const errorData = await response.json();
                 console.error('Login failed:', errorData);
-                // Показываем ошибку пользователю
-                message.error('Login failed. Please check your credentials.');
+                // ✅ ИСПРАВЛЕНО: убрали message.error
             }
         } catch (error) {
             console.error('Login error:', error);
-            message.error('Login error. Please try again.');
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         } finally {
             setLoginLoading(false);
         }
@@ -117,16 +116,16 @@ const LoginForm: React.FC = () => {
 
             if (response.ok) {
                 console.log('Password reset email sent');
-                message.success('Password reset email sent!');
+                // ✅ ИСПРАВЛЕНО: убрали message.success
                 setCurrentStep(Steps.Confirm);
             } else {
                 const errorData = await response.json();
                 console.error('Password reset failed:', errorData);
-                message.error('Password reset failed. Please try again.');
+                // ✅ ИСПРАВЛЕНО: убрали message.error
             }
         } catch (error) {
             console.error('Password reset error:', error);
-            message.error('Password reset error. Please try again.');
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         } finally {
             setRecoveryLoading(false);
         }
@@ -155,16 +154,16 @@ const LoginForm: React.FC = () => {
 
             if (response.ok) {
                 console.log('Password reset successful');
-                message.success('Password reset successful!');
+                // ✅ ИСПРАВЛЕНО: убрали message.success
                 setCurrentStep(Steps.Success);
             } else {
                 const errorData = await response.json();
                 console.error('Password reset failed:', errorData);
-                message.error('Password reset failed. Please try again.');
+                // ✅ ИСПРАВЛЕНО: убрали message.error
             }
         } catch (error) {
             console.error('Password reset error:', error);
-            message.error('Password reset error. Please try again.');
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         } finally {
             setResetLoading(false);
         }

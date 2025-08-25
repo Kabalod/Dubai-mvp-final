@@ -73,13 +73,13 @@ const Reports: React.FC = () => {
     
     if (!reportRef.current) {
       console.error('❌ No report ref found');
-      alert('❌ Error: Report element not found. Please generate a report first.');
+      // ✅ ИСПРАВЛЕНО: убрали alert, только console.error
       return;
     }
     
     if (!reportData) {
       console.error('❌ No report data found');
-      alert('❌ Error: No report data. Please generate a report first.');
+      // ✅ ИСПРАВЛЕНО: убрали alert, только console.error  
       return;
     }
     

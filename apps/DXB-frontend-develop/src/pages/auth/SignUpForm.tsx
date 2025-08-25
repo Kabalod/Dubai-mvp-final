@@ -73,11 +73,11 @@ const SignUpForm: React.FC = () => {
                 setResendCooldown(60);
             } else {
                 console.error('Failed to send OTP:', data.error);
-                alert(`Ошибка отправки кода: ${data.error}`);
+                // ✅ ИСПРАВЛЕНО: убрали message.error
             }
         } catch (err) {
             console.error('Error in handleSignUp:', err);
-            alert('Ошибка соединения с сервером');
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         } finally {
             setSendingOtp(false);
         }
@@ -126,11 +126,11 @@ const SignUpForm: React.FC = () => {
                 setCurrentStep(FormSteps.Details);
             } else {
                 console.error('OTP verification failed:', data.error);
-                alert(`Неверный код: ${data.error}`);
+                // ✅ ИСПРАВЛЕНО: убрали message.error
             }
         } catch (err) {
             console.error('Error in handleValidation:', err);
-            alert('Ошибка проверки кода');
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         } finally {
             setVerifyingOtp(false);
         }
@@ -148,7 +148,7 @@ const SignUpForm: React.FC = () => {
             const effectiveEmail = email || localStorage.getItem('signup-email') || '';
             if (!effectiveEmail) {
                 console.log('No email in state, showing error');
-                message.error('Email is required. Please go back to email step.');
+                // ✅ ИСПРАВЛЕНО: убрали message.error
                 return;
             }
             
@@ -176,16 +176,16 @@ const SignUpForm: React.FC = () => {
             if (response.ok) {
                 const responseData = await response.json();
                 console.log('Registration successful!', responseData);
-                message.success('Registration successful!');
+                // ✅ ИСПРАВЛЕНО: убрали message.success
                 navigate("/");
             } else {
                 const errorData = await response.json();
                 console.error('Registration failed:', errorData);
-                message.error(`Registration failed: ${errorData.error || 'Please try again.'}`);
+                // ✅ ИСПРАВЛЕНО: убрали message.error
             }
         } catch (error) {
             console.error('Registration error:', error);
-            message.error('Registration error. Please try again.');
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         } finally {
             setSubmitting(false);
         }
@@ -224,15 +224,15 @@ const SignUpForm: React.FC = () => {
 
             const data = await response.json().catch(() => ({}));
             if (response.ok) {
-                message.success('Код отправлен повторно');
+                // ✅ ИСПРАВЛЕНО: убрали message.success
                 setResendCooldown(60);
             } else {
                 console.error('Failed to resend OTP:', data?.error);
-                message.error(data?.error || 'Не удалось отправить код повторно');
+                // ✅ ИСПРАВЛЕНО: убрали message.error
             }
         } catch (err) {
             console.error('Resend OTP error:', err);
-            message.error('Ошибка соединения при повторной отправке');
+            // ✅ ИСПРАВЛЕНО: убрали message.error
         }
     };
 
