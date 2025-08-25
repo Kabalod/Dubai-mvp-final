@@ -33,6 +33,19 @@ import {
 const { Panel } = Collapse;
 const { RangePicker } = DatePicker;
 
+// ✅ ИСПРАВЛЕНО: Перенесено определение типа выше для использования в состоянии
+type TableRow = {
+    key: string;
+    area: string;
+    project: string;
+    building: string;
+    price: string;
+    deals: number;
+    volume: string;
+    status: string;
+    trend: string;
+};
+
 const Analytics: React.FC = () => {
     const [selectedArea, setSelectedArea] = useState<string>("all");
     const [selectedProject, setSelectedProject] = useState<string>("all");
@@ -42,20 +55,21 @@ const Analytics: React.FC = () => {
     const [activeTab, setActiveTab] = useState<string>("overview");
     const [catalogMode, setCatalogMode] = useState<string>("developer");
     const [salesMode, setSalesMode] = useState<string>("sales");
+    
+    // ✅ ДОБАВЛЕНО: состояния для обновления графиков при применении фильтров
+    const [filteredData, setFilteredData] = useState<TableRow[]>(tableData);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [appliedFilters, setAppliedFilters] = useState<string[]>([]);
+    const [chartData, setChartData] = useState({
+        buildingsData: buildingsByDistrictsData,
+        apartmentData: apartmentTypesData,
+        constructionData: constructionStatusData,
+        priceData: avgPricePerSqmData,
+        trendsData: pricesTrendData,
+        roiData: roiData
+    });
 
     // Моковые данные для таблицы
-    type TableRow = {
-        key: string;
-        area: string;
-        project: string;
-        building: string;
-        price: string;
-        deals: number;
-        volume: string;
-        status: string;
-        trend: string;
-    };
-
     const tableData: TableRow[] = [
         {
             key: "1",
@@ -95,28 +109,98 @@ const Analytics: React.FC = () => {
     // columns оставлены для будущего использования с Ant Table, сейчас не используются
     // Колонки AntTable больше не нужны (используем свой компонент таблицы)
 
-    const handleFilterApply = () => {
+    const handleFilterApply = async () => {
         console.log("🔄 Filters applied:", { selectedArea, selectedProject, selectedBuilding, dateRange, searchText });
+        setIsLoading(true);
         
-        // ✅ ИСПРАВЛЕНО: Теперь реально применяем фильтры к данным
-        const filteredData = tableData.filter(item => {
-            let matches = true;
+        try {
+            // ✅ ИСПРАВЛЕНО: Теперь реально применяем фильтры к данным
+            const newFilteredData = tableData.filter(item => {
+                let matches = true;
+                
+                if (selectedArea !== "all" && item.area !== selectedArea) matches = false;
+                if (selectedProject !== "all" && item.project !== selectedProject) matches = false;  
+                if (selectedBuilding !== "all" && item.building !== selectedBuilding) matches = false;
+                if (searchText && !item.project.toLowerCase().includes(searchText.toLowerCase())) matches = false;
+                
+                return matches;
+            });
             
-            if (selectedArea !== "all" && item.area !== selectedArea) matches = false;
-            if (selectedProject !== "all" && item.project !== selectedProject) matches = false;  
-            if (selectedBuilding !== "all" && item.building !== selectedBuilding) matches = false;
-            if (searchText && !item.project.toLowerCase().includes(searchText.toLowerCase())) matches = false;
+            console.log(`✅ Found ${newFilteredData.length} items after filtering`);
             
-            return matches;
-        });
+            // ✅ ДОБАВЛЕНО: обновляем состояние с фильтрованными данными
+            setFilteredData(newFilteredData);
+            
+            // ✅ ДОБАВЛЕНО: создаем список активных фильтров для визуального отображения
+            const activeFilters = [];
+            if (selectedArea !== "all") activeFilters.push(`Area: ${selectedArea}`);
+            if (selectedProject !== "all") activeFilters.push(`Project: ${selectedProject}`);
+            if (selectedBuilding !== "all") activeFilters.push(`Building: ${selectedBuilding}`);
+            if (searchText) activeFilters.push(`Search: "${searchText}"`);
+            if (dateRange && dateRange[0] && dateRange[1]) {
+                activeFilters.push(`Date: ${dateRange[0].format('DD/MM')} - ${dateRange[1].format('DD/MM')}`);
+            }
+            
+            setAppliedFilters(activeFilters);
+            
+            // ✅ ДОБАВЛЕНО: Перерисовка графиков с новыми данными на базе фильтров
+            console.log("📊 Updating charts with filtered data...");
+            
+            // Имитируем загрузку данных (в реальности будет API вызов)
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Обновляем данные графиков на основе фильтров
+            const updatedChartData = updateChartsBasedOnFilters(newFilteredData, {
+                selectedArea,
+                selectedProject, 
+                selectedBuilding,
+                dateRange,
+                searchText
+            });
+            
+            setChartData(updatedChartData);
+            console.log("✅ Charts updated with filtered data!");
+            
+        } catch (error) {
+            console.error('❌ Error applying filters:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    
+    // ✅ ДОБАВЛЕНО: Функция для обновления данных графиков на основе фильтров
+    const updateChartsBasedOnFilters = (filteredData: TableRow[], filters: any) => {
+        // В реальном приложении здесь будут настоящие вычисления на основе отфильтрованных данных
+        // Сейчас имитируем изменение данных для демонстрации функциональности
         
-        console.log(`✅ Found ${filteredData.length} items after filtering`);
+        const dataMultiplier = filteredData.length / tableData.length; // коэффициент для масштабирования данных
         
-        // Можно добавить состояние для фильтрованных данных
-        // setFilteredData(filteredData);
-        
-        // Перерисовка графиков с новыми данными (пока имитация)
-        console.log("📊 Updating charts with filtered data...");
+        return {
+            buildingsData: {
+                ...buildingsByDistrictsData,
+                data: buildingsByDistrictsData.data.map(val => Math.round(val * dataMultiplier))
+            },
+            apartmentData: {
+                ...apartmentTypesData,
+                data: apartmentTypesData.data.map(val => Math.round(val * dataMultiplier))
+            },
+            constructionData: {
+                ...constructionStatusData,
+                data: constructionStatusData.data.map(val => Math.round(val * dataMultiplier))
+            },
+            priceData: {
+                ...avgPricePerSqmData,
+                data: avgPricePerSqmData.data.map(val => Math.round(val * (0.8 + dataMultiplier * 0.4))) // цены меняются по-другому
+            },
+            trendsData: {
+                ...pricesTrendData,
+                data: pricesTrendData.data.map(val => Math.round(val * (0.9 + dataMultiplier * 0.2)))
+            },
+            roiData: {
+                ...roiData,
+                data: roiData.data.map(val => Math.round(val * (0.7 + dataMultiplier * 0.6)))
+            }
+        };
     };
 
     const handleExportData = () => {
@@ -156,8 +240,35 @@ const Analytics: React.FC = () => {
                 onSearch={handleFilterApply}
             />
 
+            {/* Applied Filters Indicators */}
+            {appliedFilters.length > 0 && (
+                <Card className={styles.appliedFiltersCard} size="small">
+                    <Space wrap>
+                        <span>🔍 Active Filters:</span>
+                        {appliedFilters.map((filter, index) => (
+                            <Tag key={index} color="blue" closable onClose={() => {
+                                // TODO: Remove specific filter
+                            }}>
+                                {filter}
+                            </Tag>
+                        ))}
+                        <CustomButton size="small" onClick={() => {
+                            setSelectedArea("all");
+                            setSelectedProject("all");
+                            setSelectedBuilding("all");
+                            setDateRange(null);
+                            setSearchText("");
+                            setAppliedFilters([]);
+                            setFilteredData(tableData);
+                        }}>
+                            Clear All
+                        </CustomButton>
+                    </Space>
+                </Card>
+            )}
+
             {/* Advanced Filters Section */}
-            <Card title={<><FilterOutlined /> Advanced Filters</>} className={styles.filtersCard}>
+            <Card title={<><FilterOutlined /> Advanced Filters {isLoading && <span>⏳</span>}</>} className={styles.filtersCard}>
                 <Row gutter={[16, 16]} align="middle">
                     <Col span={6}>
                         <Segmented
@@ -223,8 +334,12 @@ const Analytics: React.FC = () => {
                     </Col>
                     <Col span={12}>
                         <Space>
-                            <CustomButton type="primary" onClick={handleFilterApply}>
-                                Apply Filters
+                            <CustomButton 
+                                type="primary" 
+                                onClick={handleFilterApply}
+                                loading={isLoading}
+                            >
+                                {isLoading ? 'Applying...' : 'Apply Filters'}
                             </CustomButton>
                             <CustomButton onClick={() => {
                                 setSelectedArea("all");
@@ -232,6 +347,16 @@ const Analytics: React.FC = () => {
                                 setSelectedBuilding("all");
                                 setDateRange(null);
                                 setSearchText("");
+                                setAppliedFilters([]);
+                                setFilteredData(tableData);
+                                setChartData({
+                                    buildingsData: buildingsByDistrictsData,
+                                    apartmentData: apartmentTypesData,
+                                    constructionData: constructionStatusData,
+                                    priceData: avgPricePerSqmData,
+                                    trendsData: pricesTrendData,
+                                    roiData: roiData
+                                });
                             }}>
                                 Clear All
                             </CustomButton>
@@ -245,29 +370,53 @@ const Analytics: React.FC = () => {
             <h2>Developer Analytics</h2>
             <Row gutter={[16, 16]} className={styles.cardsRow}>
                 <Col xs={24} lg={8}>
-                    <ChartCard title="Distribution of buildings by districts" extra={<Tag>DLD</Tag>}>
+                    <ChartCard 
+                        title="Distribution of buildings by districts" 
+                        extra={
+                            <Space>
+                                <Tag>DLD</Tag>
+                                {appliedFilters.length > 0 && <Tag color="orange">Filtered</Tag>}
+                            </Space>
+                        }
+                    >
                         <BarChart 
-                            data={buildingsByDistrictsData.data} 
-                            labels={buildingsByDistrictsData.labels}
+                            data={chartData.buildingsData.data} 
+                            labels={chartData.buildingsData.labels}
                             color="#3B82F6"
                         />
                     </ChartCard>
                 </Col>
                 <Col xs={24} lg={8}>
-                    <ChartCard title="Lots by apartment type" extra={<Tag>DLD</Tag>}>
+                    <ChartCard 
+                        title="Lots by apartment type" 
+                        extra={
+                            <Space>
+                                <Tag>DLD</Tag>
+                                {appliedFilters.length > 0 && <Tag color="orange">Filtered</Tag>}
+                            </Space>
+                        }
+                    >
                         <BarChart 
-                            data={apartmentTypesData.data} 
-                            labels={apartmentTypesData.labels}
+                            data={chartData.apartmentData.data} 
+                            labels={chartData.apartmentData.labels}
                             color="#10B981"
                         />
                     </ChartCard>
                 </Col>
                 <Col xs={24} lg={8}>
-                    <ChartCard title="Buildings commissioned/under construction" extra={<Tag>DLD</Tag>}>
+                    <ChartCard 
+                        title="Buildings commissioned/under construction" 
+                        extra={
+                            <Space>
+                                <Tag>DLD</Tag>
+                                {appliedFilters.length > 0 && <Tag color="orange">Filtered</Tag>}
+                            </Space>
+                        }
+                    >
                         <PieChart 
-                            data={constructionStatusData.data} 
-                            labels={constructionStatusData.labels}
-                            colors={constructionStatusData.colors}
+                            data={chartData.constructionData.data} 
+                            labels={chartData.constructionData.labels}
+                            colors={chartData.constructionData.colors}
                         />
                     </ChartCard>
                 </Col>
@@ -285,30 +434,54 @@ const Analytics: React.FC = () => {
             </div>
             <Row gutter={[16, 16]} className={styles.cardsRow}>
                 <Col xs={24} lg={8}>
-                    <ChartCard title="Average price AED per sqm" extra={<Tag>DLD</Tag>}>
+                    <ChartCard 
+                        title="Average price AED per sqm" 
+                        extra={
+                            <Space>
+                                <Tag>DLD</Tag>
+                                {appliedFilters.length > 0 && <Tag color="orange">Filtered</Tag>}
+                            </Space>
+                        }
+                    >
                         <LineChart 
-                            data={avgPricePerSqmData.data} 
-                            labels={avgPricePerSqmData.labels}
+                            data={chartData.priceData.data} 
+                            labels={chartData.priceData.labels}
                             color="#F59E0B"
                             gradient={true}
                         />
                     </ChartCard>
                 </Col>
                 <Col xs={24} lg={8}>
-                    <ChartCard title="Price Trends (Last 6 months)" extra={<Tag>DLD</Tag>}>
+                    <ChartCard 
+                        title="Price Trends (Last 6 months)" 
+                        extra={
+                            <Space>
+                                <Tag>DLD</Tag>
+                                {appliedFilters.length > 0 && <Tag color="orange">Filtered</Tag>}
+                            </Space>
+                        }
+                    >
                         <LineChart 
-                            data={pricesTrendData.data} 
-                            labels={pricesTrendData.labels}
+                            data={chartData.trendsData.data} 
+                            labels={chartData.trendsData.labels}
                             color="#8B5CF6"
                             gradient={true}
                         />
                     </ChartCard>
                 </Col>
                 <Col xs={24} lg={8}>
-                    <ChartCard title="Average ROI %" extra={<Tag>DLD</Tag>}>
+                    <ChartCard 
+                        title="Average ROI %" 
+                        extra={
+                            <Space>
+                                <Tag>DLD</Tag>
+                                {appliedFilters.length > 0 && <Tag color="orange">Filtered</Tag>}
+                            </Space>
+                        }
+                    >
                         <BarChart 
-                            data={roiData.data} 
-                            labels={roiData.labels}
+                            data={chartData.roiData.data} 
+                            labels={chartData.roiData.labels}
                             color="#EF4444"
                         />
                     </ChartCard>
@@ -339,9 +512,14 @@ const Analytics: React.FC = () => {
                         children: (
                             /* Detailed Analysis */
                             <Collapse className={styles.expandable}>
-                                <Panel header="Property Transactions Analysis" key="1">
+                                <Panel header={
+                                    <Space>
+                                        Property Transactions Analysis
+                                        {appliedFilters.length > 0 && <Tag color="blue" size="small">Showing {filteredData.length} of {tableData.length} records</Tag>}
+                                    </Space>
+                                } key="1">
                                     <div className={styles.tableContainer}>
-                                        <TransactionsTable rows={tableData.map(r => ({
+                                        <TransactionsTable rows={filteredData.map(r => ({
                                             key: r.key,
                                             date: '18 Dec, 2024',
                                             location: `${r.project}, ${r.area}`,

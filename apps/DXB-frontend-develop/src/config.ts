@@ -6,9 +6,10 @@ const normalizeBase = (url: string) => url.replace(/\/$/, "");
 // Production/Development API base URL configuration
 const isDevelopment = import.meta.env.MODE === 'development';
 
+// ✅ ИСПРАВЛЕНО: в продакшне используем nginx прокси для избежания CORS
 const frontendApiFromEnv = isDevelopment
     ? 'http://localhost:8000'  // Local development
-    : 'https://backend-production-dbb4.up.railway.app';  // Railway production
+    : '';  // Production: используем пустую строку для прокси через nginx (/api/*)
 
 export const API_BASE_URL: string = normalizeBase(String(frontendApiFromEnv));
 

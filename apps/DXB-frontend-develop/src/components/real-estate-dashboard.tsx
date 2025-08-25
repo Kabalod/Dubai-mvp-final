@@ -39,6 +39,12 @@ interface RealEstateDashboardProps {
 export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashboardProps) {
   const [loading, setLoading] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<string[]>([]); // ✅ ИСПРАВЛЕНО: добавлено отсутствующее состояние
+  const [filteredProperties, setFilteredProperties] = useState(properties); // ✅ ДОБАВЛЕНО: состояние для отфильтрованных объектов
+  
+  // ✅ ДОБАВЛЕНО: обновляем отфильтрованные объекты при изменении properties
+  React.useEffect(() => {
+    setFilteredProperties(properties);
+  }, [properties]);
 
   // Обработчик фильтров
   const handleSearch = async (query: IMainQuery) => {
@@ -87,12 +93,35 @@ export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashbo
       if (filterSummary.length > 0) {
         console.log("📊 Updating dashboard data with filters...");
         setAppliedFilters(filterSummary); // ✅ ДОБАВЛЕНО: обновляем активные фильтры
+        
+        // ✅ ДОБАВЛЕНО: применяем фильтрацию к текущим данным для демонстрации
+        const filtered = properties.filter(property => {
+          let matches = true;
+          if (query.transactionType && query.transactionType !== 'all') {
+            matches = matches && property.listingType === query.transactionType;
+          }
+          if (query.propertyComponents.length > 0) {
+            matches = matches && query.propertyComponents.includes(property.bedrooms || '');
+          }
+          if (query.searchSubstring) {
+            matches = matches && (
+              property.title.toLowerCase().includes(query.searchSubstring.toLowerCase()) ||
+              property.area.toLowerCase().includes(query.searchSubstring.toLowerCase()) ||
+              property.location.area.toLowerCase().includes(query.searchSubstring.toLowerCase())
+            );
+          }
+          return matches;
+        });
+        setFilteredProperties(filtered);
+        console.log(`📊 Filtered ${filtered.length} of ${properties.length} properties`);
+        
         // В реальности здесь будет:
         // const newData = await apiService.getFilteredProperties(searchParams);
         // setProperties(newData);
         // setStats(calculateStats(newData));
       } else {
         setAppliedFilters([]); // ✅ ДОБАВЛЕНО: очищаем если фильтров нет
+        setFilteredProperties(properties); // ✅ ДОБАВЛЕНО: показываем все данные
       }
       
     } catch (error) {
