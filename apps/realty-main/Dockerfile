@@ -1,9 +1,6 @@
-# Railway MVP Dockerfile v3.1 - COMPLETE REBUILD REQUIRED
-# Version: 3.1 - Force Railway to rebuild completely
-# Build: 2025-08-25-18-30 - Force Railway to rebuild NOW
-# Timestamp: 2025-08-25T18:30:00Z
-# This is a completely new Dockerfile structure
-
+# Railway MVP Dockerfile v3.2 - Ultra-simplified for Railway
+# Version: 3.2 - Use simplified settings and minimal startup
+# Build: 2025-08-25 - Force Railway to rebuild
 FROM python:3.11-slim
 
 # Install system dependencies
@@ -26,7 +23,8 @@ COPY realty/ ./realty/
 
 # Set environment variables
 ENV PYTHONPATH=/app
-ENV DJANGO_SETTINGS_MODULE=realty.settings
+ENV DJANGO_SETTINGS_MODULE=realty.settings_railway
+ENV PYTHONUNBUFFERED=1
 
 # Expose port
 EXPOSE 8000
