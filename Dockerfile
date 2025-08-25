@@ -4,8 +4,8 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy only essential files
-COPY apps/realty-main/manage.py .
-COPY apps/realty-main/realty/ ./realty/
+COPY manage.py .
+COPY realty/ ./realty/
 
 # Install only core dependencies
 RUN pip install --no-cache-dir \
