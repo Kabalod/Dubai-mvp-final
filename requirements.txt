@@ -1,4 +1,4 @@
-# Complete requirements for Dubai MVP
+# Railway-compatible requirements for Dubai MVP
 Django>=5.1
 djangorestframework>=3.15
 djangorestframework-simplejwt>=5.3
@@ -6,5 +6,4 @@ django-cors-headers>=4.7
 psycopg[binary]>=3.2
 environs[django]>=11.2
 whitenoise>=6.8
-anymail[sendgrid]>=10.0
 marshmallow>=3.20
