@@ -1,0 +1,23 @@
+# Minimal Dockerfile for Railway - absolute minimum
+# No system dependencies, no complex operations
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy only essential files
+COPY apps/realty-main/manage.py .
+COPY apps/realty-main/realty/ ./realty/
+COPY apps/realty-main/api/ ./api/
+
+# Install only Django (no requirements.txt)
+RUN pip install --no-cache-dir Django
+
+# Environment
+ENV DJANGO_SETTINGS_MODULE=realty.settings
+ENV PORT=8000
+
+EXPOSE 8000
+
+# Run Django
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

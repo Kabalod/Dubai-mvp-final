@@ -1,13 +1,7 @@
-# Root Dockerfile for Railway - redirects to apps/realty-main
-# This file tells Railway where to find the actual application
+# Ultra-light Dockerfile for Railway - no system dependencies
+# Uses pure Python to avoid resource limits
 
 FROM python:3.11-slim
-
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
@@ -15,8 +9,8 @@ WORKDIR /app
 # Copy the realty-main directory
 COPY apps/realty-main/ .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies (only what's needed)
+RUN pip install --no-cache-dir Django djangorestframework django-cors-headers
 
 # Set environment variables
 ENV DJANGO_SETTINGS_MODULE=realty.settings
