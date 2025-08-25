@@ -38,6 +38,7 @@ interface RealEstateDashboardProps {
 
 export function RealEstateDashboard({ stats, properties = [] }: RealEstateDashboardProps) {
   const [loading, setLoading] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState<string[]>([]); // ✅ ИСПРАВЛЕНО: добавлено отсутствующее состояние
 
   // Обработчик фильтров
   const handleSearch = async (query: IMainQuery) => {
