@@ -26,6 +26,10 @@ ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=realty.settings_railway
 ENV PYTHONUNBUFFERED=1
 
+# Collect static files for Whitenoise (STATIC_ROOT in settings_railway -> /app/staticfiles)
+RUN mkdir -p /app/staticfiles && \
+    python manage.py collectstatic --noinput
+
 # Expose port
 EXPOSE 8000
 
