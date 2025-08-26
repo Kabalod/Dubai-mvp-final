@@ -33,5 +33,5 @@ RUN mkdir -p /app/staticfiles && \
 # Expose port
 EXPOSE 8000
 
-# Start Gunicorn directly - minimal startup
-CMD ["gunicorn", "realty.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "60"]
+# Auto-apply migrations on start (generate if missing), then run Gunicorn
+CMD ["sh","-c","python manage.py makemigrations --check || python manage.py makemigrations --noinput; python manage.py migrate --noinput; gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 1 --timeout 60"]
