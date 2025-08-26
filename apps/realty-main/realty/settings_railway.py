@@ -4,6 +4,7 @@ Simplified Django settings for Railway deployment
 import os
 from pathlib import Path
 import dj_database_url
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -64,15 +65,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'realty.wsgi.application'
 
 # Database
-_db_url = os.environ.get('DATABASE_URL')
-if _db_url:
-    DATABASES = {
-        'default': dj_database_url.parse(_db_url, conn_max_age=600),
-    }
-    # Enable atomic requests for postgres
-    if DATABASES['default']['ENGINE'].endswith('postgresql'):
-        DATABASES['default']['ATOMIC_REQUESTS'] = True
-else:
+_db_url_raw = (os.environ.get('DATABASE_URL') or '').strip()
+try:
+    if _db_url_raw and '://' in _db_url_raw:
+        DATABASES = {
+            'default': dj_database_url.parse(_db_url_raw, conn_max_age=600),
+        }
+        if DATABASES['default']['ENGINE'].endswith('postgresql'):
+            DATABASES['default']['ATOMIC_REQUESTS'] = True
+    else:
+        raise ValueError('DATABASE_URL missing or malformed')
+except Exception as e:  # Fallback to SQLite to avoid startup crash
+    logging.warning(f"DATABASE_URL invalid or not set, falling back to SQLite: {e}")
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
