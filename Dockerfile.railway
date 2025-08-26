@@ -37,7 +37,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 
 # Collect static files for Whitenoise (creates /app/realty/staticfiles)
-RUN python -m django collectstatic --noinput
+RUN mkdir -p /app/realty/staticfiles && python -m django collectstatic --noinput
 
 EXPOSE 8000
 
