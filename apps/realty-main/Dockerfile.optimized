@@ -2,7 +2,7 @@
 # Версия: Production-Ready MVP
 # Дата: 2025-01-23
 
-FROM python:3.11-slim AS base
+FROM python:3.12-slim AS base
 
 # Метаданные
 LABEL maintainer="kbalodk@gmail.com"
@@ -24,31 +24,15 @@ RUN groupadd -r django && useradd -r -g django django
 WORKDIR /app
 
 # Копирование requirements (для кеширования слоёв)
-COPY requirements.txt* ./
+COPY requirements*.txt ./
 
 # Установка Python зависимостей
-RUN pip install --no-cache-dir --upgrade pip==25.2 \
-    && pip install --no-cache-dir \
-        # Database
-        psycopg[binary,pool]==3.2.9 \
-        dj-database-url==2.3.0 \
-        # Django Core
-        django==4.2.17 \
-        djangorestframework==3.15.2 \
-        # Authentication
-        djangorestframework-simplejwt==5.3.0 \
-        django-allauth==65.3.0 \
-        # CORS & Security
-        django-cors-headers==4.6.0 \
-        # Email
-        django-anymail==13.0.0 \
-        # Configuration
-        environs==11.2.2 \
-        # Additional (only if needed)
-        python-dateutil==2.9.0.post0 \
-        pillow==11.1.0 \
-        whitenoise==6.8.2 \
-    && pip cache purge
+RUN /bin/sh -c 'pip install --upgrade pip==25.2 && \
+    if [ -f requirements.compiled.txt ]; then \
+        pip install --no-cache-dir --no-deps --require-hashes -r requirements.compiled.txt; \
+    else \
+        pip install --no-cache-dir -r requirements.txt; \
+    fi && pip cache purge'
 
 # Копирование кода приложения
 COPY . .

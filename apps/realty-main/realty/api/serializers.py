@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework import serializers as drf_serializers
 from realty.api.models import Payment, PaymentEventAudit, UserReportHistory
 try:
@@ -96,6 +96,9 @@ class PropertySearchSerializer(serializers.Serializer):
     area = serializers.CharField(required=False, allow_blank=True)
     limit = serializers.IntegerField(default=50, max_value=500)
     offset = serializers.IntegerField(default=0, min_value=0)
+
+
+User = get_user_model()
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

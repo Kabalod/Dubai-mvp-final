@@ -46,6 +46,9 @@ coverage/
 .vite/
 out/
 
+# --- Local MCP servers (do not commit) ---
+tools/jira-mcp/
+
 # --- Java / Maven / Gradle ---
 target/
 build/

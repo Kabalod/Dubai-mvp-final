@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "");
-    const frontendApi = env.VITE_FRONTEND_API_URL || env.FRONTEND_API_URL || "/api";
+    const frontendApi = env.VITE_FRONTEND_API_URL || env.FRONTEND_API_URL || "";
     return {
         plugins: [
             lingui(),

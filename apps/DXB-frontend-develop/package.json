@@ -47,13 +47,14 @@
         "dev": "vite --mode development",
         "build": "vite build",
         "preview": "vite preview",
+        "deps:check": "yarn install --immutable && echo deps ok",
         "extract": "lingui extract",
         "compile": "lingui compile --typescript",
         "codegen": "graphql-codegen --config codegen.ts",
-        "mcp:build": "cd ../tools/memory-mcp-server && npm i && npm run build",
-        "memsync:build": "cd ../tools/memory-sync && npm i && npm run build",
-        "memsync:dev": "cd ../tools/memory-sync && npm run dev -- --root ../DXB-frontend-develop/src --api %VITE_MEMORY_API_URL% --tags frontend --category code:frontend",
-        "memsync:start": "set MEMORY_BASE_URL=%VITE_MEMORY_API_URL%&& cd ../tools/memory-sync && npm run start -- --root ../DXB-frontend-develop/src --api %MEMORY_BASE_URL% --tags frontend,prod --category code:frontend"
+        "mcp:build": "echo deprecated",
+        "memsync:build": "echo deprecated",
+        "memsync:dev": "echo deprecated",
+        "memsync:start": "echo deprecated"
     },
     "eslintConfig": {
         "extends": [

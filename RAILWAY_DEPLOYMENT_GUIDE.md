@@ -6,17 +6,10 @@ Railway сталкивается с ошибкой `exit code: 137` при ус�
 ## 🔧 **Решения**
 
 ### **Вариант 1: Основной Dockerfile (рекомендуемый)**
-```dockerfile
-# Использует оптимизированный Dockerfile с минимальными зависимостями
-# Убраны build-essential и g++ для экономии ресурсов
-```
+Используйте `Dockerfile.railway` в корне: он копирует код из `apps/realty-main`, ставит зависимости из `apps/realty-main/requirements.txt`, задаёт `DJANGO_SETTINGS_MODULE=realty.settings_railway` и healthcheck `/api/health/`.
 
 ### **Вариант 2: Простой Dockerfile (если основной не работает)**
-```dockerfile
-# Dockerfile.simple - максимально упрощенная версия
-# Только libpq-dev для PostgreSQL
-# Django runserver вместо gunicorn
-```
+Можно использовать `apps/realty-main/Dockerfile.simple` с `runserver` для минимального потребления ресурсов.
 
 ## 🎯 **Оптимизации для Railway**
 
@@ -47,13 +40,13 @@ Railway сталкивается с ошибкой `exit code: 137` при ус�
 ## 🔍 **Мониторинг**
 
 ### **GitHub Actions:**
-https://github.com/Kabalod/Workerproject/actions
+`https://github.com/Kabalod/Workerproject/actions`
 
 ### **Railway Dashboard:**
-https://railway.app/dashboard
+`https://railway.app/dashboard`
 
 ### **Production URL:**
-https://workerproject-production.up.railway.app
+`https://workerproject-production.up.railway.app`
 
 ## ⚠️ **Если деплой не удается**
 

@@ -36,31 +36,30 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 ### 3. Запуск через Docker Compose
 
 ```bash
-# Сборка и запуск в режиме разработки
-docker compose --profile local build
-docker compose --profile local up
+# Сборка и запуск локально (профиль backend)
+docker compose --profile backend build
+docker compose --profile backend up
 
-# Или в production режиме
-docker compose --profile prod build
-docker compose --profile prod up
+# Production (рекомендуется для серверов)
+docker compose -f docker-compose.production.yml up -d --build backend
 ```
 
 ### 4. Инициализация базы данных
 
 ```bash
 # В новом терминале
-docker compose --profile local exec web python manage.py migrate
-docker compose --profile local exec web python manage.py createsuperuser
+docker compose exec realty-main-web python manage.py migrate --noinput
+docker compose exec realty-main-web python manage.py createsuperuser
 ```
 
-### 5. Запуск скрейпера для сбора данных
+### 5. Healthcheck и статические файлы
 
 ```bash
-# Переходим в директорию скрейпера
-cd scraper_module
+# Проверка доступности API
+curl http://localhost:8000/api/health/
 
-# Запускаем автоматический сбор данных
-./run_scraper.sh
+# Сбор статических файлов (для прод)
+docker compose exec realty-main-web python manage.py collectstatic --noinput
 ```
 
 ## 🏗️ Архитектура проекта
@@ -85,14 +84,14 @@ cd scraper_module
 
 ### Технологический стек
 
-- **Backend**: Django 5.1, Python 3.12
+- **Backend**: Django 4.2/5.1 (MVP Railway — 4.2), Python 3.12
 - **Database**: PostgreSQL 16
 - **API**: GraphQL (Strawberry), REST
 - **Data Processing**: Pandas, NumPy
 - **Infrastructure**: Docker, Docker Compose, Nginx
-- **Web Server**: Granian, Uvicorn
+- **Web Server**: Gunicorn (prod), runserver (dev)
 - **Background Tasks**: django-tasks
-- **Monitoring**: Sentry
+- **Monitoring**: Prometheus Middleware (встроенный), опционально Sentry
 
 ## 📊 Основные возможности
 

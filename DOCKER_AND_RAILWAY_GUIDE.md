@@ -30,7 +30,7 @@ This guide explains how to:
 | Service | URL | Description |
 |---------|-----|-------------|
 | Frontend | http://localhost:3000 | React application |
-| Backend API | http://localhost:8000 | Django REST API |
+| Backend API | http://localhost:8000 | Django REST API (health: `/api/health/`) |
 | Nginx (optional) | http://localhost:8080 | Production-like proxy |
 | Django Admin | http://localhost:8000/admin/ | Django administration |
 | Health Check | http://localhost:8000/health/ | Service health status |
@@ -89,7 +89,7 @@ docker exec -it dubai-django-local python manage.py createsuperuser
 The project includes:
 - `railway.json` - Railway-specific configuration
 - `Dockerfile.railway` - Production-optimized Docker image
-- `requirements.txt` - Production dependencies
+- `apps/realty-main/requirements.txt` - Production dependencies
 
 ### Environment Variables
 
@@ -114,7 +114,7 @@ Set these in Railway dashboard:
 
 | File | Purpose |
 |------|---------|
-| `requirements.txt` | Production dependencies for Railway |
+| `apps/realty-main/requirements.txt` | Production dependencies for Railway |
 | `requirements.local.txt` | Enhanced dependencies for local development |
 
 ## 🚨 Troubleshooting
@@ -135,12 +135,12 @@ Set these in Railway dashboard:
 
 4. **Railway deployment fails:**
    - Check logs: `railway logs`
-   - Verify `requirements.txt` has all dependencies
+   - Verify `apps/realty-main/requirements.txt` has all dependencies
    - Ensure `railway.json` is properly configured
 
 ### Health Checks
 
-- Backend: http://localhost:8000/health/
+- Backend: http://localhost:8000/api/health/
 - Database: `docker exec -it dubai-postgres-local pg_isready -U postgres`
 - Redis: `docker exec -it dubai-redis-local redis-cli ping`
 

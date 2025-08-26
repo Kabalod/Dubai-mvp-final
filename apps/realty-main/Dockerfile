@@ -1,7 +1,7 @@
 # Railway MVP Dockerfile v3.2 - Ultra-simplified for Railway
 # Version: 3.2 - Use simplified settings and minimal startup
 # Build: 2025-08-25 - Force Railway to rebuild
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
