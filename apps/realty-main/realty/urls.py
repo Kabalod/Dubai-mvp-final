@@ -67,6 +67,13 @@ urlpatterns = [
     *([path("health/", MainView.as_view())] if MainView else []),
     # Отключено для MVP: allauth не используется
     # path("accounts/", include("allauth.urls")),
+    # Корень сервиса: простой JSON, чтобы корневая ссылка не давала 404
+    path("", lambda request: JsonResponse({
+        "service": "realty-backend",
+        "status": "ok",
+        "health": "/healthz/",
+        "api_base": "/api/"
+    })),
     # Прямой лёгкий healthcheck, не зависящий от импорта API
     path("healthz/", lambda request: JsonResponse({"status": "ok"})),
     path("api/", include("realty.api.urls")),
