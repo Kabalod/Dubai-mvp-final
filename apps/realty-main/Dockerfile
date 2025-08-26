@@ -34,4 +34,4 @@ RUN mkdir -p /app/staticfiles && \
 EXPOSE 8000
 
 # Auto-apply migrations on start (always generate), then run Gunicorn with access logs
-CMD ["sh","-c","python manage.py makemigrations --noinput; python manage.py migrate --noinput; gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 1 --timeout 60 --access-logfile - --error-logfile -"]
+CMD ["sh","-c","python manage.py makemigrations --noinput; python manage.py migrate --noinput; gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 1 --timeout 60 --access-logfile - --error-logfile -"]
