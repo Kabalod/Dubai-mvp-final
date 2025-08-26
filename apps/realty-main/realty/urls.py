@@ -24,6 +24,7 @@ except Exception:  # pragma: no cover
 # from strawberry.django.views import GraphQLView
 from django.views.generic import RedirectView
 from django.urls import reverse_lazy
+from django.http import JsonResponse
 
 # admin.autodiscover()
 # admin.site.login = secure_admin_login(admin.site.login)
@@ -66,6 +67,8 @@ urlpatterns = [
     *([path("health/", MainView.as_view())] if MainView else []),
     # Отключено для MVP: allauth не используется
     # path("accounts/", include("allauth.urls")),
+    # Прямой лёгкий healthcheck, не зависящий от импорта API
+    path("healthz/", lambda request: JsonResponse({"status": "ok"})),
     path("api/", include("realty.api.urls")),
     path(settings.ADMIN_URL, admin.site.urls),
     # path("download-dbdump/<str:filename>/", download_db_dump, name="download-db-dump")),
