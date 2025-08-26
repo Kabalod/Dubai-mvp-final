@@ -66,15 +66,28 @@ WSGI_APPLICATION = 'realty.wsgi.application'
 
 # Database
 _db_url_raw = (os.environ.get('DATABASE_URL') or '').strip()
+
+def _build_url_from_pg_env() -> str | None:
+    host = os.environ.get('PGHOST') or os.environ.get('POSTGRES_HOST')
+    user = os.environ.get('PGUSER') or os.environ.get('POSTGRES_USER')
+    password = os.environ.get('PGPASSWORD') or os.environ.get('POSTGRES_PASSWORD')
+    dbname = os.environ.get('PGDATABASE') or os.environ.get('POSTGRES_DB')
+    port = os.environ.get('PGPORT') or os.environ.get('POSTGRES_PORT') or '5432'
+    if all([host, user, password, dbname]):
+        return f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
+    return None
+
 try:
-    if _db_url_raw and '://' in _db_url_raw:
+    url = _db_url_raw if (_db_url_raw and '://' in _db_url_raw) else _build_url_from_pg_env()
+    if url:
         DATABASES = {
-            'default': dj_database_url.parse(_db_url_raw, conn_max_age=600),
+            'default': dj_database_url.parse(url, conn_max_age=600),
         }
         if DATABASES['default']['ENGINE'].endswith('postgresql'):
             DATABASES['default']['ATOMIC_REQUESTS'] = True
+        logging.getLogger(__name__).info("Using database engine: %s", DATABASES['default']['ENGINE'])
     else:
-        raise ValueError('DATABASE_URL missing or malformed')
+        raise ValueError('DATABASE_URL missing and PG* env not present')
 except Exception as e:  # Fallback to SQLite to avoid startup crash
     logging.warning(f"DATABASE_URL invalid or not set, falling back to SQLite: {e}")
     DATABASES = {
