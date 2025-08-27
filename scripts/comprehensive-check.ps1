@@ -18,7 +18,7 @@ Write-Host "`n📁 Проверка структуры проекта..." -Foreg
 
 $requiredFiles = @(
     "apps/realty-main/Dockerfile",
-    "apps/realty-main/realty/settings.py",
+    "apps/realty-main/realty/settings_railway.py",
     "apps/realty-main/realty/api/views.py",
     "apps/realty-main/realty/api/urls.py",
     "apps/realty-main/realty/api/models.py",

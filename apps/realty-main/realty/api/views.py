@@ -38,11 +38,9 @@ from .serializers import (
     PropertySearchSerializer,
 )
 
-# Import property models with fallback for MVP
-try:
-    from realty.pfimport.models import PFListSale, PFListRent, Area, Building
-except ImportError:
-    PFListSale = PFListRent = Area = Building = None
+# MVP: Use mock data instead of complex pfimport models
+# from realty.pfimport.models import PFListSale, PFListRent, Area, Building
+PFListSale = PFListRent = Area = Building = None
 
 User = get_user_model()
 

@@ -1,8 +1,13 @@
-# Generated manually for Railway deployment
+# Новые чистые миграции для Dubai MVP
+# Создано: 2025-08-26 - Полная очистка от старых проблем
 
-from django.db import migrations, models
-import django.db.models.deletion
 from django.conf import settings
+from django.db import migrations, models
+import django.contrib.auth.models
+import django.contrib.auth.validators
+import django.core.validators
+import django.db.models.deletion
+import django.utils.timezone
 
 
 class Migration(migrations.Migration):
@@ -10,10 +15,36 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('auth', '0012_alter_user_first_name_max_length'),
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='User',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('password', models.CharField(max_length=128, verbose_name='password')),
+                ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
+                ('is_superuser', models.BooleanField(default=False, help_text='Designates that this user has all permissions without explicitly assigning them.', verbose_name='superuser status')),
+                ('username', models.CharField(error_messages={'unique': 'A user with that username already exists.'}, help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.', max_length=150, unique=True, validators=[django.contrib.auth.validators.UnicodeUsernameValidator()], verbose_name='username')),
+                ('first_name', models.CharField(blank=True, max_length=150, verbose_name='first name')),
+                ('last_name', models.CharField(blank=True, max_length=150, verbose_name='last name')),
+                ('email', models.EmailField(blank=True, max_length=254, verbose_name='email address')),
+                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
+                ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
+                ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
+                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to.', related_name='api_user_set', to='auth.group', verbose_name='groups')),
+                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='api_user_set', to='auth.permission', verbose_name='user permissions')),
+            ],
+            options={
+                'verbose_name': 'user',
+                'verbose_name_plural': 'users',
+                'abstract': False,
+            },
+            managers=[
+                ('objects', django.contrib.auth.models.UserManager()),
+            ],
+        ),
         migrations.CreateModel(
             name='OTPCode',
             fields=[
@@ -26,76 +57,29 @@ class Migration(migrations.Migration):
                 ('attempts', models.IntegerField(default=0)),
             ],
             options={
-                'db_table': 'api_otp_codes',
+                'verbose_name': 'OTP Code',
+                'verbose_name_plural': 'OTP Codes',
                 'ordering': ['-created_at'],
             },
-        ),
-        migrations.CreateModel(
-            name='SubscriptionPlan',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.CharField(max_length=32, unique=True)),
-                ('name', models.CharField(max_length=100)),
-                ('price_aed', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('period_days', models.PositiveIntegerField(default=30)),
-                ('is_active', models.BooleanField(default=True)),
-            ],
-            options={'db_table': 'api_subscription_plan'},
-        ),
-        migrations.CreateModel(
-            name='UserProfile',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(choices=[('free', 'Free'), ('paid', 'Paid'), ('admin', 'Admin')], default='free', max_length=16)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
-            ],
-            options={'db_table': 'api_user_profile'},
         ),
         migrations.CreateModel(
             name='Payment',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount_aed', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('method', models.CharField(choices=[('mock', 'Mock'), ('card', 'Card'), ('paypal', 'PayPal'), ('crypto', 'Crypto')], default='mock', max_length=16)),
-                ('provider', models.CharField(default='mock', max_length=32)),
-                ('status', models.CharField(choices=[('succeeded', 'Succeeded'), ('failed', 'Failed'), ('pending', 'Pending')], default='succeeded', max_length=16)),
-                ('paid_at', models.DateTimeField(auto_now_add=True)),
-                ('external_id', models.CharField(blank=True, max_length=128, null=True)),
-                ('plan', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='api.subscriptionplan')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-            options={'db_table': 'api_payment'},
-        ),
-        migrations.CreateModel(
-            name='UserSubscription',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('free', 'Free'), ('active', 'Active'), ('expired', 'Expired')], default='free', max_length=16)),
-                ('started_at', models.DateTimeField(blank=True, null=True)),
-                ('valid_until', models.DateTimeField(blank=True, null=True)),
-                ('payment_method', models.CharField(blank=True, max_length=32, null=True)),
-                ('last_payment_at', models.DateTimeField(blank=True, null=True)),
-                ('plan', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='api.subscriptionplan')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='subscription', to=settings.AUTH_USER_MODEL)),
-            ],
-            options={'db_table': 'api_user_subscription'},
-        ),
-        migrations.CreateModel(
-            name='Report',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=255)),
-                ('status', models.CharField(choices=[('queued', 'Queued'), ('processing', 'Processing'), ('ready', 'Ready'), ('failed', 'Failed')], default='queued', max_length=16)),
-                ('payload', models.JSONField(blank=True, null=True)),
-                ('result', models.JSONField(blank=True, null=True)),
-                ('error', models.TextField(blank=True, null=True)),
+                ('stripe_charge_id', models.CharField(default='', max_length=100, unique=True)),
+                ('amount', models.DecimalField(decimal_places=2, default=0.0, max_digits=10)),
+                ('currency', models.CharField(default='AED', max_length=10)),
+                ('status', models.CharField(default='succeeded', max_length=20)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reports', to=settings.AUTH_USER_MODEL)),
+                ('description', models.TextField(blank=True, null=True)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payments', to=settings.AUTH_USER_MODEL)),
             ],
-            options={'db_table': 'api_report', 'ordering': ['-created_at']},
+            options={
+                'verbose_name': 'Payment',
+                'verbose_name_plural': 'Payments',
+                'ordering': ['-created_at'],
+            },
         ),
         migrations.CreateModel(
             name='PaymentEventAudit',
@@ -105,28 +89,74 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('provider', models.CharField(max_length=32)),
                 ('event_type', models.CharField(max_length=64)),
-                ('event_id', models.CharField(max_length=128)),
-                ('idempotency_key', models.CharField(blank=True, max_length=128, null=True)),
-                ('signature', models.CharField(blank=True, max_length=256, null=True)),
-                ('payload', models.JSONField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('received', 'Received'), ('processed', 'Processed'), ('skipped', 'Skipped'), ('failed', 'Failed')], default='received', max_length=16)),
+                ('event_id', models.CharField(max_length=128, unique=True)),
+                ('payload', models.JSONField(default=dict)),
                 ('processed_at', models.DateTimeField(blank=True, null=True)),
-                ('attempt_count', models.PositiveIntegerField(default=0)),
-                ('error', models.TextField(blank=True, null=True)),
-                ('payment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='api.payment')),
+                ('status', models.CharField(default='received', max_length=32)),
+                ('error_message', models.TextField(blank=True, null=True)),
+                ('related_payment', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='webhook_events', to='api.payment')),
             ],
-            options={'db_table': 'api_payment_event_audit'},
+            options={
+                'verbose_name': 'Payment Event Audit',
+                'verbose_name_plural': 'Payment Event Audits',
+                'ordering': ['-created_at'],
+            },
+        ),
+        migrations.CreateModel(
+            name='UserReportHistory',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('report_type', models.CharField(default='property_analysis', max_length=50)),
+                ('generated_at', models.DateTimeField(auto_now_add=True)),
+                ('file_path', models.CharField(blank=True, max_length=500)),
+                ('parameters', models.JSONField(blank=True, default=dict)),
+                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='report_history', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': 'User Report History',
+                'verbose_name_plural': 'User Report Histories',
+                'ordering': ['-generated_at'],
+            },
+        ),
+        migrations.AddIndex(
+            model_name='otpcode',
+            index=models.Index(fields=['email'], name='api_otpcode_email_bee0a2_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='otpcode',
+            index=models.Index(fields=['created_at'], name='api_otpcode_created_572054_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='payment',
+            index=models.Index(fields=['user'], name='api_payment_user_id_03c2cf_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='payment',
+            index=models.Index(fields=['stripe_charge_id'], name='api_payment_stripe__0cead4_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='payment',
+            index=models.Index(fields=['status'], name='api_payment_status_c61efc_idx'),
         ),
         migrations.AddIndex(
             model_name='paymenteventaudit',
-            index=models.Index(fields=['provider', 'event_id'], name='idx_provider_event'),
+            index=models.Index(fields=['provider', 'event_id'], name='api_payment_provide_59f71e_idx'),
         ),
         migrations.AddIndex(
             model_name='paymenteventaudit',
-            index=models.Index(fields=['idempotency_key'], name='idx_idem_key'),
+            index=models.Index(fields=['event_type'], name='api_payment_event_t_1402b4_idx'),
         ),
-        migrations.AddConstraint(
-            model_name='paymenteventaudit',
-            constraint=models.UniqueConstraint(fields=('provider', 'event_id'), name='uniq_provider_event'),
+        migrations.AddIndex(
+            model_name='userreporthistory',
+            index=models.Index(fields=['user'], name='api_userrepor_user_id_0a1234_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='userreporthistory',
+            index=models.Index(fields=['report_type'], name='api_userrepor_report__5b2345_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='userreporthistory',
+            index=models.Index(fields=['generated_at'], name='api_userrepor_generat_6c3456_idx'),
         ),
     ]
+

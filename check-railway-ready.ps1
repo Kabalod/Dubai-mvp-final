@@ -7,13 +7,13 @@ Write-Host "🔍 Checking Railway Readiness for Dubai MVP..." -ForegroundColor G
 Write-Host "📁 Checking required files..." -ForegroundColor Yellow
 
 $requiredFiles = @(
-    "Dockerfile.railway",
-    "railway.json", 
-    "requirements.txt",
-    "realty/settings.py",
-    "realty/urls.py",
-    "realty/views.py",
-    "manage.py"
+    "apps/realty-main/Dockerfile",
+    "railway.json",
+    "apps/realty-main/requirements.txt", 
+    "apps/realty-main/realty/settings_railway.py",
+    "apps/realty-main/realty/urls.py",
+    "apps/realty-main/realty/api/views.py",
+    "apps/realty-main/manage.py"
 )
 
 $missingFiles = @()
@@ -37,12 +37,12 @@ if ($missingFiles.Count -gt 0) {
 
 # Check Dockerfile.railway content
 Write-Host ""
-Write-Host "🐳 Checking Dockerfile.railway..." -ForegroundColor Yellow
-$dockerfileContent = Get-Content "Dockerfile.railway" -Raw
+Write-Host "🐳 Checking apps/realty-main/Dockerfile..." -ForegroundColor Yellow
+$dockerfileContent = Get-Content "apps/realty-main/Dockerfile" -Raw
 if ($dockerfileContent -match "gunicorn") {
     Write-Host "✅ Gunicorn configured correctly" -ForegroundColor Green
 } else {
-    Write-Host "❌ Gunicorn not found in Dockerfile.railway" -ForegroundColor Red
+    Write-Host "❌ Gunicorn not found in Dockerfile" -ForegroundColor Red
 }
 
 if ($dockerfileContent -match "HEALTHCHECK") {
@@ -54,7 +54,7 @@ if ($dockerfileContent -match "HEALTHCHECK") {
 # Check requirements.txt for essential packages
 Write-Host ""
 Write-Host "📦 Checking requirements.txt..." -ForegroundColor Yellow
-$requirementsContent = Get-Content "requirements.txt" -Raw
+$requirementsContent = Get-Content "apps/realty-main/requirements.txt" -Raw
 $essentialPackages = @("django", "gunicorn", "environs", "marshmallow", "psycopg", "redis")
 
 foreach ($package in $essentialPackages) {

@@ -136,8 +136,13 @@ STORAGES = {
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CORS
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS - Безопасная настройка для продакшена
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    'https://frontend-production-5c48.up.railway.app',
+    'https://workerproject-production.up.railway.app', 
+    'http://localhost:3000',  # для локальной разработки
+]
 
 # REST Framework
 REST_FRAMEWORK = {

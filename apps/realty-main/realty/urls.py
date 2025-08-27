@@ -10,16 +10,10 @@ from django.http import HttpResponse
 from django.urls import include
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
-try:
-    # Используем только в DEBUG; в проде отсутствует
-    from falco.urls import errors_urlpatterns
-except Exception:
-    errors_urlpatterns = []
-# Health check через отдельный пакет не обязателен в MVP
-try:
-    from health_check.views import MainView  # type: ignore
-except Exception:  # pragma: no cover
-    MainView = None
+# MVP: falco removed for simplified deployment
+errors_urlpatterns = []
+# MVP: health_check package not included in requirements
+MainView = None
 # from realty.main.schema import schema
 # from strawberry.django.views import GraphQLView
 from django.views.generic import RedirectView
@@ -71,7 +65,7 @@ urlpatterns = [
     path("", lambda request: JsonResponse({
         "service": "realty-backend",
         "status": "ok",
-        "health": "/healthz/",
+        "health": "/api/health/",
         "api_base": "/api/"
     })),
     # Прямой лёгкий healthcheck, не зависящий от импорта API
@@ -85,13 +79,12 @@ urlpatterns = [
     # path("r2d2/", include("realty.reports.urls", namespace="reports")),
 ]
 
-# DEBUG
+# DEBUG - Simplified for MVP  
 if settings.DEBUG:
-    from debug_toolbar.toolbar import debug_toolbar_urls
-
+    # debug_toolbar not included in MVP requirements
     urlpatterns += [
-        path("__reload__/", include("django_browser_reload.urls")),
+        # path("__reload__/", include("django_browser_reload.urls")),
         *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
-        *debug_toolbar_urls(),
+        # *debug_toolbar_urls(),  # Not available in MVP
         *errors_urlpatterns,
     ]
