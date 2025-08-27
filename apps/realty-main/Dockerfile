@@ -1,6 +1,6 @@
-# Railway MVP Dockerfile v3.2 - Ultra-simplified for Railway
-# Version: 3.2 - Use simplified settings and minimal startup
-# Build: 2025-08-25 - Force Railway to rebuild
+# Railway MVP Dockerfile v4.0 - Final production version  
+# Version: 4.0 - Direct Gunicorn start without migrations/collectstatic
+# Build: 2025-08-28 - Force complete cache rebuild
 FROM python:3.12-slim
 
 # Install system dependencies
@@ -32,5 +32,5 @@ RUN mkdir -p /app/staticfiles
 # Expose port
 EXPOSE 8000
 
-# Auto-apply migrations and collect static files on start, then run Gunicorn
-CMD ["sh","-c","echo 'Starting Django production server...' && python manage.py collectstatic --noinput --clear && echo 'Starting Gunicorn...' && gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 30 --max-requests 1000 --preload --access-logfile - --error-logfile - --log-level info"]
+# Start Gunicorn directly - migrations already applied
+CMD ["sh","-c","echo 'Starting Gunicorn server...' && gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info"]
