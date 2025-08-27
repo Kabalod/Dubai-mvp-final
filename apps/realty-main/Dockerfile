@@ -26,12 +26,11 @@ ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=realty.settings_railway
 ENV PYTHONUNBUFFERED=1
 
-# Collect static files for Whitenoise (STATIC_ROOT in settings_railway -> /app/staticfiles)
-RUN mkdir -p /app/staticfiles && \
-    python manage.py collectstatic --noinput
+# Create staticfiles directory (collectstatic will run at runtime)
+RUN mkdir -p /app/staticfiles
 
 # Expose port
 EXPOSE 8000
 
-# Auto-apply migrations on start (always generate), then run Gunicorn with access logs
-CMD ["sh","-c","python manage.py makemigrations --noinput; python manage.py migrate --noinput; gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 1 --timeout 60 --access-logfile - --error-logfile -"]
+# Auto-apply migrations and collect static files on start, then run Gunicorn
+CMD ["sh","-c","echo 'Starting Django production server...' && python manage.py collectstatic --noinput --clear && echo 'Starting Gunicorn...' && gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 30 --max-requests 1000 --preload --access-logfile - --error-logfile - --log-level info"]
