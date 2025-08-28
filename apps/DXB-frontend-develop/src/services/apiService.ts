@@ -141,7 +141,7 @@ class ApiService {
     }
 
     async refreshToken(refreshToken: string) {
-        return this.api.post('/auth/refresh/', {
+        return this.api.post('/auth/token/refresh/', {
             refresh: refreshToken,
         });
     }
