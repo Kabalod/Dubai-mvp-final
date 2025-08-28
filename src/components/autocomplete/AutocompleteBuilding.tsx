@@ -1,8 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { t } from "@lingui/core/macro";
-import { useLazyQuery } from "@apollo/client";
-import { SEARCH_AUTOCOMPLETE_BUILDING } from "@/api/queries";
-import { AutocompleteQueryVariables, AutocompleteResults } from "@/api/schema";
+import { apiService } from "../../services/apiService";
 import { debounce } from "@/Utilities/utils";
 import AutocompleteBase from "./AutocompleteBase";
 
@@ -14,18 +12,63 @@ const AutocompleteBuilding: React.FC<AutocompleteBuildingProps> = ({
     onValueChange,
 }) => {
     const [value, setValue] = useState("");
+    const [options, setOptions] = useState<AutocompleteOption[]>([]);
+    const [loading, setLoading] = useState(false);
 
-    const [getSearchResults, { data, loading, error }] = useLazyQuery<
-        AutocompleteResults,
-        AutocompleteQueryVariables
-    >(SEARCH_AUTOCOMPLETE_BUILDING);
+    const searchBuildings = useCallback(async (searchValue: string) => {
+        if (!searchValue.trim()) {
+            setOptions([]);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            console.log('🔍 Searching buildings for:', searchValue);
+            
+            // Комбинируем поиск по areas и buildings
+            const [areasResponse, buildingsResponse] = await Promise.all([
+                apiService.getAreas().catch(() => []),
+                apiService.getBuildings({ limit: 50 }).catch(() => [])
+            ]);
+            
+            // Фильтруем areas
+            const filteredAreas = (areasResponse || []).filter((area: any) => 
+                area.name?.toLowerCase().includes(searchValue.toLowerCase())
+            );
+            
+            // Фильтруем buildings
+            const buildingResults = buildingsResponse?.results || buildingsResponse || [];
+            const filteredBuildings = buildingResults.filter((building: any) => 
+                building.name?.toLowerCase().includes(searchValue.toLowerCase())
+            );
+            
+            const areaOptions: AutocompleteOption[] = filteredAreas.map((area: any) => ({
+                id: area.id?.toString(),
+                value: area.name,
+                type: "area" as SearchEntityType,
+            }));
+            
+            const buildingOptions: AutocompleteOption[] = filteredBuildings.map((building: any) => ({
+                id: building.id?.toString(),
+                value: building.name,
+                type: "building" as SearchEntityType,
+            }));
+            
+            const combinedOptions = [...areaOptions, ...buildingOptions];
+            setOptions(combinedOptions);
+            console.log('✅ Found options:', combinedOptions.length);
+            
+        } catch (error) {
+            console.warn('⚠️ Building search failed:', error);
+            setOptions([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     const debouncedSearch = useMemo(
-        () =>
-            debounce((value: string) => {
-                getSearchResults({ variables: { search: value } });
-            }, 400),
-        [getSearchResults]
+        () => debounce(searchBuildings, 400),
+        [searchBuildings]
     );
 
     const onSearch = (value: string) => {
@@ -38,29 +81,6 @@ const AutocompleteBuilding: React.FC<AutocompleteBuildingProps> = ({
         });
     };
 
-    const options = useMemo<AutocompleteOption[]>(() => {
-        if (!data) return [];
-        // data.entities is (AreaType | BuildingType | ProjectType)[]
-        const areas = data.autocomplete.areas.map((a) => ({
-            id: a.areaIdx?.toString(),
-            value: a.nameEn,
-            type: "area" as SearchEntityType,
-        }));
-        const buildings = data.autocomplete.buildings.map((b) => ({
-            id: b.buildingNumber,
-            value: b.nameEn,
-            type: "building" as SearchEntityType,
-        }));
-        const projects = data.autocomplete.projects.map((p) => ({
-            id: p.id?.toString(),
-            value: p.nameEn,
-            type: "project" as SearchEntityType,
-        }));
-        const ret = areas.concat(buildings).concat(projects);
-
-        return ret;
-    }, [data]);
-
     const onSelect = (value: string, option: AutocompleteOption) => {
         setValue(value);
         onValueChange({
@@ -71,7 +91,9 @@ const AutocompleteBuilding: React.FC<AutocompleteBuildingProps> = ({
     };
 
     const onBlur = () => {
-        value ?? setValue(options[0]?.value ?? "");
+        if (!value) {
+            setValue(options[0]?.value ?? "");
+        }
     };
 
     return (

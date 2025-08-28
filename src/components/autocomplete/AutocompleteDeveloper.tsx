@@ -1,8 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { t } from "@lingui/core/macro";
-import { useLazyQuery } from "@apollo/client";
-import { SEARCH_AUTOCOMPLETE_DEVELOPER } from "@/api/queries";
-import { AutocompleteQueryVariables, AutocompleteResults } from "@/api/schema";
+import { apiService } from "../../services/apiService";
 import { debounce } from "@/Utilities/utils";
 import AutocompleteBase from "./AutocompleteBase";
 
@@ -14,18 +12,44 @@ const AutocompleteDeveloper: React.FC<AutocompleteDeveloperProps> = ({
     onValueChange,
 }) => {
     const [value, setValue] = useState("");
+    const [options, setOptions] = useState<AutocompleteOption[]>([]);
+    const [loading, setLoading] = useState(false);
 
-    const [getSearchResults, { data, loading, error }] = useLazyQuery<
-        AutocompleteResults,
-        AutocompleteQueryVariables
-    >(SEARCH_AUTOCOMPLETE_DEVELOPER);
+    const searchAreas = useCallback(async (searchValue: string) => {
+        if (!searchValue.trim()) {
+            setOptions([]);
+            return;
+        }
+
+        try {
+            setLoading(true);
+            console.log('🔍 Searching areas for:', searchValue);
+            
+            const response = await apiService.getAreas();
+            const filteredAreas = response.filter((area: any) => 
+                area.name.toLowerCase().includes(searchValue.toLowerCase())
+            );
+            
+            const areaOptions: AutocompleteOption[] = filteredAreas.map((area: any) => ({
+                id: area.id?.toString(),
+                value: area.name,
+                type: "area" as SearchEntityType,
+            }));
+            
+            setOptions(areaOptions);
+            console.log('✅ Found areas:', areaOptions.length);
+            
+        } catch (error) {
+            console.warn('⚠️ Area search failed:', error);
+            setOptions([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     const debouncedSearch = useMemo(
-        () =>
-            debounce((value: string) => {
-                getSearchResults({ variables: { search: value } });
-            }, 400),
-        [getSearchResults]
+        () => debounce(searchAreas, 400),
+        [searchAreas]
     );
 
     const onSearch = (value: string) => {
@@ -37,29 +61,6 @@ const AutocompleteDeveloper: React.FC<AutocompleteDeveloperProps> = ({
             value,
         });
     };
-
-    const options = useMemo<AutocompleteOption[]>(() => {
-        if (!data) return [];
-        // data.entities is (AreaType | BuildingType | ProjectType)[]
-        const areas = data.autocomplete.areas.map((a) => ({
-            id: a.areaIdx?.toString(),
-            value: a.nameEn,
-            type: "area" as SearchEntityType,
-        }));
-        const buildings = data.autocomplete.buildings.map((b) => ({
-            id: b.buildingNumber,
-            value: b.nameEn,
-            type: "building" as SearchEntityType,
-        }));
-        const projects = data.autocomplete.projects.map((p) => ({
-            id: p.id?.toString(),
-            value: p.nameEn,
-            type: "project" as SearchEntityType,
-        }));
-        const ret = areas.concat(buildings).concat(projects);
-
-        return ret;
-    }, [data]);
 
     const onSelect = (value: string, option: AutocompleteOption) => {
         setValue(value);

@@ -1,13 +1,7 @@
-import { gql } from "@apollo/client";
+// GraphQL mutations removed - using REST API instead
+// All mutations have been migrated to apiService.ts
 
-export const LOGIN_MUTATION = gql`
-    mutation Login($email: String!, $password: String!) {
-        login(email: $email, password: $password) {
-            token
-            user {
-                id
-                name
-            }
-        }
-    }
-`;
+// This file is kept for backward compatibility but all exports are deprecated
+console.warn('GraphQL mutations are deprecated. Use apiService instead.');
+
+export const LOGIN_MUTATION = null;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Search, FileDown, Star } from 'lucide-react';
 import ReportsTable from '@/components/Tables/ReportsTable';
-import { mockReportsTableData, generateReportsData } from '@/utils/mockTableData';
+import { apiService } from '@/services/apiService';
 
 interface ReportFilters {
   building: string;
@@ -60,7 +60,43 @@ const Reports: React.FC = () => {
   const reportRef = useRef<HTMLDivElement>(null);
   
   // Mock table data - in real app would come from API
-  const [tableData] = useState(() => generateReportsData(50));
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReportsData = async () => {
+      try {
+        setLoading(true);
+        console.log('📊 Fetching reports data from API...');
+        
+        const response = await apiService.getTransactions();
+        
+        // Transform API data to match reports format
+        const transformedData = response.map((item: any, index: number) => ({
+          id: index + 1,
+          building: item.location || 'N/A',
+          price: item.price || '0',
+          area: item.sqm || '0',
+          bedrooms: item.rooms || 'N/A',
+          floor: 'N/A',
+          view: 'N/A',
+          purpose: 'Sale', // default value
+        }));
+        
+        setTableData(transformedData);
+        console.log('✅ Reports data loaded:', transformedData.length);
+        
+      } catch (error) {
+        console.warn('⚠️ Failed to load reports data:', error);
+        // Fallback to empty data
+        setTableData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReportsData();
+  }, []);
 
   const bedOptions = ['Studio', '1', '2', '3', '4', '5', '6', '7', '8+'];
   const rentingOptions = ['Renting out', 'Flipping', 'Live in an apartment'];
