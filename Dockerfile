@@ -19,7 +19,7 @@ WORKDIR /app
 RUN apk add --no-cache git python3 make g++
 
 # Копирование package files
-COPY apps/DXB-frontend-develop/package.json apps/DXB-frontend-develop/yarn.lock* ./
+COPY package.json yarn.lock* ./
 
 # Настройка npm для стабильности
 RUN npm config set registry https://registry.npmjs.org/ \
@@ -38,7 +38,7 @@ FROM deps AS builder
 COPY --from=deps /app/node_modules ./node_modules
 
 # Копирование исходного кода
-COPY apps/DXB-frontend-develop/ .
+COPY . .
 
 # Сборка приложения
 RUN npm run build
