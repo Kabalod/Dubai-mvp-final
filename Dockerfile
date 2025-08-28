@@ -33,8 +33,11 @@ COPY src/ ./src/
 COPY public/ ./public/
 COPY index.html ./
 
-# Сборка приложения (новый bundle без Apollo)
+# Сборка приложения (новый bundle без Apollo)  
 RUN npm run build
+
+# Диагностика: проверяем что было создано
+RUN ls -la /build/dist/ && cat /build/dist/index.html
 
 # ================================
 # Stage 2: Production Server
