@@ -1,8 +1,9 @@
-# Railway Ignore File - Frontend Deploy Only
+# Railway Ignore File - Frontend Deploy Only - UPDATED
 # Исключаем все Django/Python файлы чтобы Railway не путался
+# Версия: 0.1.2
 
 # Django/Python файлы
-manage.py
+manage.py*
 requirements*.txt
 *.py
 __pycache__/
@@ -11,7 +12,7 @@ venv/
 .env
 db.sqlite3
 
-# Backend приложения
+# Backend приложения  
 apps/realty-main/
 apps/pfimport-main/
 realty/
@@ -24,7 +25,6 @@ Dockerfile.frontend.optimized
 # Системные файлы
 .git/
 .gitignore
-node_modules/
 *.log
 
 # Документация и конфиги
@@ -48,3 +48,6 @@ Storybook/
 sorce/
 infrastructure/
 services/
+
+# Принудительная очистка кеша Railway
+# Version bump: 0.1.2
