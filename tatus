@@ -1,0 +1,5 @@
+[33mb2d6d0f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmvp-release[m[33m, [m[1;31morigin/mvp-release[m[33m)[m CLEAN-001: chore(frontend): Clean up unused dependencies and components
+[33m1c29280[m FRONT-001: feat(frontend): Sync apiService with final backend API endpoints
+[33m2c91df9[m DB-001: refactor(api): Switch from mock data to real database models in API views
+[33me6c309e[m RAILWAY-014: Force Docker cache bust to apply latest API routes
+[33m803c965[m API-001: feat(api): Implement all missing backend endpoints for full product functionality
