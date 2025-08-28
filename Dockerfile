@@ -65,9 +65,9 @@ RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run \
 # Порт
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
+# Health check отключен для Railway
+# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+#     CMD curl -f http://localhost/ || exit 1
 
 # Запуск nginx
 CMD ["nginx", "-g", "daemon off;"]
