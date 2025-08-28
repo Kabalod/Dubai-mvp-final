@@ -25,8 +25,8 @@ WORKDIR /build
 COPY package.json ./
 COPY lingui.config.js postcss.config.js tailwind.config.js tsconfig.json vite.config.ts ./
 
-# Установка зависимостей включая devDependencies для сборки
-RUN npm install --legacy-peer-deps --no-fund --no-audit
+# Установка всех зависимостей включая devDependencies для сборки
+RUN npm install --include=dev --legacy-peer-deps --no-fund --no-audit
 
 # Копирование исходного кода
 COPY src/ ./src/
@@ -34,7 +34,7 @@ COPY public/ ./public/
 COPY index.html ./
 
 # Сборка приложения (новый bundle без Apollo)
-RUN npx vite build
+RUN npm run build
 
 # ================================
 # Stage 2: Production Server
