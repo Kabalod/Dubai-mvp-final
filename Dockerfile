@@ -1,36 +1,79 @@
-# Railway Dockerfile for Django Backend - v4.1 (cache bust)
-# This Dockerfile is in the root directory to work with Railway's build system
+# 🐳 Railway Frontend Dockerfile - Принудительный режим
+# Railway будет ОБЯЗАН использовать этот файл для сборки frontend
+# Версия: Force-Deploy v1.0
 
-FROM python:3.12-slim
+# ================================
+# Stage 1: Dependencies
+# ================================
+FROM node:20-alpine AS deps
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+# Метаданные
+LABEL maintainer="kbalodk@gmail.com"
+LABEL description="Dubai MVP Frontend - Railway Force Deploy"
+LABEL version="1.0.0"
 
-# Set work directory
+# Рабочая директория
 WORKDIR /app
 
-# Copy requirements from apps/realty-main/ and install Python dependencies
-COPY apps/realty-main/requirements.txt .
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Установка системных зависимостей
+RUN apk add --no-cache git python3 make g++
 
-# Copy Django app from apps/realty-main/
-COPY apps/realty-main/manage.py .
-COPY apps/realty-main/realty/ ./realty/
+# Копирование package files
+COPY apps/DXB-frontend-develop/package.json apps/DXB-frontend-develop/yarn.lock* ./
 
-# Set environment variables
-ENV PYTHONPATH=/app
-ENV DJANGO_SETTINGS_MODULE=realty.settings_railway_simple
-ENV PYTHONUNBUFFERED=1
+# Настройка npm для стабильности
+RUN npm config set registry https://registry.npmjs.org/ \
+    && npm config set timeout 180000 \
+    && npm config set prefer-offline true
 
-# Create staticfiles directory
-RUN mkdir -p /app/staticfiles
+# Установка зависимостей
+RUN npm install --legacy-peer-deps --prefer-offline --no-audit
 
-# Expose port (Railway will set PORT variable)
-EXPOSE ${PORT:-8000}
+# ================================
+# Stage 2: Builder
+# ================================
+FROM deps AS builder
 
-# Start Gunicorn directly - migrations already applied
-CMD ["sh","-c","echo 'Starting Gunicorn server...' && gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info"]
+# Копирование node_modules из предыдущего stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Копирование исходного кода
+COPY apps/DXB-frontend-develop/ .
+
+# Сборка приложения
+RUN npm run build
+
+# ================================
+# Stage 3: Production
+# ================================
+FROM nginx:1.25-alpine AS production
+
+# Установка curl для healthcheck
+RUN apk add --no-cache curl
+
+# Копирование собранного приложения
+COPY --from=builder --chown=nginx:nginx /app/dist /usr/share/nginx/html
+
+# Копирование nginx конфигурации
+COPY apps/DXB-frontend-develop/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Создание необходимых директорий
+RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run \
+    && chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run \
+    && chown -R nginx:nginx /usr/share/nginx/html \
+    && chmod -R 755 /usr/share/nginx/html
+
+# Порт
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
+# Запуск nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+# ================================
+# Stage 4: Default (Production)
+# ================================
+FROM production

@@ -1,0 +1,50 @@
+# Railway Ignore File - Frontend Deploy Only
+# Исключаем все Django/Python файлы чтобы Railway не путался
+
+# Django/Python файлы
+manage.py
+requirements*.txt
+*.py
+__pycache__/
+*.pyc
+venv/
+.env
+db.sqlite3
+
+# Backend приложения
+apps/realty-main/
+apps/pfimport-main/
+realty/
+
+# Docker файлы для backend
+Dockerfile.backend
+Dockerfile.frontend
+Dockerfile.frontend.optimized
+
+# Системные файлы
+.git/
+.gitignore
+node_modules/
+*.log
+
+# Документация и конфиги
+docs/
+configs/
+scripts/
+monitoring/
+backups/
+
+# Временные файлы
+*.tmp
+*.cache
+.DS_Store
+thumbs.db
+
+# Другие ненужные для frontend директории
+ssl/
+tools/
+e2e/
+Storybook/
+sorce/
+infrastructure/
+services/
