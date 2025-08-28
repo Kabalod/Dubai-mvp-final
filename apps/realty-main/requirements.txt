@@ -1,6 +1,6 @@
-# Minimal Railway requirements for Dubai MVP v3.0
-# Version: 3.0 - Ultra-simplified for Railway
-# Build: 2025-08-25 - Force Railway to rebuild
+# Railway requirements for Dubai MVP v4.0 - FIXED
+# Version: 4.0 - Added missing dependencies for settings_railway.py
+# Build: 2025-08-28 - Fixed dj_database_url and other missing deps
 django>=4.2
 djangorestframework>=3.15
 django-cors-headers>=4.7
@@ -10,3 +10,5 @@ psycopg[binary]>=3.2
 whitenoise[brotli]>=6.6
 djangorestframework-simplejwt>=5.3
 prometheus-client>=0.21
+dj-database-url>=2.1.0
+python-decouple>=3.8

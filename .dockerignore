@@ -85,13 +85,13 @@ backups/
 *.bak
 *.backup
 
-# Docker
-Dockerfile*
+# Docker (keep main Dockerfile)
+# Dockerfile*  # Commented out - need Dockerfile for Railway
 docker-compose*
 .dockerignore
 
-# Railway
-railway.json
+# Railway (keep railway.json for config)
+# railway.json  # Commented out - need for Railway config
 railway.toml
 
 # Testing

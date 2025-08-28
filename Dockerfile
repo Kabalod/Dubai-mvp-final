@@ -24,7 +24,7 @@ COPY apps/realty-main/realty/ ./realty/
 
 # Set environment variables
 ENV PYTHONPATH=/app
-ENV DJANGO_SETTINGS_MODULE=realty.settings_railway
+ENV DJANGO_SETTINGS_MODULE=realty.settings_railway_simple
 ENV PYTHONUNBUFFERED=1
 
 # Create staticfiles directory
