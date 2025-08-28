@@ -25,17 +25,14 @@ WORKDIR /app
 # Копирование package files для кеширования
 COPY package.json yarn.lock ./
 
-# Включение corepack и установка зависимостей
-RUN corepack enable \
-    && yarn config set network-timeout 300000 \
-    && yarn install --production=false \
-    && yarn cache clean
+# Установка зависимостей с legacy peer deps для совместимости
+RUN (npm install --legacy-peer-deps || (sleep 10 && npm install --legacy-peer-deps) || (sleep 30 && npm install --legacy-peer-deps))
 
 # Копирование исходного кода
 COPY . .
 
 # Сборка приложения
-RUN yarn build
+RUN npm run build
 
 # ================================
 # Stage 2: Production
@@ -96,8 +93,7 @@ RUN apk add --no-cache git
 COPY package.json yarn.lock ./
 
 # Установка зависимостей
-RUN corepack enable \
-    && yarn install
+RUN npm install
 
 # Копирование исходного кода
 COPY . .
@@ -106,7 +102,7 @@ COPY . .
 EXPOSE 3000
 
 # Команда для разработки
-CMD ["yarn", "dev", "--host", "0.0.0.0"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 
 # ================================
 # Stage 4: Final (default build target for PaaS)
