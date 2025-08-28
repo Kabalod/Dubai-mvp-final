@@ -33,4 +33,4 @@ RUN mkdir -p /app/staticfiles
 EXPOSE 8000
 
 # Start Gunicorn directly - migrations already applied
-CMD ["sh","-c","echo 'Starting Gunicorn server...' && gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info"]
+CMD ["gunicorn", "realty.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "--log-level", "info"]
