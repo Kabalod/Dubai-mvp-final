@@ -30,8 +30,8 @@ ENV PYTHONUNBUFFERED=1
 # Create staticfiles directory
 RUN mkdir -p /app/staticfiles
 
-# Expose port
-EXPOSE 8000
+# Expose port (Railway will set PORT variable)
+EXPOSE ${PORT:-8000}
 
 # Start Gunicorn directly - migrations already applied
 CMD ["sh","-c","echo 'Starting Gunicorn server...' && gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info"]
