@@ -22,11 +22,11 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /build
 
 # Копирование конфигурационных файлов
-COPY package.json package-lock.json ./
+COPY package.json ./
 COPY lingui.config.js postcss.config.js tailwind.config.js tsconfig.json vite.config.ts ./
 
 # Установка зависимостей (БЕЗ Apollo Client)
-RUN npm ci --only=production=false --legacy-peer-deps
+RUN npm install --legacy-peer-deps --no-fund --no-audit
 
 # Копирование исходного кода
 COPY src/ ./src/
