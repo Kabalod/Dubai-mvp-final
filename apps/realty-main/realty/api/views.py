@@ -42,9 +42,7 @@ from .serializers import (
     PropertySearchSerializer,
 )
 
-# MVP: Use mock data instead of complex pfimport models
-# from realty.pfimport.models import PFListSale, PFListRent, Area, Building
-PFListSale = PFListRent = Area = Building = None
+from realty.pfimport.models import PFListSale, PFListRent, Area, Building
 
 User = get_user_model()
 
@@ -507,204 +505,67 @@ class GoogleAuthCallbackView(APIView):
 
 # --- Properties API Views ---
 
-class PropertiesListView(APIView):
-    """API для получения списка недвижимости (заглушка парсера)"""
+class PropertiesListView(generics.ListAPIView):
+    """API для получения списка недвижимости (реальные данные)"""
     permission_classes = (permissions.AllowAny,)
-    
-    def get(self, request):
-        """Возвращает список объявлений недвижимости"""
-        try:
-            if not PFListSale or not PFListRent:
-                raise ImportError("Models not available")
-            
-            # Код для реальных данных будет здесь если модели доступны
-            # ... (пока используем моковые данные для стабильности)
-            raise ImportError("Using mock data for MVP")
-            
-        except Exception as e:
-            # Возвращаем моковые данные для MVP
-            mock_properties = [
-                {
-                    'id': f'mock_{i}',
-                    'title': f'Luxury {i+1}BR Apartment in Dubai Marina',
-                    'price': 1200000 + (i * 150000),
-                    'area': 'Dubai Marina' if i % 3 == 0 else 'Downtown Dubai' if i % 3 == 1 else 'Business Bay',
-                    'bedrooms': (i % 3) + 1,
-                    'bathrooms': (i % 2) + 2,
-                    'sqm': 75 + (i * 15),
-                    'location': {
-                        'area': 'Dubai Marina' if i % 3 == 0 else 'Downtown Dubai' if i % 3 == 1 else 'Business Bay',
-                        'building': f'Marina Tower {i+1}' if i % 3 == 0 else f'Downtown Complex {i+1}' if i % 3 == 1 else f'Business Center {i+1}'
-                    },
-                    'images': ['/static/mock_property.jpg'],
-                    'listing_type': 'sale' if i % 2 == 0 else 'rent',
-                    'property_type': 'apartment',
-                    'description': f'Beautiful {(i % 3) + 1}BR apartment with stunning views',
-                    'features': ['Pool', 'Gym', 'Parking', 'Security'],
-                    'added_on': timezone.now().isoformat(),
-                    'last_updated': timezone.now().isoformat()
-                } for i in range(20)
-            ]
-            
-            # Применяем простую пагинацию
-            limit = int(request.query_params.get('limit', 20))
-            offset = int(request.query_params.get('offset', 0))
-            
-            total = len(mock_properties)
-            paginated = mock_properties[offset:offset + limit]
-            
-            return Response({
-                'count': total,
-                'results': paginated,
-                'next': offset + limit if offset + limit < total else None,
-                'previous': offset - limit if offset > 0 else None,
-                'data_source': 'mock_mvp_data'
-            })
+    serializer_class = PropertySerializer
+    pagination_class = StandardResultsSetPagination
+
+    def get_queryset(self):
+        # Объединяем queryset'ы из двух моделей
+        # В реальном проекте, возможно, лучше использовать одну модель или view
+        queryset = PFListSale.objects.select_related('area', 'building').all()
+        # Тут можно добавить фильтрацию по параметрам запроса
+        return queryset
 
 
-
-
-class PropertyDetailView(APIView):
+class PropertyDetailView(generics.RetrieveAPIView):
     """API для получения детальной информации об объявлении"""
     permission_classes = (permissions.AllowAny,)
-    
-    def get(self, request, listing_id):
-        """Возвращает детальную информацию об объявлении"""
-        if not PFListSale or not PFListRent:
-            return Response({
-                'error': 'Property models not available'
-            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-        
-        # Ищем в объявлениях продажи
-        try:
-            property_obj = PFListSale.objects.select_related('area', 'building').get(
-                listing_id=listing_id
-            )
-        except PFListSale.DoesNotExist:
-            # Ищем в объявлениях аренды
-            try:
-                property_obj = PFListRent.objects.select_related('area', 'building').get(
-                    listing_id=listing_id
-                )
-            except PFListRent.DoesNotExist:
-                return Response({
-                    'error': 'Property not found'
-                }, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = PropertySerializer(property_obj)
-        return Response(serializer.data)
+    serializer_class = PropertySerializer
+    lookup_field = 'listing_id'
+
+    def get_queryset(self):
+        # Ищем в обеих моделях
+        listing_id = self.kwargs.get('listing_id')
+        if PFListSale.objects.filter(listing_id=listing_id).exists():
+            return PFListSale.objects.select_related('area', 'building').all()
+        return PFListRent.objects.select_related('area', 'building').all()
 
 
-class AreasListView(APIView):
-    """API для получения списка районов"""
+class AreasListView(generics.ListAPIView):
+    """API для получения списка районов (реальные данные)"""
+    queryset = Area.objects.all().order_by('name')
     permission_classes = (permissions.AllowAny,)
-    
-    def get(self, request):
-        """Возвращает список районов с количеством объявлений"""
-        if not Area:
-            # Возвращаем моковый список районов для MVP, чтобы не ломать фронт
-            mock_areas = [
-                {'id': 1, 'name': 'Dubai Marina', 'sale_count': 120, 'rent_count': 95, 'total_count': 215},
-                {'id': 2, 'name': 'Downtown Dubai', 'sale_count': 140, 'rent_count': 110, 'total_count': 250},
-                {'id': 3, 'name': 'Business Bay', 'sale_count': 100, 'rent_count': 130, 'total_count': 230},
-            ]
-            return Response(mock_areas)
-        
-        areas = Area.objects.all().order_by('area_name')
-        
-        # Добавляем подсчет объявлений для каждого района
-        result = []
-        for area in areas:
-            sale_count = 0
-            rent_count = 0
-            
-            if PFListSale:
-                sale_count = PFListSale.objects.filter(area=area).count()
-            if PFListRent:
-                rent_count = PFListRent.objects.filter(area=area).count()
-            
-            result.append({
-                'id': area.id,
-                'name': area.area_name,
-                'sale_count': sale_count,
-                'rent_count': rent_count,
-                'total_count': sale_count + rent_count
-            })
-        
-        return Response(result)
+    # serializer_class = AreaSerializer  # Нужно будет создать AreaSerializer
+
+    def list(self, request, *args, **kwargs):
+        # Временное решение без сериализатора
+        queryset = self.get_queryset()
+        data = [{"id": area.id, "name": area.name} for area in queryset]
+        return Response(data)
 
 
 class PropertyStatsView(APIView):
-    """API для получения статистики по недвижимости"""
+    """API для получения статистики по недвижимости (реальные данные)"""
     permission_classes = (permissions.AllowAny,)
     
     def get(self, request):
-        """Возвращает общую статистику по недвижимости"""
-        # Пытаемся получить реальные данные, если не получается - возвращаем моковые
-        try:
-            if not PFListSale or not PFListRent:
-                raise ImportError("Models not available")
-            
-            # Если модели доступны - используем реальные данные
-            from django.db.models import Avg
-            
-            sale_count = PFListSale.objects.count()
-            rent_count = PFListRent.objects.count()
-            total_properties = sale_count + rent_count
-            
-            areas_count = Area.objects.count() if Area else 0
-            buildings_count = Building.objects.count() if Building else 0
-            
-            avg_sale_price = PFListSale.objects.aggregate(
-                avg=Avg('price')
-            )['avg'] or 0
-            
-            avg_rent_price = PFListRent.objects.aggregate(
-                avg=Avg('price')
-            )['avg'] or 0
-            
-            return Response({
-                'total_properties': total_properties,
-                'total_buildings': buildings_count,
-                'total_deals': total_properties,
-                'average_price': int((avg_sale_price + avg_rent_price) / 2) if avg_sale_price or avg_rent_price else 0,
-                'median_price': int(avg_sale_price) if avg_sale_price else 0,
-                'avg_price_per_sqm': int(avg_sale_price / 100) if avg_sale_price else 0,
-                'price_range': {
-                    'min': 450000,
-                    'max': 12500000
-                },
-                'market_volume': {
-                    'deals': total_properties,
-                    'total_volume': int(total_properties * avg_sale_price) if avg_sale_price else 0
-                },
-                'liquidity': 0.57,
-                'roi': 6.8,
-                'last_updated': timezone.now().isoformat(),
-                'data_source': 'real_database'
-            })
-        except Exception as e:
-            # В случае любой ошибки возвращаем моковые данные
-            return Response({
-                'total_properties': 15420,
-                'total_buildings': 342,
-                'total_deals': 8750,
-                'average_price': 1850000,
-                'median_price': 1620000,
-                'avg_price_per_sqm': 18500,
-                'price_range': {
-                    'min': 450000,
-                    'max': 12500000
-                },
-                'market_volume': {
-                    'deals': 8750,
-                    'total_volume': 16175000000
-                },
-                'liquidity': 0.57,
-                'roi': 6.8,
-                'last_updated': timezone.now().isoformat(),
-                'data_source': 'mock_mvp_data'
-            })
+        """Возвращает общую статистику по недвижимости (реальные данные)"""
+        from django.db.models import Count, Avg
+
+        total_properties = PFListSale.objects.count() + PFListRent.objects.count()
+        total_buildings = Building.objects.count()
+        avg_sale_price = PFListSale.objects.aggregate(avg_price=Avg('price'))['avg_price'] or 0
+
+        stats = {
+            'total_properties': total_properties,
+            'total_buildings': total_buildings,
+            'total_deals': total_properties, # Упрощенно
+            'average_price': int(avg_sale_price),
+            'data_source': 'real_database'
+        }
+        return Response(stats)
 
 
 class BuildingsListView(APIView):

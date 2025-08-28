@@ -13,36 +13,27 @@ except Exception:  # pragma: no cover
     BuildingReport = None
 
 
-class PropertySerializer(serializers.Serializer):
-    """Unified property serializer for both sale and rent properties."""
-    
-    id = serializers.CharField()
-    listing_id = serializers.CharField()
-    title = serializers.CharField()
-    display_address = serializers.CharField()
-    bedrooms = serializers.CharField(allow_null=True)
-    bathrooms = serializers.CharField(allow_null=True)
-    price = serializers.DecimalField(max_digits=12, decimal_places=2)
-    price_currency = serializers.CharField(default='AED')
-    price_duration = serializers.CharField(allow_null=True)
-    property_type = serializers.CharField()
-    listing_type = serializers.CharField()
-    numeric_area = serializers.FloatField(allow_null=True)
-    size_min = serializers.CharField(allow_null=True)
-    furnishing = serializers.CharField(allow_null=True)
-    broker = serializers.CharField(allow_null=True)
-    agent = serializers.CharField(allow_null=True)
-    agent_phone = serializers.CharField(allow_null=True)
-    verified = serializers.BooleanField(default=False)
-    latitude = serializers.FloatField(allow_null=True)
-    longitude = serializers.FloatField(allow_null=True)
-    added_on = serializers.DateTimeField(allow_null=True)
-    url = serializers.URLField(allow_null=True)
-    description = serializers.CharField(allow_null=True)
-    
-    # Связанные объекты
-    area_name = serializers.CharField(allow_null=True, source='area.area_name')
-    building_name = serializers.CharField(allow_null=True, source='building.building_name')
+if PFListSale is not None:
+    class PropertySerializer(serializers.ModelSerializer):
+        """Unified property serializer for both sale and rent properties."""
+        area_name = serializers.CharField(source='area.name', read_only=True)
+        building_name = serializers.CharField(source='building.name', read_only=True)
+
+        class Meta:
+            model = PFListSale  # Используем одну из моделей как основу
+            fields = [
+                'id', 'listing_id', 'title', 'display_address', 'bedrooms', 
+                'bathrooms', 'price', 'price_currency', 'price_duration', 
+                'property_type', 'listing_type', 'numeric_area', 'size_min', 
+                'furnishing', 'broker', 'agent', 'agent_phone', 'verified', 
+                'latitude', 'longitude', 'added_on', 'url', 'description',
+                'area_name', 'building_name'
+            ]
+else:
+    class PropertySerializer(serializers.Serializer):
+        # Fallback serializer if models are not available
+        id = serializers.CharField()
+        title = serializers.CharField()
 
 
 if Area is not None:
