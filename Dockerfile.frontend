@@ -17,16 +17,24 @@ RUN apk add --no-cache \
     git \
     python3 \
     make \
-    g++
+    g++ \
+    && apk update && apk upgrade
+
+# Установка Node.js зависимостей
+RUN npm config set registry https://registry.npmjs.org/ \
+    && npm config set timeout 300000 \
+    && npm config set prefer-offline true \
+    && npm config set cache-max 1209600000
 
 # Рабочая директория
 WORKDIR /app
 
 # Копирование package files для кеширования
-COPY apps/DXB-frontend-develop/package.json apps/DXB-frontend-develop/yarn.lock ./
+COPY apps/DXB-frontend-develop/package.json apps/DXB-frontend-develop/yarn.lock* ./
 
-# Установка зависимостей с legacy peer deps для совместимости
-RUN (npm install --legacy-peer-deps || (sleep 10 && npm install --legacy-peer-deps) || (sleep 30 && npm install --legacy-peer-deps))
+# Установка зависимостей с оптимизацией
+RUN npm install --legacy-peer-deps --prefer-offline --no-audit \
+    && npm cache clean --force
 
 # Копирование исходного кода
 COPY apps/DXB-frontend-develop/ .
