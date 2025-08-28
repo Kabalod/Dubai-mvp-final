@@ -1,29 +1,18 @@
-import {
-    ApolloClient,
-    InMemoryCache,
-    createHttpLink,
-    makeVar,
-} from "@apollo/client";
-import { GRAPHQL_API_URL } from "@/config";
-import { setContext } from "@apollo/client/link/context";
+// Apollo Client removed from Dubai MVP - using REST API instead
+// GraphQL functionality disabled for simplified deployment
 
-const httpLink = createHttpLink({
-    uri: GRAPHQL_API_URL,
-});
+// Mock exports for backwards compatibility
+export const isLoggedInVar = {
+    __typename: "MockVar",
+    value: false
+};
 
-const authLink = setContext((_, { headers }) => {
-    const token = localStorage.getItem("token");
-    return {
-        headers: {
-            ...headers,
-            authorization: token ? `Bearer ${token}` : "",
-        },
-    };
-});
-
-export const isLoggedInVar = makeVar<boolean>(false);
-
-export const client = new ApolloClient({
-    link: authLink.concat(httpLink),
-    cache: new InMemoryCache(),
-});
+// Mock Apollo Client for components that still import it
+export const client = {
+    query: () => Promise.reject(new Error("GraphQL disabled - use REST API")),
+    mutate: () => Promise.reject(new Error("GraphQL disabled - use REST API")),
+    cache: {
+        readQuery: () => null,
+        writeQuery: () => {},
+    }
+};
