@@ -2,20 +2,17 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile"
+    "dockerfilePath": "apps/DXB-frontend-develop/Dockerfile"
   },
   "deploy": {
     "startCommand": "",
-    "healthcheckPath": "/healthz/",
-    "healthcheckTimeout": 600,
-    "healthcheckInitialDelaySeconds": 60,
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 300,
+    "healthcheckInitialDelaySeconds": 30,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   },
   "variables": {
-    "DEBUG": "False",
-    "DJANGO_SETTINGS_MODULE": "realty.settings_railway",
-    "PYTHONUNBUFFERED": "1",
-    "PYTHONDONTWRITEBYTECODE": "1"
+    "NODE_ENV": "production"
   }
 }
