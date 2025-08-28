@@ -23,7 +23,6 @@ COPY package.json yarn.lock* ./
 
 # Настройка npm для стабильности
 RUN npm config set registry https://registry.npmjs.org/ \
-    && npm config set timeout 180000 \
     && npm config set prefer-offline true
 
 # Установка зависимостей
