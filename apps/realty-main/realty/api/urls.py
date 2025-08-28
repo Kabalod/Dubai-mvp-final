@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from rest_framework_simplejwt.views import TokenRefreshView
 
 app_name = "api"
 
@@ -19,7 +20,11 @@ urlpatterns = [
     # Google OAuth
     path("auth/google/login/", views.GoogleAuthInitView.as_view(), name="google_auth_init"),
     path("auth/google/callback/", views.GoogleAuthCallbackView.as_view(), name="google_auth_callback"),
-    
+    path("auth/logout/", views.LogoutView.as_view(), name="logout"),
+    path("auth/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("auth/password/reset/", views.PasswordResetRequestView.as_view(), name="password_reset_request"),
+    path("auth/password/reset/confirm/", views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+
     # User Profile
     path("profile/me/", views.UserProfileView.as_view(), name="user_profile"),
     
@@ -30,7 +35,11 @@ urlpatterns = [
     path("stats/", views.PropertyStatsView.as_view(), name="property_stats"),
     # Alias для совместимости: /api/analytics/ → статистика
     path("analytics/", views.PropertyStatsView.as_view(), name="property_stats_alias"),
-    
+    path("buildings/", views.BuildingsListView.as_view(), name="buildings_list"),
+    path("reports/", views.ReportsView.as_view(), name="reports_list_create"),
+    path("reports/history/", views.ReportsView.as_view(), name="reports_history"),
+    path("reports/generate/", views.ReportsView.as_view(), name="reports_generate"),
+
     # Admin Views
     path("admin/users/", views.UserProfileAdminView.as_view(), name="admin_users"),
     path("admin/payments/", views.PaymentAdminView.as_view(), name="admin_payments"),

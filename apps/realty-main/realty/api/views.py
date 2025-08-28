@@ -25,6 +25,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.pagination import PageNumberPagination
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import TokenError
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 from .models import OTPCode, Payment, PaymentEventAudit
 from .serializers import (
@@ -274,6 +278,74 @@ class OTPLoginView(APIView):
             })
         except OTPCode.DoesNotExist:
             return Response({"error": "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(APIView):
+    """Logs out the user by blacklisting their refresh token."""
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class PasswordResetRequestView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Не раскрываем, существует ли email
+            return Response({'message': 'If an account with that email exists, a password reset link has been sent.'}, status=status.HTTP_200_OK)
+
+        # Создаем токен для сброса пароля (для простоты используем OTP-логику)
+        token = ''.join([str(secrets.randbelow(10)) for _ in range(20)])
+        cache.set(f"password_reset:{token}", user.id, timeout=3600) # 1 час
+
+        # В реальном проекте здесь будет отправка email
+        # send_mail(...)
+        
+        # Для full-product возвращаем токен в ответе для простоты тестирования
+        return Response({
+            'message': 'Password reset token generated.',
+            'token': token,
+            'note': 'In a real product, this token would be sent via email.'
+        })
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        token = request.data.get('token')
+        password = request.data.get('password')
+        
+        if not token or not password:
+            return Response({'error': 'Token and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_id = cache.get(f"password_reset:{token}")
+        if not user_id:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(id=user_id)
+            user.set_password(password)
+            user.save()
+            cache.delete(f"password_reset:{token}")
+            return Response({'message': 'Password has been reset successfully.'})
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 # --- User Profile Views ---
 class UserProfileView(generics.RetrieveUpdateAPIView):
@@ -633,3 +705,41 @@ class PropertyStatsView(APIView):
                 'last_updated': timezone.now().isoformat(),
                 'data_source': 'mock_mvp_data'
             })
+
+
+class BuildingsListView(APIView):
+    """API для получения списка зданий (mock data)"""
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        mock_buildings = [
+            {'id': 1, 'name': 'Marina Tower 1', 'area': 'Dubai Marina'},
+            {'id': 2, 'name': 'Downtown Complex 2', 'area': 'Downtown Dubai'},
+            {'id': 3, 'name': 'Business Center 3', 'area': 'Business Bay'},
+        ]
+        return Response(mock_buildings)
+
+
+class ReportsView(APIView):
+    """API для отчетов (mock data)"""
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        # /api/reports/ and /api/reports/history/
+        mock_history = [
+            {'id': 1, 'report_type': 'property_analysis', 'generated_at': timezone.now() - timedelta(days=1), 'file_path': '/media/mock_report.pdf'},
+            {'id': 2, 'report_type': 'market_overview', 'generated_at': timezone.now() - timedelta(days=5), 'file_path': '/media/mock_report.pdf'},
+        ]
+        return Response(mock_history)
+
+    def post(self, request):
+        # /api/reports/generate/
+        report_type = request.data.get('report_type', 'custom_report')
+        new_report = {
+            'id': 3,
+            'report_type': report_type,
+            'generated_at': timezone.now(),
+            'file_path': '/media/mock_report_new.pdf',
+            'status': 'generating'
+        }
+        return Response(new_report, status=status.HTTP_201_CREATED)
