@@ -1,129 +1,73 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { apiService } from '../../services/apiService';
+
+interface Transaction {
+    key: React.Key;
+    date: string;
+    location: string;
+    rooms: string;
+    sqm: number | string;
+    price: string;
+}
 
 interface TransactionsTableProps {
-    rows?: Array<{
-        key: React.Key;
-        date: string;
-        location: string;
-        rooms: string;
-        sqm: number | string;
-        price: string;
-    }>;
+    rows?: Transaction[];
     onLoadMore?: () => void;
 }
 
-// Моковые данные для демонстрации (расширенные для тестирования пагинации)
-const mockTransactions = [
-    {
-        key: '1',
-        date: '2024-08-21',
-        location: 'Downtown Dubai',
-        rooms: '2BR',
-        sqm: '95',
-        price: '1,850,000'
-    },
-    {
-        key: '2',
-        date: '2024-08-20',
-        location: 'Dubai Marina',
-        rooms: '1BR',
-        sqm: '75',
-        price: '1,200,000'
-    },
-    {
-        key: '3',
-        date: '2024-08-19',
-        location: 'Business Bay',
-        rooms: '3BR',
-        sqm: '120',
-        price: '2,500,000'
-    },
-    {
-        key: '4',
-        date: '2024-08-18',
-        location: 'DIFC',
-        rooms: '2BR',
-        sqm: '85',
-        price: '2,100,000'
-    },
-    {
-        key: '5',
-        date: '2024-08-17',
-        location: 'JBR',
-        rooms: '1BR',
-        sqm: '65',
-        price: '1,400,000'
-    },
-    {
-        key: '6',
-        date: '2024-08-16',
-        location: 'Palm Jumeirah',
-        rooms: '4BR',
-        sqm: '180',
-        price: '4,200,000'
-    },
-    {
-        key: '7',
-        date: '2024-08-15',
-        location: 'Dubai Hills',
-        rooms: '3BR',
-        sqm: '140',
-        price: '2,800,000'
-    },
-    {
-        key: '8',
-        date: '2024-08-14',
-        location: 'City Walk',
-        rooms: '2BR',
-        sqm: '110',
-        price: '2,300,000'
-    },
-    {
-        key: '9',
-        date: '2024-08-13',
-        location: 'Dubai Creek',
-        rooms: '1BR',
-        sqm: '70',
-        price: '1,100,000'
-    },
-    {
-        key: '10',
-        date: '2024-08-12',
-        location: 'Jumeirah Village',
-        rooms: '2BR',
-        sqm: '90',
-        price: '1,600,000'
-    },
-    {
-        key: '11',
-        date: '2024-08-11',
-        location: 'Dubai South',
-        rooms: '3BR',
-        sqm: '130',
-        price: '1,900,000'
-    },
-    {
-        key: '12',
-        date: '2024-08-10',
-        location: 'Al Barsha',
-        rooms: '2BR',
-        sqm: '100',
-        price: '1,750,000'
-    }
-];
-
-const TransactionsTable: React.FC<TransactionsTableProps> = ({ rows = mockTransactions, onLoadMore }) => {
+const TransactionsTable: React.FC<TransactionsTableProps> = ({ rows: propRows, onLoadMore }) => {
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [loading, setLoading] = useState(true);
     const [displayCount, setDisplayCount] = useState(5);
-    const [loading, setLoading] = useState(false);
-    
+    const [loadingMore, setLoadingMore] = useState(false);
+
+    useEffect(() => {
+        const fetchTransactions = async () => {
+            try {
+                setLoading(true);
+                console.log('📊 Fetching transactions from API...');
+                
+                const response = await apiService.getProperties({ limit: 20 });
+                const properties = response.results || response;
+                
+                // Конвертируем properties в transactions format
+                const transactionsData: Transaction[] = properties.map((prop: any, index: number) => ({
+                    key: prop.id || index,
+                    date: new Date(prop.added_on || Date.now()).toISOString().split('T')[0],
+                    location: prop.display_address || 'Unknown Location',
+                    rooms: prop.bedrooms || 'N/A',
+                    sqm: prop.numeric_area || 'N/A',
+                    price: prop.price?.toLocaleString() || 'N/A'
+                }));
+                
+                setTransactions(transactionsData);
+                console.log('✅ Transactions loaded:', transactionsData.length);
+                
+            } catch (error) {
+                console.warn('⚠️ API unavailable, using empty state:', error);
+                setTransactions([]); // Empty state instead of mock data
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        // Use prop rows if provided, otherwise fetch from API
+        if (propRows) {
+            setTransactions(propRows);
+            setLoading(false);
+        } else {
+            fetchTransactions();
+        }
+    }, [propRows]);
+
     const handleShowMore = async () => {
-        setLoading(true);
+        setLoadingMore(true);
         console.log('🔄 Loading more transactions...');
         
         // Симуляция загрузки
         setTimeout(() => {
             setDisplayCount(prev => prev + 5);
-            setLoading(false);
+            setLoadingMore(false);
             console.log('✅ Loaded more transactions');
             
             // Вызываем callback если есть
@@ -133,8 +77,17 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ rows = mockTransa
         }, 500);
     };
     
-    const displayedRows = rows.slice(0, displayCount);
-    const hasMore = displayCount < rows.length;
+    if (loading) {
+        return (
+            <div className="text-center py-8">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                <p className="text-gray-600">Loading transactions...</p>
+            </div>
+        );
+    }
+
+    const displayedRows = transactions.slice(0, displayCount);
+    const hasMore = displayCount < transactions.length;
 
     return (
         <div className="space-y-3">
@@ -176,15 +129,15 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ rows = mockTransa
                     <button 
                         className="px-4 py-2 border rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={handleShowMore}
-                        disabled={loading}
+                        disabled={loadingMore}
                     >
-                        {loading ? (
+                        {loadingMore ? (
                             <span className="flex items-center gap-2">
                                 <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
                                 Loading...
                             </span>
                         ) : (
-                            `Show more (${rows.length - displayCount} remaining)`
+                            `Show more (${transactions.length - displayCount} remaining)`
                         )}
                     </button>
                 </div>
@@ -192,12 +145,18 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ rows = mockTransa
             
             {/* Show count info */}
             <div className="text-center text-sm text-gray-500">
-                Showing {displayedRows.length} of {rows.length} transactions
+                Showing {displayedRows.length} of {transactions.length} transactions
             </div>
+
+            {/* Empty state */}
+            {transactions.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                    <p>No transactions available</p>
+                    <p className="text-sm">Connect to backend API to load real data</p>
+                </div>
+            )}
         </div>
     );
 };
 
 export default TransactionsTable;
-
-

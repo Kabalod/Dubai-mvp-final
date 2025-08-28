@@ -14,6 +14,7 @@
   "variables": {
     "NODE_ENV": "production",
     "NPM_CONFIG_TIMEOUT": "300000",
-    "RAILWAY_DOCKERFILE": "Dockerfile"
+    "RAILWAY_DOCKERFILE": "Dockerfile",
+    "VITE_FRONTEND_API_URL": "https://gentle-vitality.railway.internal:8000"
   }
 }
