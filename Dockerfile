@@ -1,78 +1,66 @@
-# 🐳 Railway Frontend Dockerfile - Принудительный режим
-# Railway будет ОБЯЗАН использовать этот файл для сборки frontend
-# Версия: Force-Deploy v1.0
+# 🔥 Railway Frontend Dockerfile - CACHE BUSTER v0.1.2
+# Полностью новая структура для принудительной пересборки
+# Apollo Client ПОЛНОСТЬЮ УДАЛЕН - только REST API
 
 # ================================
-# Stage 1: Dependencies
-# ================================
-FROM node:20-alpine AS deps
+# Stage 1: Build Environment
+# ================================  
+FROM node:20-bullseye-slim AS builder
 
-# Метаданные
-LABEL maintainer="kbalodk@gmail.com"
-LABEL description="Dubai MVP Frontend - Railway Force Deploy"
-LABEL version="1.0.0"
+# Принудительная очистка кеша
+ENV CACHE_BUST=2025-01-29-15-30
+ENV NODE_ENV=production
+ENV APOLLO_REMOVED=true
 
-# Рабочая директория
-WORKDIR /app
+# Системные зависимости
+RUN apt-get update && apt-get install -y \
+    git \
+    python3 \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
-# Установка системных зависимостей
-RUN apk add --no-cache git python3 make g++
+WORKDIR /build
 
-# Копирование package files
-COPY package.json yarn.lock* ./
+# Копирование конфигурационных файлов
+COPY package.json package-lock.json ./
+COPY lingui.config.js postcss.config.js tailwind.config.js tsconfig.json vite.config.ts ./
 
-# Настройка npm для стабильности
-RUN npm config set registry https://registry.npmjs.org/ \
-    && npm config set prefer-offline true
-
-# Установка зависимостей
-RUN npm install --legacy-peer-deps --prefer-offline --no-audit
-
-# ================================
-# Stage 2: Builder
-# ================================
-FROM deps AS builder
-
-# Копирование node_modules из предыдущего stage
-COPY --from=deps /app/node_modules ./node_modules
+# Установка зависимостей (БЕЗ Apollo Client)
+RUN npm ci --only=production=false --legacy-peer-deps
 
 # Копирование исходного кода
-COPY . .
+COPY src/ ./src/
+COPY public/ ./public/
+COPY index.html ./
 
-# Сборка приложения
+# Сборка приложения (новый bundle без Apollo)
 RUN npm run build
 
 # ================================
-# Stage 3: Production
+# Stage 2: Production Server
 # ================================
 FROM nginx:1.25-alpine AS production
+
+# Принудительные метки для нового образа
+LABEL cache-bust="2025-01-29-15-30"
+LABEL apollo-removed="true"
+LABEL version="0.1.2"
 
 # Установка curl для healthcheck
 RUN apk add --no-cache curl
 
 # Копирование собранного приложения
-COPY --from=builder --chown=nginx:nginx /app/dist /usr/share/nginx/html
+COPY --from=builder /build/dist /usr/share/nginx/html
 
 # Копирование nginx конфигурации
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Создание необходимых директорий
-RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run \
-    && chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run \
-    && chown -R nginx:nginx /usr/share/nginx/html \
-    && chmod -R 755 /usr/share/nginx/html
+# Настройка прав
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
 
 # Порт
 EXPOSE 80
 
-# Health check отключен для Railway
-# HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-#     CMD curl -f http://localhost/ || exit 1
-
 # Запуск nginx
 CMD ["nginx", "-g", "daemon off;"]
-
-# ================================
-# Stage 4: Default (Production)
-# ================================
-FROM production
