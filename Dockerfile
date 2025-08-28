@@ -55,7 +55,7 @@ RUN apk add --no-cache curl
 COPY --from=builder --chown=nginx:nginx /app/dist /usr/share/nginx/html
 
 # Копирование nginx конфигурации
-COPY apps/DXB-frontend-develop/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Создание необходимых директорий
 RUN mkdir -p /var/cache/nginx /var/log/nginx /var/run \
