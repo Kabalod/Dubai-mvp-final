@@ -1,6 +1,5 @@
-# Railway MVP Dockerfile v4.0 - ROOT - Final production version  
-# Version: 4.0 - Direct Gunicorn start from apps/realty-main/
-# Build: 2025-08-28 - Fixed paths for Railway root context
+# Railway Dockerfile for Django Backend - v4.1 (cache bust)
+# This Dockerfile is in the root directory to work with Railway's build system
 
 FROM python:3.12-slim
 
