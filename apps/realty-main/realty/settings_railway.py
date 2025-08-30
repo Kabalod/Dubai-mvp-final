@@ -13,7 +13,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-railway-mvp-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Временно включаем DEBUG для диагностики Railway ошибок
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
