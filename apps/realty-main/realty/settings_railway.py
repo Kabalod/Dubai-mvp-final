@@ -137,6 +137,16 @@ STORAGES = {
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Google OAuth settings для Railway (без allauth - упрощенная версия)
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', 'test-client-id-12345')
+GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', 'test-secret-12345')
+
+# Frontend URL for OAuth redirects
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://workerproject-production.up.railway.app')
+
+# OAuth redirect URI для Google
+GOOGLE_OAUTH_REDIRECT_URI = f"{FRONTEND_URL}/auth/google/callback/"
+
 # CORS - Безопасная настройка для продакшена
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
