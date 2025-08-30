@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.http import JsonResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.core.mail import send_mail
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -123,4 +124,86 @@ def simple_login(request):
         return Response({
             'error': str(e),
             'message': 'Login failed'
+        }, status=500)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_user(request):
+    """Регистрация пользователя с отправкой email"""
+    try:
+        email = request.data.get('email')
+        password = request.data.get('password')
+        first_name = request.data.get('first_name', '')
+        last_name = request.data.get('last_name', '')
+        
+        if not email or not password:
+            return Response({
+                'error': 'Email and password are required',
+                'message': 'Registration failed'
+            }, status=400)
+        
+        # Проверяем что пользователь не существует
+        if User.objects.filter(email=email).exists():
+            return Response({
+                'error': 'User already exists',
+                'message': 'Registration failed'
+            }, status=400)
+        
+        # Создаем пользователя
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            is_active=True
+        )
+        
+        # Отправляем приветственное письмо
+        try:
+            subject = 'Welcome to Dubai Real Estate Platform'
+            message = f'''
+            Hi {first_name or email}!
+            
+            Welcome to Dubai Real Estate Platform!
+            Your account has been successfully created.
+            
+            You can now login to access property data and analytics.
+            
+            Best regards,
+            Dubai Real Estate Team
+            '''
+            
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=True,  # Не падаем если email не отправился
+            )
+            
+        except Exception as email_error:
+            # Email не отправился, но регистрация прошла успешно
+            print(f"Email sending failed: {email_error}")
+        
+        # Генерируем токены для автоматического входа
+        refresh = RefreshToken.for_user(user)
+        
+        return Response({
+            'message': 'Registration successful',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+            },
+            'email_sent': True
+        })
+        
+    except Exception as e:
+        return Response({
+            'error': str(e),
+            'message': 'Registration failed'
         }, status=500)
