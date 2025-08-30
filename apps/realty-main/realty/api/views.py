@@ -450,25 +450,32 @@ class StripeWebhookView(APIView):
 # --- Google OAuth Views ---
 
 class GoogleAuthInitView(APIView):
-    """Инициирует Google OAuth процесс - возвращает URL для авторизации"""
+    """Инициирует реальный Google OAuth процесс согласно Google Identity API"""
     permission_classes = (permissions.AllowAny,)
     
     def get(self, request):
-        # Для MVP возвращаем mock auth_url, который редиректит сразу на callback
-        callback_url = request.build_absolute_uri('/api/auth/google/callback/')
+        # Реальная Google OAuth интеграция
+        state = secrets.token_urlsafe(32)
+        cache.set(f"oauth_state_{state}", True, timeout=600)  # 10 минут
         
-        # Mock Google OAuth - сразу редиректим на callback с mock кодом
-        mock_params = {
-            'code': 'mock_authorization_code_12345',
-            'state': 'mock_state_12345'
+        # Реальная Google OAuth URL согласно документации
+        base_url = "https://accounts.google.com/o/oauth2/v2/auth"
+        params = {
+            'client_id': settings.GOOGLE_OAUTH_CLIENT_ID,
+            'redirect_uri': settings.GOOGLE_OAUTH_REDIRECT_URI,
+            'scope': 'openid email profile',
+            'response_type': 'code',
+            'state': state,
+            'access_type': 'online',
+            'prompt': 'select_account'
         }
         
-        mock_auth_url = f"{callback_url}?{urlencode(mock_params)}"
+        auth_url = f"{base_url}?{urlencode(params)}"
         
         return Response({
-            'auth_url': mock_auth_url,
-            'state': 'mock_state_12345',
-            'message': 'MVP Mock Google OAuth - will auto-login as test user'
+            'auth_url': auth_url,
+            'state': state,
+            'message': 'Real Google OAuth - follow auth_url to authenticate'
         })
 
 
@@ -477,22 +484,44 @@ class GoogleAuthCallbackView(APIView):
     permission_classes = (permissions.AllowAny,)
     
     def get(self, request):
-        # Получаем mock код авторизации
-        code = request.GET.get('code', 'mock_authorization_code_12345')
-        state = request.GET.get('state', 'mock_state_12345')
+        # Получаем параметры от Google OAuth callback
+        code = request.GET.get('code')
+        state = request.GET.get('state')
         error = request.GET.get('error')
         
         if error:
             return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error={error}")
+            
+        if not code or not state:
+            return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error=missing_parameters")
+        
+        # Проверяем state для безопасности
+        if not cache.get(f"oauth_state_{state}"):
+            return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error=invalid_state")
         
         try:
-            # MVP Mock Google OAuth - создаем тестового пользователя
-            google_user_data = {
-                'email': 'testuser@gmail.com',
-                'given_name': 'Google',
-                'family_name': 'User',
-                'sub': '1234567890'
+            # Обмениваем authorization code на access token
+            import requests
+            
+            token_url = "https://oauth2.googleapis.com/token"
+            token_data = {
+                'client_id': settings.GOOGLE_OAUTH_CLIENT_ID,
+                'client_secret': settings.GOOGLE_OAUTH_CLIENT_SECRET,
+                'code': code,
+                'grant_type': 'authorization_code',
+                'redirect_uri': settings.GOOGLE_OAUTH_REDIRECT_URI,
             }
+            
+            token_response = requests.post(token_url, data=token_data)
+            token_json = token_response.json()
+            
+            if 'access_token' not in token_json:
+                return HttpResponseRedirect(f"{settings.FRONTEND_URL}/auth#error=token_exchange_failed")
+            
+            # Получаем информацию о пользователе от Google
+            user_info_url = f"https://www.googleapis.com/oauth2/v2/userinfo?access_token={token_json['access_token']}"
+            user_response = requests.get(user_info_url)
+            google_user_data = user_response.json()
             
             # Создаем или получаем пользователя
             user, created = User.objects.get_or_create(

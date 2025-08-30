@@ -12,3 +12,4 @@ djangorestframework-simplejwt>=5.3
 prometheus-client>=0.21
 dj-database-url>=2.1.0
 python-decouple>=3.8
+requests>=2.31.0
