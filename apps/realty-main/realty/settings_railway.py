@@ -30,6 +30,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'realty.api',
+    'realty.main',
+    'realty.pfimport',
+    'realty.building_reports',
+    'realty.reports',
+    'realty.core',
 ]
 
 MIDDLEWARE = [
