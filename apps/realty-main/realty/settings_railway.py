@@ -83,25 +83,29 @@ def _build_url_from_pg_env() -> str | None:
         return f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
     return None
 
-try:
-    url = _db_url_raw if (_db_url_raw and '://' in _db_url_raw) else _build_url_from_pg_env()
-    if url:
-        DATABASES = {
-            'default': dj_database_url.parse(url, conn_max_age=600),
-        }
-        if DATABASES['default']['ENGINE'].endswith('postgresql'):
-            DATABASES['default']['ATOMIC_REQUESTS'] = True
-        logging.getLogger(__name__).info("Using database engine: %s", DATABASES['default']['ENGINE'])
-    else:
-        raise ValueError('DATABASE_URL missing and PG* env not present')
-except Exception as e:  # Fallback to SQLite to avoid startup crash
-    logging.warning(f"DATABASE_URL invalid or not set, falling back to SQLite: {e}")
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# Временно используем SQLite для стабильности, позже подключим PostgreSQL
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+# Оригинальный код с PostgreSQL закомментирован:
+# try:
+#     url = _db_url_raw if (_db_url_raw and '://' in _db_url_raw) else _build_url_from_pg_env()
+#     if url:
+#         DATABASES = {
+#             'default': dj_database_url.parse(url, conn_max_age=600),
+#         }
+# except Exception as e:
+#     logging.warning(f"Database fallback to SQLite: {e}")
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
