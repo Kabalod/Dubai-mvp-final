@@ -1,134 +1,95 @@
 """
-SIMPLIFIED Django settings for Railway deployment - DEBUG VERSION
-Minimal settings to get Django working, then we'll add complexity
+Минимальные Django settings ТОЛЬКО для авторизации
+Версия: Railway MVP Auth Only
 """
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-railway-mvp-debug-key-12345')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-# Simple allowed hosts
+# Security
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-auth-only-key-12345')
+DEBUG = True
 ALLOWED_HOSTS = ['*']
 
-# Application definition - MINIMAL
+# Минимальные приложения ТОЛЬКО для авторизации
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
     'corsheaders',
-    'realty.api',
+    'rest_framework',
+    'rest_framework_simplejwt',
 ]
 
+# Минимальный middleware
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'realty.urls'
+ROOT_URLCONF = 'realty.urls_simple'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+# Database - восстанавливаем связь с PostgreSQL
+import dj_database_url
 
-WSGI_APPLICATION = 'realty.wsgi.application'
-
-# Database - SIMPLE PostgreSQL
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    # Simple database config without dj_database_url
-    import urllib.parse as urlparse
-    url = urlparse.urlparse(DATABASE_URL)
+_db_url = os.environ.get('DATABASE_URL')
+if _db_url:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': url.path[1:],
-            'USER': url.username,
-            'PASSWORD': url.password,
-            'HOST': url.hostname,
-            'PORT': url.port,
-        }
+        'default': dj_database_url.parse(_db_url, conn_max_age=600),
     }
 else:
+    # Fallback к SQLite если PostgreSQL недоступен
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': BASE_DIR / 'auth.sqlite3',
         }
     }
 
-# Internationalization
+# REST Framework для JWT
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# JWT settings
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+}
+
+# CORS для frontend
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+
+# Google OAuth (простая версия)
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', 'test-client-id')
+GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', 'test-secret')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://workerproject-production.up.railway.app')
+
+# Статические файлы (минимум)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Интернационализация
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Default primary key field type
+# Primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Admin URL (required by urls.py)
-ADMIN_URL = 'admin/'
-
-# CORS settings - SIMPLE
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    "https://frontend-production-5c48.up.railway.app",
-]
-
-# REST Framework - MINIMAL
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-}
-
-# Logging - SIMPLE
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-}
