@@ -48,8 +48,22 @@ User = get_user_model()
 
 # --- Health Check ---
 def health_check(request):
+    """Simplified health check without any complex dependencies"""
     from django.http import JsonResponse
-    return JsonResponse({"status": "ok", "timestamp": timezone.now().isoformat()})
+    try:
+        return JsonResponse({
+            "status": "ok", 
+            "service": "realty-backend",
+            "timestamp": str(timezone.now()),
+            "debug": settings.DEBUG,
+            "database": "configured" if 'default' in settings.DATABASES else "missing"
+        })
+    except Exception as e:
+        return JsonResponse({
+            "status": "error",
+            "error": str(e),
+            "message": "Health check failed"
+        }, status=500)
 
 # --- Authentication Views ---
 class RegisterView(generics.CreateAPIView):
