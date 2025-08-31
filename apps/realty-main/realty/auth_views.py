@@ -22,11 +22,18 @@ User = get_user_model()
 @permission_classes([AllowAny])
 def health_check(request):
     """Простой health check"""
+    # Диагностика database подключения
+    db_engine = settings.DATABASES['default']['ENGINE']
+    db_name = str(settings.DATABASES['default']['NAME'])
+    db_url_exists = bool(os.environ.get('DATABASE_URL'))
+    
     return Response({
         "status": "ok",
         "service": "auth-backend",
         "debug": settings.DEBUG,
-        "database": "sqlite3",
+        "database": db_engine.split('.')[-1],  # 'postgresql' или 'sqlite3'
+        "database_name": db_name,
+        "database_url_set": db_url_exists,
         "auth": "ready"
     })
 
