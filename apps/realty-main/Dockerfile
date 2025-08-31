@@ -22,7 +22,7 @@ COPY realty/auth_views.py ./realty/
 COPY realty/wsgi.py ./realty/
 
 # Добавляем cache bust для принудительного обновления
-ENV CACHE_BUST=2025-01-30-01-00
+ENV CACHE_BUST=2025-01-30-01-30
 
 # Environment variables
 ENV PYTHONPATH=/app

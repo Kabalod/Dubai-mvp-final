@@ -11,11 +11,17 @@ def root_view(request):
     return JsonResponse({
         "service": "dubai-auth-backend",
         "status": "ok",
-        "version": "minimal",
+        "version": "mvp-updated",
+        "cache_bust": "2025-01-30-01-30",
         "endpoints": {
             "health": "/api/health/",
+            "csrf": "/api/csrf/",
+            "send_otp": "/api/auth/send-otp/",
+            "verify_otp": "/api/auth/verify-otp/",
             "google_auth": "/api/auth/google/login/",
-            "simple_auth": "/api/auth/login/"
+            "simple_auth": "/api/auth/login/",
+            "stats": "/api/stats/",
+            "properties": "/api/properties/"
         }
     })
 
