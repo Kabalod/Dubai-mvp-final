@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { API_BASE_URL } from '@/config';
+import { API_BASE_URL } from '../config';
 
 // ========================================
 // API Configuration (base comes from env via src/config.ts)
