@@ -37,6 +37,25 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'realty.urls_simple'
 
+# Templates для Django admin
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'realty.wsgi.application'
+
 # Database - восстанавливаем связь с PostgreSQL
 import dj_database_url
 
