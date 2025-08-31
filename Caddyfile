@@ -10,7 +10,7 @@
     try_files {path} /index.html
     
     # API endpoints - проксирование к backend
-    reverse_proxy /api/* https://dubai.up.railway.app {
+    reverse_proxy /api/* https://workerproject-production.up.railway.app {
         # Передаем заголовки
         header_up Host {upstream_hostport}
         header_up X-Real-IP {remote_host}
