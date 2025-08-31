@@ -24,7 +24,7 @@ COPY realty/wsgi.py ./realty/
 
 # Environment variables
 ENV PYTHONPATH=/app
-ENV DJANGO_SETTINGS_MODULE=realty.settings_railway_simple
+ENV DJANGO_SETTINGS_MODULE=realty.settings_railway
 ENV PYTHONUNBUFFERED=1
 
 # Создаем базу данных

@@ -1,193 +1,109 @@
 """
-Simplified Django settings for Railway deployment
+Минимальные Django settings ТОЛЬКО для авторизации
+Версия: Railway MVP Auth Only
 """
 import os
 from pathlib import Path
-import dj_database_url
-import logging
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Build paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-railway-mvp-key')
-
-# SECURITY WARNING: don't run with debug turned on in production!
-# Временно включаем DEBUG для диагностики Railway ошибок
+# Security
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-auth-only-key-12345')
 DEBUG = True
-
 ALLOWED_HOSTS = ['*']
 
-# Application definition
+# Минимальные приложения ТОЛЬКО для авторизации
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
-    'realty.api',
-    # Остальные apps временно отключены для стабильности
-    # 'realty.main',
-    # 'realty.pfimport', 
-    # 'realty.building_reports',
-    # 'realty.reports',
-    # 'realty.core',
 ]
 
+# Минимальный middleware
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'realty.api.middleware.MetricsMiddleware',
 ]
 
-ROOT_URLCONF = 'realty.urls'
+ROOT_URLCONF = 'realty.urls_simple'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+# Database - восстанавливаем связь с PostgreSQL
+import dj_database_url
 
-WSGI_APPLICATION = 'realty.wsgi.application'
-
-# Database
-_db_url_raw = (os.environ.get('DATABASE_URL') or '').strip()
-
-def _build_url_from_pg_env() -> str | None:
-    host = os.environ.get('PGHOST') or os.environ.get('POSTGRES_HOST')
-    user = os.environ.get('PGUSER') or os.environ.get('POSTGRES_USER')
-    password = os.environ.get('PGPASSWORD') or os.environ.get('POSTGRES_PASSWORD')
-    dbname = os.environ.get('PGDATABASE') or os.environ.get('POSTGRES_DB')
-    port = os.environ.get('PGPORT') or os.environ.get('POSTGRES_PORT') or '5432'
-    if all([host, user, password, dbname]):
-        return f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
-    return None
-
-# Временно используем SQLite для стабильности, позже подключим PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+_db_url = os.environ.get('DATABASE_URL')
+if _db_url:
+    DATABASES = {
+        'default': dj_database_url.parse(_db_url, conn_max_age=600),
     }
+else:
+    # Fallback к SQLite если PostgreSQL недоступен
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'auth.sqlite3',
+        }
+    }
+
+# REST Framework для JWT
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
 
-# Оригинальный код с PostgreSQL закомментирован:
-# try:
-#     url = _db_url_raw if (_db_url_raw and '://' in _db_url_raw) else _build_url_from_pg_env()
-#     if url:
-#         DATABASES = {
-#             'default': dj_database_url.parse(url, conn_max_age=600),
-#         }
-# except Exception as e:
-#     logging.warning(f"Database fallback to SQLite: {e}")
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
+# JWT settings
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+}
 
-# Password validation
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+# CORS для frontend
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
-# Internationalization
+# Google OAuth (простая версия)
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', 'test-client-id')
+GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', 'test-secret')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://workerproject-production.up.railway.app')
+
+# Статические файлы (минимум)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Интернационализация
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Whitenoise staticfiles backend
-STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
-    },
-    'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
-    },
-}
-
-# Default primary key field type
+# Primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Google OAuth settings для Railway (без allauth - упрощенная версия)
-GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', 'test-client-id-12345')
-GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', 'test-secret-12345')
+# Email настройки для отправки писем
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'mail.kabalod.online')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() == 'true'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'noreply@kabalod.online')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Dubai Real Estate <noreply@kabalod.online>')
 
-# Frontend URL for OAuth redirects (правильный актуальный URL)
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'https://workerproject-production.up.railway.app')
-
-# OAuth redirect URI для Google - используем backend URL для callback
-GOOGLE_OAUTH_REDIRECT_URI = f"https://dubai.up.railway.app/api/auth/google/callback/"
-
-# CORS - Безопасная настройка для продакшена
-CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = [
-    'https://workerproject-production.up.railway.app',  # Актуальный frontend URL
-    'http://localhost:3000',  # для локальной разработки
-]
-
-# REST Framework
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-    ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-    ],
-}
-
-# Basic project URLs
-ADMIN_URL = os.environ.get('ADMIN_URL', 'admin/')
-FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
-
-# Optional: Stripe webhook secret default (safe)
-STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
-
-# JWT Settings (минимально необходимое)
-from datetime import timedelta
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-}
+# Если нет настроек SMTP - используем console backend для development
+if not EMAIL_HOST_PASSWORD:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
