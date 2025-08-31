@@ -6,12 +6,12 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-22-30
+ENV CACHE_BUST=2025-01-29-23-00
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 
 # Метки для идентификации
-LABEL cache-bust="2025-01-29-22-30"
+LABEL cache-bust="2025-01-29-23-00"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
 LABEL version="0.1.4"
@@ -64,21 +64,11 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo '    try_files {path} /index.html' >> /etc/caddy/Caddyfile && \
     echo '    ' >> /etc/caddy/Caddyfile && \
     echo '    # API endpoints - проксирование к backend' >> /etc/caddy/Caddyfile && \
-    echo '    reverse_proxy /api/* https://dubai.up.railway.app {' >> /etc/caddy/Caddyfile && \
-    echo '        # Передаем заголовки' >> /etc/caddy/Caddyfile && \
-    echo '        header_up Host {upstream_hostport}' >> /etc/caddy/Caddyfile && \
-    echo '        header_up X-Real-IP {remote_host}' >> /etc/caddy/Caddyfile && \
-    echo '        header_up X-Forwarded-For {remote_host}' >> /etc/caddy/Caddyfile && \
-    echo '        header_up X-Forwarded-Proto {scheme}' >> /etc/caddy/Caddyfile && \
-    echo '        ' >> /etc/caddy/Caddyfile && \
-    echo '        # CORS заголовки' >> /etc/caddy/Caddyfile && \
-    echo '        header_down Access-Control-Allow-Origin *' >> /etc/caddy/Caddyfile && \
-    echo '        header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"' >> /etc/caddy/Caddyfile && \
-    echo '        header_down Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"' >> /etc/caddy/Caddyfile && \
-    echo '        ' >> /etc/caddy/Caddyfile && \
-    echo '        # Настройки транспорта' >> /etc/caddy/Caddyfile && \
-    echo '        transport http {' >> /etc/caddy/Caddyfile && \
-    echo '            tls_insecure_skip_verify' >> /etc/caddy/Caddyfile && \
+    echo '    handle /api/* {' >> /etc/caddy/Caddyfile && \
+    echo '        reverse_proxy https://dubai.up.railway.app {' >> /etc/caddy/Caddyfile && \
+    echo '            transport http {' >> /etc/caddy/Caddyfile && \
+    echo '                tls_insecure_skip_verify' >> /etc/caddy/Caddyfile && \
+    echo '            }' >> /etc/caddy/Caddyfile && \
     echo '        }' >> /etc/caddy/Caddyfile && \
     echo '    }' >> /etc/caddy/Caddyfile && \
     echo '    ' >> /etc/caddy/Caddyfile && \
