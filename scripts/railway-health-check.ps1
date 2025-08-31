@@ -69,7 +69,7 @@ try {
 # Frontend
 Write-Host "`nFrontend:" -ForegroundColor White
 try {
-    $frontendResponse = Invoke-WebRequest -Uri "https://frontend-production-5c48.up.railway.app/" -Method GET -TimeoutSec 10
+    $frontendResponse = Invoke-WebRequest -Uri "https://workerproject-production.up.railway.app/" -Method GET -TimeoutSec 10
     if ($frontendResponse.StatusCode -eq 200) {
         Write-Host "✅ Frontend доступен" -ForegroundColor Green
     }
@@ -104,7 +104,7 @@ foreach ($endpoint in $otpEndpoints) {
 Write-Host "`n💡 РЕКОМЕНДАЦИИ:" -ForegroundColor Cyan
 
 Write-Host "Для тестирования OTP системы:" -ForegroundColor White
-Write-Host "1. Откройте: https://frontend-production-5c48.up.railway.app/auth" -ForegroundColor Yellow
+Write-Host "1. Откройте: https://workerproject-production.up.railway.app/auth" -ForegroundColor Yellow
 Write-Host "2. Введите email: kbalodk@gmail.com" -ForegroundColor Yellow
 Write-Host "3. Нажмите 'SIGN UP'" -ForegroundColor Yellow
 Write-Host "4. Проверьте почту на код от SendGrid" -ForegroundColor Yellow

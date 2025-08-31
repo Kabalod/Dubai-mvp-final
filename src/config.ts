@@ -4,7 +4,7 @@
 const normalizeBase = (url: string) => url.replace(/\/$/, "");
 
 // Production/Development API base URL configuration
-// Берём из Vite env, иначе используем относительный путь (через общий прокси Nginx)
+// Берём из Vite env, иначе используем относительный путь (через Caddy прокси)
 const envBase = (import.meta.env.VITE_FRONTEND_API_URL as string) || 
                 (import.meta.env.VITE_API_BASE_URL as string) || 
                 (import.meta.env.API_BASE_URL as string) || '';

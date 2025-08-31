@@ -94,20 +94,10 @@ services:
     restart: unless-stopped
 
   # ========================================
-  # Nginx (опционально, для production-like тестирования)
+  # Direct Access (nginx removed)
+  # Frontend: http://localhost:3000
+  # Backend: http://localhost:8000
   # ========================================
-  nginx:
-    image: nginx:alpine
-    container_name: dubai-nginx-local
-    volumes:
-      - ./configs/nginx/nginx.local.conf:/etc/nginx/nginx.conf:ro
-    ports:
-      - "8080:80"
-    depends_on:
-      - django
-      - frontend
-    restart: unless-stopped
-    profiles: ["nginx"]
 
 volumes:
   postgres_data:

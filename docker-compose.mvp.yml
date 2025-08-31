@@ -123,19 +123,10 @@ services:
       retries: 3
 
   # ========================================
-  # Nginx (прокси для всех сервисов)
+  # Прямой доступ к сервисам (nginx удалён)
+  # Frontend: http://localhost:3000
+  # Backend API: http://localhost:8000
   # ========================================
-  nginx:
-    image: nginx:alpine
-    container_name: mvp-nginx
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    ports:
-      - "80:80"
-    depends_on:
-      - api-service
-      - frontend
-    restart: unless-stopped
 
   # ========================================
   # Базовый мониторинг (опционально)

@@ -55,9 +55,10 @@ docker compose -f docker-compose.mvp.yml up -d api-service parser-service fronte
 echo -e "${YELLOW}⏳ Ждем готовности приложений...${NC}"
 sleep 15
 
-# Запуск Nginx
-echo -e "${YELLOW}🚀 Запускаем Nginx прокси...${NC}"
-docker compose -f docker-compose.mvp.yml up -d nginx
+# Nginx удалён - используем прямой доступ
+echo -e "${YELLOW}🌐 Сервисы доступны напрямую:${NC}"
+echo -e "${WHITE}   • Frontend: http://localhost:3000${NC}"
+echo -e "${WHITE}   • Backend API: http://localhost:8000${NC}"
 
 # Проверка статуса
 echo ""
@@ -83,7 +84,7 @@ check_service "redis" "http://localhost:6379" "Redis Cache"
 check_service "api" "http://localhost:8000" "Django API"
 check_service "parser" "http://localhost:8002" "Parser Service"
 check_service "frontend" "http://localhost:3000" "React Frontend"
-check_service "nginx" "http://localhost:80" "Nginx Proxy"
+# nginx удалён
 
 echo ""
 echo -e "${BLUE}========================================${NC}"

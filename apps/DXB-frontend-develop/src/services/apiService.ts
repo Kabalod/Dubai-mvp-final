@@ -9,9 +9,9 @@ class ApiService {
     private api: AxiosInstance;
 
     constructor() {
-        // ✅ ИСПРАВЛЕНО: в продакшне используем прокси через nginx для избежания CORS
+        // ✅ ИСПРАВЛЕНО: в продакшне используем прокси через Caddy для избежания CORS
         const baseURL = process.env.NODE_ENV === 'production' 
-            ? '/api' // использует прокси nginx
+            ? '/api' // использует прокси Caddy
             : `${API_BASE_URL}/api`;
             
         this.api = axios.create({

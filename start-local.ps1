@@ -45,7 +45,7 @@ Write-Host ""
 Write-Host "📍 Services available at:" -ForegroundColor Cyan
 Write-Host "   • Frontend: http://localhost:3000" -ForegroundColor White
 Write-Host "   • Backend API: http://localhost:8000" -ForegroundColor White
-Write-Host "   • Nginx (optional): http://localhost:8080" -ForegroundColor White
+
 Write-Host "   • Django Admin: http://localhost:8000/admin/" -ForegroundColor White
 Write-Host "   • Health Check: http://localhost:8000/health/" -ForegroundColor White
 Write-Host ""
@@ -56,10 +56,7 @@ Write-Host "   • Restart services: docker-compose -f docker-compose.local.yml 
 Write-Host "   • Access Django shell: docker exec -it dubai-django-local python manage.py shell" -ForegroundColor White
 Write-Host ""
 
-# Ask if user wants to start Nginx
-$startNginx = Read-Host "🌐 Start Nginx for production-like testing? (y/n)"
-if ($startNginx -eq "y" -or $startNginx -eq "Y") {
-    Write-Host "🌐 Starting Nginx..." -ForegroundColor Yellow
-    docker-compose -f docker-compose.local.yml --profile nginx up -d nginx
-    Write-Host "✅ Nginx started at http://localhost:8080" -ForegroundColor Green
-}
+# Direct access (nginx removed):
+Write-Host "🌐 Services available at:" -ForegroundColor Yellow
+Write-Host "   • Frontend: http://localhost:3000" -ForegroundColor White
+Write-Host "   • Backend API: http://localhost:8000" -ForegroundColor White

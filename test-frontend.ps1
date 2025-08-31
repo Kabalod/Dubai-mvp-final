@@ -15,9 +15,9 @@ try {
     exit 1
 }
 
-# Проверяем API endpoints через nginx
+# Проверяем API endpoints через прямой доступ
 Write-Host ""
-Write-Host "2. Testing API endpoints through nginx proxy..." -ForegroundColor Green
+Write-Host "2. Testing API endpoints through direct access..." -ForegroundColor Green
 
 $endpoints = @(
     "/api/health/",
@@ -38,7 +38,7 @@ foreach ($endpoint in $endpoints) {
     } catch {
         $statusCode = $_.Exception.Response.StatusCode.value__
         $statusText = if ($statusCode -eq 200) { "✅ OK" } 
-                     elseif ($statusCode -eq 502) { "❌ 502 (nginx proxy issue)" }
+                     elseif ($statusCode -eq 502) { "❌ 502 (proxy issue)" }
                      elseif ($statusCode -eq 503) { "⚠️ 503 (backend unavailable)" }
                      else { "❌ $statusCode" }
         Write-Host "  $statusText" -ForegroundColor $(if ($statusCode -eq 200) { "Green" } else { "Red" })

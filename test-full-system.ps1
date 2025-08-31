@@ -37,9 +37,9 @@ try {
     $backendWorking = $false
 }
 
-# Проверка API через nginx прокси
+# Проверка API через Caddy прокси
 Write-Host ""
-Write-Host "🔗 NGINX PROXY CHECK (Frontend → Backend)" -ForegroundColor Cyan
+Write-Host "🔗 CADDY PROXY CHECK (Frontend → Backend)" -ForegroundColor Cyan
 $apiEndpoints = @("/api/health/", "/api/stats/", "/api/auth/google/login/")
 
 foreach ($endpoint in $apiEndpoints) {
@@ -59,7 +59,7 @@ foreach ($endpoint in $apiEndpoints) {
     } catch {
         $statusCode = $_.Exception.Response.StatusCode.value__
         if ($statusCode -eq 502) {
-            Write-Host "❌ $endpoint - 502 (nginx → backend connection failed)" -ForegroundColor Red
+            Write-Host "❌ $endpoint - 502 (Caddy → backend connection failed)" -ForegroundColor Red
         } elseif ($statusCode -eq 503) {
             Write-Host "⚠️ $endpoint - 503 (backend unavailable, using fallback)" -ForegroundColor Yellow
         } else {
