@@ -6,12 +6,12 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-20-00
+ENV CACHE_BUST=2025-01-29-20-30
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 
 # Метки для идентификации
-LABEL cache-bust="2025-01-29-20-00"
+LABEL cache-bust="2025-01-29-20-30"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
 LABEL version="0.1.4"
