@@ -215,3 +215,113 @@ def register_user(request):
             'error': str(e),
             'message': 'Registration failed'
         }, status=500)
+
+
+# --- Дополнительные endpoints для OTP и API ---
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def csrf_token_view(request):
+    """Получение CSRF токена"""
+    from django.middleware.csrf import get_token
+    csrf_token = get_token(request)
+    return Response({
+        'csrfToken': csrf_token,
+        'message': 'CSRF token generated'
+    })
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@csrf_exempt
+def send_otp(request):
+    """Отправка OTP кода"""
+    email = request.data.get('email')
+    if not email:
+        return Response({'error': 'Email is required'}, status=400)
+    
+    # Генерируем OTP код
+    otp_code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+    
+    # В MVP возвращаем код в ответе (в продакшн отправлять на email)
+    return Response({
+        'message': 'OTP code sent successfully',
+        'otp_code': otp_code,  # ТОЛЬКО ДЛЯ MVP!
+        'expires_in': 600,
+        'email': email,
+        'note': 'MVP: OTP code provided in response'
+    })
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@csrf_exempt
+def verify_otp(request):
+    """Верификация OTP кода"""
+    email = request.data.get('email')
+    code = request.data.get('code')
+    
+    if not email or not code:
+        return Response({
+            'error': 'Email and code are required'
+        }, status=400)
+    
+    # В MVP принимаем любой 6-значный код
+    if len(code) == 6 and code.isdigit():
+        user, created = User.objects.get_or_create(
+            email=email, 
+            defaults={'username': email}
+        )
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'message': 'OTP verified successfully',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'username': user.username,
+                'is_new_user': created
+            }
+        })
+    
+    return Response({
+        'error': 'Invalid OTP code'
+    }, status=400)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def mock_stats(request):
+    """Mock статистика для MVP"""
+    return Response({
+        'total_properties': 1250,
+        'avg_price': 850000,
+        'price_change': 5.2,
+        'total_sales': 89,
+        'status': 'ok'
+    })
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def mock_properties(request):
+    """Mock свойства для MVP"""
+    return Response({
+        'results': [
+            {
+                'id': '1',
+                'title': 'Luxury Apartment in Downtown Dubai',
+                'price': 1200000,
+                'area': 'Downtown Dubai',
+                'bedrooms': 2,
+                'bathrooms': 2
+            },
+            {
+                'id': '2', 
+                'title': 'Villa in Palm Jumeirah',
+                'price': 3500000,
+                'area': 'Palm Jumeirah',
+                'bedrooms': 4,
+                'bathrooms': 5
+            }
+        ],
+        'count': 2,
+        'status': 'ok'
+    })

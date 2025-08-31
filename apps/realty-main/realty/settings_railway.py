@@ -23,7 +23,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
-    'realty.api',  # Добавляем API приложение
 ]
 
 # Минимальный middleware
