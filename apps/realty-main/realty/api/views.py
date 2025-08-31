@@ -86,10 +86,18 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegisterSerializer
+    
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 class PasswordLoginView(APIView):
     """Обычная авторизация по email/username и паролю (для тестовых пользователей)"""
     permission_classes = (permissions.AllowAny,)
+    
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
         from django.contrib.auth import authenticate
@@ -144,6 +152,10 @@ class SendOTPView(APIView):
     """Отправка OTP кода на email"""
     permission_classes = (permissions.AllowAny,)
     
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
     def post(self, request):
         email = request.data.get('email')
         if not email:
@@ -184,6 +196,10 @@ class SendOTPView(APIView):
 class VerifyOTPView(APIView):
     """Верификация OTP кода"""
     permission_classes = (permissions.AllowAny,)
+    
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
     
     def post(self, request):
         email = request.data.get('email')
@@ -324,6 +340,10 @@ class LogoutView(APIView):
 
 class PasswordResetRequestView(APIView):
     permission_classes = (permissions.AllowAny,)
+    
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request):
         email = request.data.get('email')
@@ -353,6 +373,10 @@ class PasswordResetRequestView(APIView):
 
 class PasswordResetConfirmView(APIView):
     permission_classes = (permissions.AllowAny,)
+    
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request):
         token = request.data.get('token')
@@ -469,6 +493,10 @@ class GoogleAuthInitView(APIView):
     """Инициирует реальный Google OAuth процесс согласно Google Identity API"""
     permission_classes = (permissions.AllowAny,)
     
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+    
     def get(self, request):
         # Реальная Google OAuth интеграция
         state = secrets.token_urlsafe(32)
@@ -498,6 +526,10 @@ class GoogleAuthInitView(APIView):
 class GoogleAuthCallbackView(APIView):
     """Обрабатывает callback от Google OAuth и создает/авторизует пользователя"""
     permission_classes = (permissions.AllowAny,)
+    
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
     
     def get(self, request):
         # Получаем параметры от Google OAuth callback
