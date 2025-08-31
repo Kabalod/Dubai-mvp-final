@@ -325,3 +325,41 @@ def mock_properties(request):
         'count': 2,
         'status': 'ok'
     })
+
+@api_view(['GET', 'POST'])
+@permission_classes([AllowAny])
+@csrf_exempt
+def force_login(request):
+    """Принудительный логин для тестирования"""
+    email = request.GET.get('email') or request.data.get('email') or 'admin@test.com'
+    
+    # Создаем или получаем пользователя
+    user, created = User.objects.get_or_create(
+        email=email,
+        defaults={
+            'username': email,
+            'first_name': 'Test',
+            'last_name': 'User',
+            'is_staff': True,
+            'is_superuser': True
+        }
+    )
+    
+    # Создаем JWT токены
+    refresh = RefreshToken.for_user(user)
+    
+    return Response({
+        'message': 'Force login successful',
+        'access': str(refresh.access_token),
+        'refresh': str(refresh),
+        'user': {
+            'id': user.id,
+            'email': user.email,
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': user.is_staff,
+            'is_new_user': created
+        },
+        'note': 'TESTING ONLY - auto-created admin user'
+    })
