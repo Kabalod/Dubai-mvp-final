@@ -400,6 +400,14 @@ else:
 # Временно разрешить все origins для тестирования
 CORS_ALLOW_ALL_ORIGINS = True
 
+# CSRF trusted origins для Railway
+CSRF_TRUSTED_ORIGINS = [
+    "https://frontend-production-261c.up.railway.app",
+    "https://frontend-production-fa38.up.railway.app", 
+    "https://workerproject-production.up.railway.app",
+    "https://dubai.up.railway.app",
+]
+
 # django-litestream
 LITESTREAM = {
     "config_file": BASE_DIR / "litestream.yml",
