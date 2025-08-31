@@ -10,7 +10,9 @@
     "startCommand": "caddy run --config /etc/caddy/Caddyfile --adapter caddyfile",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10,
-    "deploymentTimeout": 1800
+    "deploymentTimeout": 1800,
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 300
   },
   "variables": {
     "NODE_ENV": "production",

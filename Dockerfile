@@ -6,9 +6,16 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-18-30
+ENV CACHE_BUST=2025-01-29-19-30
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
+
+# Метки для идентификации
+LABEL cache-bust="2025-01-29-19-30"
+LABEL apollo-removed="true"
+LABEL caddy-replaced-nginx="true"
+LABEL version="0.1.4"
+LABEL single-stage="true"
 
 # Системные зависимости
 RUN apt-get update && apt-get install -y \
@@ -93,5 +100,8 @@ RUN chown -R 1000:1000 /app && \
 # Порт
 EXPOSE 80
 
-# Запуск Caddy
+# Запуск Caddy (явно указываем команду для Railway)
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+
+# Альтернативная команда для отладки (закомментирована)
+# CMD ["sh", "-c", "echo 'Starting Caddy...' && caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]
