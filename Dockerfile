@@ -1,15 +1,12 @@
-# 🔥 Railway Frontend Dockerfile - CACHE BUSTER v0.1.3
-# Полностью новая структура для принудительной пересборки
+# 🔥 Railway Frontend Dockerfile - УПРОЩЕННАЯ ВЕРСИЯ v0.1.4
+# Одноэтапная сборка для избежания проблем с копированием между stages
 # Apollo Client ПОЛНОСТЬЮ УДАЛЕН - только REST API
 # ЗАМЕНЕН nginx на Caddy для простоты
 
-# ================================
-# Stage 1: Build Environment
-# ================================  
-FROM node:20-bullseye-slim AS builder
+FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-18-00
+ENV CACHE_BUST=2025-01-29-18-30
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 
@@ -20,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /build
+WORKDIR /app
 
 # Копирование конфигурационных файлов
 COPY package.json ./
@@ -38,21 +35,14 @@ COPY index.html ./
 RUN npm run build
 
 # Диагностика: проверяем что было создано
-RUN ls -la /build/dist/ && cat /build/dist/index.html
+RUN ls -la /app/dist/ && cat /app/dist/index.html
 
-# ================================
-# Stage 2: Production Server (Caddy)
-# ================================
-FROM caddy:2-alpine AS production
-
-# Принудительные метки для нового образа
-LABEL cache-bust="2025-01-29-18-00"
-LABEL apollo-removed="true"
-LABEL caddy-replaced-nginx="true"
-LABEL version="0.1.3"
-
-# Копирование собранного приложения
-COPY --from=builder /build/dist /usr/share/caddy
+# Установка Caddy
+RUN apt-get update && apt-get install -y curl && \
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg && \
+    curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list && \
+    apt-get update && apt-get install -y caddy && \
+    rm -rf /var/lib/apt/lists/*
 
 # Создание Caddyfile конфигурации
 RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyfile && \
@@ -60,7 +50,7 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo '' >> /etc/caddy/Caddyfile && \
     echo ':80 {' >> /etc/caddy/Caddyfile && \
     echo '    # Корневая директория для React приложения' >> /etc/caddy/Caddyfile && \
-    echo '    root * /usr/share/caddy' >> /etc/caddy/Caddyfile && \
+    echo '    root * /app/dist' >> /etc/caddy/Caddyfile && \
     echo '    file_server' >> /etc/caddy/Caddyfile && \
     echo '    ' >> /etc/caddy/Caddyfile && \
     echo '    # React SPA маршрутизация' >> /etc/caddy/Caddyfile && \
@@ -97,8 +87,8 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo '}' >> /etc/caddy/Caddyfile
 
 # Настройка прав
-RUN chown -R 1000:1000 /usr/share/caddy && \
-    chmod -R 755 /usr/share/caddy
+RUN chown -R 1000:1000 /app && \
+    chmod -R 755 /app
 
 # Порт
 EXPOSE 80
