@@ -107,6 +107,34 @@ const Auth: React.FC = () => {
         }
     };
 
+    const handleForceLogin = () => {
+        console.log('🔐 Force login - creating mock session...');
+        
+        // Создаем mock токены для тестирования
+        const mockTokens = {
+            access: 'mock-access-token-' + Date.now(),
+            refresh: 'mock-refresh-token-' + Date.now()
+        };
+        
+        const mockUser = {
+            id: 1,
+            email: 'admin@test.com',
+            username: 'admin@test.com',
+            first_name: 'Test',
+            last_name: 'Admin'
+        };
+        
+        // Сохраняем в localStorage
+        localStorage.setItem('accessToken', mockTokens.access);
+        localStorage.setItem('refreshToken', mockTokens.refresh);
+        localStorage.setItem('userData', JSON.stringify(mockUser));
+        
+        console.log('✅ Force login successful');
+        
+        // Редиректим на dashboard
+        window.location.href = '/dashboard';
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.leftContainer}>

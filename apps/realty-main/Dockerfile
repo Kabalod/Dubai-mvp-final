@@ -21,6 +21,9 @@ COPY realty/urls_simple.py ./realty/
 COPY realty/auth_views.py ./realty/
 COPY realty/wsgi.py ./realty/
 
+# Добавляем cache bust для принудительного обновления
+ENV CACHE_BUST=2025-01-30-01-00
+
 # Environment variables
 ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=realty.settings_railway
