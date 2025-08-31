@@ -6,12 +6,12 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-23-00
+ENV CACHE_BUST=2025-01-29-23-30
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 
 # Метки для идентификации
-LABEL cache-bust="2025-01-29-23-00"
+LABEL cache-bust="2025-01-29-23-30"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
 LABEL version="0.1.4"
@@ -64,11 +64,9 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo '    try_files {path} /index.html' >> /etc/caddy/Caddyfile && \
     echo '    ' >> /etc/caddy/Caddyfile && \
     echo '    # API endpoints - проксирование к backend' >> /etc/caddy/Caddyfile && \
-    echo '    handle /api/* {' >> /etc/caddy/Caddyfile && \
-    echo '        reverse_proxy https://dubai.up.railway.app {' >> /etc/caddy/Caddyfile && \
-    echo '            transport http {' >> /etc/caddy/Caddyfile && \
-    echo '                tls_insecure_skip_verify' >> /etc/caddy/Caddyfile && \
-    echo '            }' >> /etc/caddy/Caddyfile && \
+    echo '    reverse_proxy /api/* https://dubai.up.railway.app {' >> /etc/caddy/Caddyfile && \
+    echo '        transport http {' >> /etc/caddy/Caddyfile && \
+    echo '            tls_insecure_skip_verify' >> /etc/caddy/Caddyfile && \
     echo '        }' >> /etc/caddy/Caddyfile && \
     echo '    }' >> /etc/caddy/Caddyfile && \
     echo '    ' >> /etc/caddy/Caddyfile && \
