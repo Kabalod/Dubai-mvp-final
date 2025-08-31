@@ -9,6 +9,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), "");
     const frontendApi = env.VITE_FRONTEND_API_URL || env.FRONTEND_API_URL || "";
+    const apiBaseUrl = env.VITE_API_BASE_URL || "";
+    const googleClientId = env.VITE_GOOGLE_CLIENT_ID || "";
+    const frontendUrl = env.VITE_FRONTEND_URL || "";
     return {
         plugins: [
             lingui(),
@@ -32,6 +35,9 @@ export default defineConfig(({ mode }) => {
         },
         define: {
             "import.meta.env.VITE_FRONTEND_API_URL": JSON.stringify(frontendApi),
+            "import.meta.env.VITE_API_BASE_URL": JSON.stringify(apiBaseUrl),
+            "import.meta.env.VITE_GOOGLE_CLIENT_ID": JSON.stringify(googleClientId),
+            "import.meta.env.VITE_FRONTEND_URL": JSON.stringify(frontendUrl),
         },
         server: {
             port: 3000,
