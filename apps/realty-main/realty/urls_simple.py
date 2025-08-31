@@ -26,12 +26,8 @@ urlpatterns = [
     # Health check
     path("healthz/", lambda request: JsonResponse({"status": "ok", "service": "auth-only"})),
     
-    # API - прямое подключение auth views
-    path("api/health/", auth_views.health_check, name="health_check"),
-    path("api/auth/register/", auth_views.register_user, name="register"),
-    path("api/auth/google/login/", auth_views.google_auth_init, name="google_init"),
-    path("api/auth/google/callback/", auth_views.google_auth_callback, name="google_callback"),
-    path("api/auth/login/", auth_views.simple_login, name="simple_login"),
+    # API - подключаем полный API модуль
+    path("api/", include("realty.api.urls")),
     
     # Admin (опционально)
     path("admin/", admin.site.urls),

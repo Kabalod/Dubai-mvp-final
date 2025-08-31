@@ -39,10 +39,29 @@ const Auth: React.FC = () => {
             setGoogleLoading(true);
             console.log('🔄 Attempting Google OAuth login to: /api/auth/google/login/');
             
-            // ✅ ИСПРАВЛЕНО: Прямая навигация к Google OAuth вместо fetch
-            // В большинстве случаев Google OAuth работает через прямой редирект
-            console.log('🔗 Redirecting directly to Google OAuth endpoint...');
-            window.location.href = '/api/auth/google/login/';
+            // ✅ ИСПРАВЛЕНО: Получаем auth_url от backend и редиректим
+            const resp = await fetch('/api/auth/google/login/', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+            
+            if (!resp.ok) {
+                throw new Error(`Server error: ${resp.status}`);
+            }
+            
+            const data = await resp.json();
+            console.log('📦 Google OAuth response:', data);
+            
+            if (data.auth_url) {
+                console.log('🔗 Redirecting to Google OAuth:', data.auth_url);
+                window.location.href = data.auth_url;
+            } else {
+                throw new Error('auth_url missing from response');
+            }
             
             // Старый подход через fetch - убираем, т.к. может вызывать проблемы
             /*
