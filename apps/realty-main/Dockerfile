@@ -1,36 +1,40 @@
-# Railway MVP Dockerfile v4.0 - Final production version  
-# Version: 4.0 - Direct Gunicorn start without migrations/collectstatic
-# Build: 2025-08-28 - Force complete cache rebuild
+# Minimal Django Dockerfile - ТОЛЬКО для авторизации
 FROM python:3.12-slim
 
-# Install system dependencies
+# Системные зависимости (минимум)
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Set work directory
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
+# Минимальные Python зависимости
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy Django app
+# Копируем ТОЛЬКО необходимые файлы для авторизации
 COPY manage.py .
-COPY realty/ ./realty/
+COPY realty/__init__.py ./realty/
+COPY realty/settings_railway_simple.py ./realty/
+COPY realty/urls_simple.py ./realty/
+COPY realty/auth_urls.py ./realty/
+COPY realty/auth_views.py ./realty/
+COPY realty/wsgi.py ./realty/
 
-# Set environment variables
+# Environment variables
 ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=realty.settings_railway
 ENV PYTHONUNBUFFERED=1
 
-# Create staticfiles directory (collectstatic will run at runtime)
-RUN mkdir -p /app/staticfiles
+# Создаем базу данных
+RUN python manage.py migrate
 
-# Expose port
+# Создаем админа (опционально)
+RUN echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@test.com', 'admin123') if not User.objects.filter(username='admin').exists() else None" | python manage.py shell
+
+# Порт
 EXPOSE 8000
 
-# Start Gunicorn with Railway PORT variable
-CMD ["sh", "-c", "gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120 --access-logfile - --error-logfile - --log-level info"]
+# Запуск (простой)
+CMD ["gunicorn", "realty.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--access-logfile", "-", "--error-logfile", "-"]
