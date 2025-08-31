@@ -18,7 +18,6 @@ COPY manage.py .
 COPY realty/__init__.py ./realty/
 COPY realty/settings_railway.py ./realty/
 COPY realty/urls_simple.py ./realty/
-COPY realty/auth_urls.py ./realty/
 COPY realty/auth_views.py ./realty/
 COPY realty/wsgi.py ./realty/
 
