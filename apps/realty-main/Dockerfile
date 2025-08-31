@@ -35,5 +35,5 @@ RUN echo "from django.contrib.auth import get_user_model; User = get_user_model(
 # Порт
 EXPOSE 8000
 
-# Запуск (простой)
-CMD ["gunicorn", "realty.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2", "--access-logfile", "-", "--error-logfile", "-"]
+# Запуск с Railway PORT переменной
+CMD ["sh", "-c", "gunicorn realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --access-logfile - --error-logfile - --log-level debug"]
