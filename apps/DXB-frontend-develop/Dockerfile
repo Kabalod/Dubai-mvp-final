@@ -6,12 +6,12 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-20-30
+ENV CACHE_BUST=2025-01-29-21-00
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 
 # Метки для идентификации
-LABEL cache-bust="2025-01-29-20-30"
+LABEL cache-bust="2025-01-29-21-00"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
 LABEL version="0.1.4"
@@ -55,7 +55,7 @@ RUN apt-get update && apt-get install -y curl && \
 RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyfile && \
     echo '# Простая и надежная замена nginx' >> /etc/caddy/Caddyfile && \
     echo '' >> /etc/caddy/Caddyfile && \
-    echo ':80 {' >> /etc/caddy/Caddyfile && \
+    echo ':{$PORT:80} {' >> /etc/caddy/Caddyfile && \
     echo '    # Корневая директория для React приложения' >> /etc/caddy/Caddyfile && \
     echo '    root * /app/dist' >> /etc/caddy/Caddyfile && \
     echo '    file_server' >> /etc/caddy/Caddyfile && \
@@ -97,8 +97,8 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
 RUN chown -R 1000:1000 /app && \
     chmod -R 755 /app
 
-# Порт
-EXPOSE 80
+# Порт (Railway использует переменную PORT)
+EXPOSE ${PORT:-80}
 
 # Запуск Caddy (явно указываем команду для Railway)
 CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
