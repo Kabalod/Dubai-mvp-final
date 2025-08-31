@@ -58,7 +58,7 @@ COPY --from=builder /build/dist /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 
 # Настройка прав
-RUN chown -R caddy:caddy /usr/share/caddy && \
+RUN chown -R 1000:1000 /usr/share/caddy && \
     chmod -R 755 /usr/share/caddy
 
 # Порт
