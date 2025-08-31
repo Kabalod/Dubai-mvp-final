@@ -14,7 +14,8 @@ except ImportError:
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.core.cache import cache
@@ -80,6 +81,19 @@ def health_check(request):
             "error": str(e),
             "message": "Health check failed"
         }, status=500)
+
+# --- CSRF Token View ---
+class CSRFTokenView(APIView):
+    """Получение CSRF токена для frontend"""
+    permission_classes = (permissions.AllowAny,)
+    
+    @ensure_csrf_cookie
+    def get(self, request):
+        csrf_token = get_token(request)
+        return Response({
+            'csrfToken': csrf_token,
+            'message': 'CSRF token generated'
+        })
 
 # --- Authentication Views ---
 class RegisterView(generics.CreateAPIView):

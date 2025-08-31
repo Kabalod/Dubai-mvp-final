@@ -8,6 +8,9 @@ urlpatterns = [
     # Health Check
     path("health/", views.health_check, name="health_check"),
     
+    # CSRF Token
+    path("csrf/", views.CSRFTokenView.as_view(), name="csrf_token"),
+    
     # Authentication
     path("auth/register/", views.RegisterView.as_view(), name="register"),
     path("auth/login/", views.PasswordLoginView.as_view(), name="password_login"),  # Обычный логин для тестовых пользователей

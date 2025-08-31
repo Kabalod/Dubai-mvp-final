@@ -8,18 +8,46 @@ class ApiService {
         this.baseUrl = API_BASE_URL;
     }
 
+    // Получение CSRF токена
+    private async getCSRFToken(): Promise<string> {
+        try {
+            const response = await fetch(`${this.baseUrl}/api/csrf/`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+            if (response.ok) {
+                const data = await response.json();
+                return data.csrfToken || '';
+            }
+        } catch (error) {
+            console.warn('CSRF token fetch failed:', error);
+        }
+        return '';
+    }
+
     // Базовый метод для API запросов
     private async request(endpoint: string, options: RequestInit = {}) {
         const url = `${this.baseUrl}${endpoint}`;
         
         console.log(`🌐 API Request: ${options.method || 'GET'} ${url}`);
         
+        // Добавляем CSRF токен для POST запросов
+        let headers = {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        };
+        
+        if (options.method === 'POST') {
+            const csrfToken = await this.getCSRFToken();
+            if (csrfToken) {
+                headers['X-CSRFToken'] = csrfToken;
+            }
+        }
+        
         const response = await fetch(url, {
             ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
+            headers,
+            credentials: 'include', // Для CSRF cookies
         });
 
         console.log(`📡 API Response: ${response.status} ${response.statusText}`);
