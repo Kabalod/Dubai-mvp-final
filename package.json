@@ -2,7 +2,7 @@
     "name": "estate",
     "version": "0.1.2",
     "private": true,
-    "type": "module",
+
     "dependencies": {
         "@ant-design/icons": "^6.0.0",
         "@ant-design/pro-components": "^2.8.10",
