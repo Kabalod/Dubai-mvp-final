@@ -11,9 +11,6 @@
     
     # API endpoints - проксирование к backend
     reverse_proxy /api/* https://dubai.up.railway.app {
-        # Отключаем проверку SSL для backend
-        tls_insecure_skip_verify
-        
         # Передаем заголовки
         header_up Host {upstream_hostport}
         header_up X-Real-IP {remote_host}
@@ -24,6 +21,11 @@
         header_down Access-Control-Allow-Origin *
         header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
         header_down Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+        
+        # Настройки транспорта
+        transport http {
+            tls_insecure_skip_verify
+        }
     }
     
     # Статические файлы с кешированием
