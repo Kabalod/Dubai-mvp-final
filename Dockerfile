@@ -9,7 +9,7 @@
 FROM node:20-bullseye-slim AS builder
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-16-30
+ENV CACHE_BUST=2025-01-29-17-30
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 
@@ -46,7 +46,7 @@ RUN ls -la /build/dist/ && cat /build/dist/index.html
 FROM caddy:2-alpine AS production
 
 # Принудительные метки для нового образа
-LABEL cache-bust="2025-01-29-17-00"
+LABEL cache-bust="2025-01-29-17-30"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
 LABEL version="0.1.3"
