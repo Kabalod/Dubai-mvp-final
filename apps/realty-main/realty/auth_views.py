@@ -3,6 +3,7 @@
 Без сложных зависимостей - только Django User модель
 """
 import json
+import os
 import secrets
 from urllib.parse import urlencode
 from django.conf import settings
