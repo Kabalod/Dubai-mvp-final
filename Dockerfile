@@ -1,6 +1,7 @@
-# 🔥 Railway Frontend Dockerfile - CACHE BUSTER v0.1.2
+# 🔥 Railway Frontend Dockerfile - CACHE BUSTER v0.1.3
 # Полностью новая структура для принудительной пересборки
 # Apollo Client ПОЛНОСТЬЮ УДАЛЕН - только REST API
+# ЗАМЕНЕН nginx на Caddy для простоты
 
 # ================================
 # Stage 1: Build Environment
@@ -8,7 +9,7 @@
 FROM node:20-bullseye-slim AS builder
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-15-30
+ENV CACHE_BUST=2025-01-29-16-00
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 
@@ -40,30 +41,28 @@ RUN npm run build
 RUN ls -la /build/dist/ && cat /build/dist/index.html
 
 # ================================
-# Stage 2: Production Server
+# Stage 2: Production Server (Caddy)
 # ================================
-FROM nginx:1.25-alpine AS production
+FROM caddy:2-alpine AS production
 
 # Принудительные метки для нового образа
-LABEL cache-bust="2025-01-29-15-30"
+LABEL cache-bust="2025-01-29-16-00"
 LABEL apollo-removed="true"
-LABEL version="0.1.2"
-
-# Установка curl для healthcheck
-RUN apk add --no-cache curl
+LABEL caddy-replaced-nginx="true"
+LABEL version="0.1.3"
 
 # Копирование собранного приложения
-COPY --from=builder /build/dist /usr/share/nginx/html
+COPY --from=builder /build/dist /usr/share/caddy
 
-# Копирование nginx конфигурации
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Копирование Caddyfile конфигурации
+COPY Caddyfile /etc/caddy/Caddyfile
 
 # Настройка прав
-RUN chown -R nginx:nginx /usr/share/nginx/html && \
-    chmod -R 755 /usr/share/nginx/html
+RUN chown -R caddy:caddy /usr/share/caddy && \
+    chmod -R 755 /usr/share/caddy
 
 # Порт
 EXPOSE 80
 
-# Запуск nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Запуск Caddy
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
