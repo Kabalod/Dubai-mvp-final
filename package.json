@@ -75,7 +75,7 @@
         "deps:check": "yarn install --immutable && echo deps ok",
         "extract": "lingui extract",
         "compile": "lingui compile --typescript",
-        "codegen": "graphql-codegen --config codegen.ts",
+
         "mcp:build": "echo deprecated",
         "memsync:build": "echo deprecated",
         "memsync:dev": "echo deprecated",

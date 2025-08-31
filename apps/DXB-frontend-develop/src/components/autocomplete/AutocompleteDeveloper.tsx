@@ -1,9 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { t } from "@lingui/core/macro";
-import { useLazyQuery } from "@apollo/client";
-import { SEARCH_AUTOCOMPLETE_DEVELOPER } from "@/api/queries";
-import { AutocompleteQueryVariables, AutocompleteResults } from "@/api/schema";
-import { debounce } from "@/Utilities/utils";
+// Apollo Client удален - используем REST API
 import AutocompleteBase from "./AutocompleteBase";
 
 export interface AutocompleteDeveloperProps {
@@ -15,58 +12,23 @@ const AutocompleteDeveloper: React.FC<AutocompleteDeveloperProps> = ({
 }) => {
     const [value, setValue] = useState("");
 
-    const [getSearchResults, { data, loading, error }] = useLazyQuery<
-        AutocompleteResults,
-        AutocompleteQueryVariables
-    >(SEARCH_AUTOCOMPLETE_DEVELOPER);
-
-    const debouncedSearch = useMemo(
-        () =>
-            debounce((value: string) => {
-                getSearchResults({ variables: { search: value } });
-            }, 400),
-        [getSearchResults]
-    );
-
-    const onSearch = (value: string) => {
-        setValue(value);
-        debouncedSearch(value);
+    // Apollo Client удален - заглушка компонента
+    const onSearch = (inputValue: string) => {
+        setValue(inputValue);
         onValueChange({
             id: undefined,
             type: undefined,
-            value,
+            value: inputValue,
         });
+        // TODO: Реализовать поиск через REST API
     };
 
-    const options = useMemo<AutocompleteOption[]>(() => {
-        if (!data) return [];
-        // data.entities is (AreaType | BuildingType | ProjectType)[]
-        const areas = data.autocomplete.areas.map((a) => ({
-            id: a.areaIdx?.toString(),
-            value: a.nameEn,
-            type: "area" as SearchEntityType,
-        }));
-        const buildings = data.autocomplete.buildings.map((b) => ({
-            id: b.buildingNumber,
-            value: b.nameEn,
-            type: "building" as SearchEntityType,
-        }));
-        const projects = data.autocomplete.projects.map((p) => ({
-            id: p.id?.toString(),
-            value: p.nameEn,
-            type: "project" as SearchEntityType,
-        }));
-        const ret = areas.concat(buildings).concat(projects);
-
-        return ret;
-    }, [data]);
-
-    const onSelect = (value: string, option: AutocompleteOption) => {
-        setValue(value);
+    const onSelect = (selectedValue: string, option: any) => {
+        setValue(selectedValue);
         onValueChange({
-            id: option.id,
-            type: option.type,
-            value: option.value,
+            id: option?.id,
+            type: option?.type,
+            value: selectedValue,
         });
     };
 
@@ -78,7 +40,7 @@ const AutocompleteDeveloper: React.FC<AutocompleteDeveloperProps> = ({
                 id: "autocomplete.developer.placeholder",
                 message: `Developer`,
             })}
-            options={options}
+            options={[]} // Пустые результаты до реализации REST API
             onSearch={onSearch}
             onSelect={onSelect}
             value={value}
