@@ -83,7 +83,11 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
 
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="flex items-center space-x-2 p-2">
+                            <Button
+                              variant="ghost"
+                              className="flex items-center space-x-2 p-2 border-2 border-green-500"
+                              onClick={() => console.log('🎯 Dropdown trigger clicked!')}
+                            >
                               <Avatar className="h-8 w-8">
                                 <AvatarImage src={user.avatar_url || "/placeholder.svg?height=32&width=32"} />
                                 <AvatarFallback>
@@ -93,7 +97,11 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                               <ChevronDown className="h-4 w-4 text-gray-500" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-56">
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-56 border-4 border-purple-500 bg-pink-100"
+                            onOpenAutoFocus={() => console.log('📂 Dropdown content opened!')}
+                          >
                             <DropdownMenuItem
                               onClick={() => {
                                 console.log('🖱️ Profile button clicked!');
