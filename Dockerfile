@@ -11,7 +11,6 @@ ENV CACHE_BUST=126
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 ENV BACKEND_URL=https://dubai.up.railway.app
-ENV PORT=80
 
 # Метки для идентификации
 LABEL cache-bust="2025-09-01-14-00"
@@ -66,8 +65,7 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo '            reverse_proxy {$BACKEND_URL} {' >> /etc/caddy/Caddyfile && \
     echo '                header_up Host {upstream_hostport}' >> /etc/caddy/Caddyfile && \
     echo '                header_up X-Real-IP {remote_host}' >> /etc/caddy/Caddyfile && \
-    echo '                header_up X-Forwarded-For {remote_host}' >> /etc/caddy/Caddyfile && \
-    echo '                header_up X-Forwarded-Proto {scheme}' >> /etc/caddy/Caddyfile && \
+    # remove redundant header_up per Caddy defaults
     echo '                transport http {' >> /etc/caddy/Caddyfile && \
     echo '                    tls_insecure_skip_verify' >> /etc/caddy/Caddyfile && \
     echo '                }' >> /etc/caddy/Caddyfile && \
