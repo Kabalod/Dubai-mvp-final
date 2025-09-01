@@ -52,6 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             
             try {
                 console.log('🔐 Checking authentication...');
+                console.log('🔐 DEMO_MODE from config:', import.meta.env.VITE_DEMO_MODE);
                 const isAuth = apiService.isAuthenticated();
                 console.log('🔐 Is authenticated:', isAuth);
                 

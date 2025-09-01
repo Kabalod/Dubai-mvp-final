@@ -2,16 +2,21 @@
 # Одноэтапная сборка для избежания проблем с копированием между stages
 # Apollo Client ПОЛНОСТЬЮ УДАЛЕН - только REST API
 # ЗАМЕНЕН nginx на Caddy для простоты
-# MVP-143: URGENT DEMO MODE FIX - CACHE_BUST=131
+# MVP-144: FINAL DEMO MODE WITH ARGS - CACHE_BUST=132
 
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=131
-ENV NODE_ENV=production
-ENV APOLLO_REMOVED=true
-ENV BACKEND_URL=https://dubai.up.railway.app
-ENV VITE_DEMO_MODE=true
+ARG CACHE_BUST=132
+ENV CACHE_BUST=${CACHE_BUST}
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+ARG APOLLO_REMOVED=true
+ENV APOLLO_REMOVED=${APOLLO_REMOVED}
+ARG BACKEND_URL=https://dubai.up.railway.app
+ENV BACKEND_URL=${BACKEND_URL}
+ARG VITE_DEMO_MODE=true
+ENV VITE_DEMO_MODE=${VITE_DEMO_MODE}
 
 # Метки для идентификации
 LABEL cache-bust="2025-09-01-20-20-emergency"

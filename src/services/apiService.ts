@@ -346,7 +346,7 @@ class ApiService {
     isAuthenticated(): boolean {
         // DEMO MODE: всегда возвращаем true
         if (DEMO_MODE) {
-            console.log('🎭 DEMO MODE: Always authenticated');
+            console.log('🎭 DEMO MODE: Always authenticated (DEMO_MODE=true)');
             return true;
         }
 
