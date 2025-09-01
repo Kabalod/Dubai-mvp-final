@@ -57,7 +57,7 @@ RUN apt-get update && apt-get install -y curl && \
 RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyfile && \
     echo '# Простая и надежная замена nginx' >> /etc/caddy/Caddyfile && \
     echo '' >> /etc/caddy/Caddyfile && \
-    echo ':{$PORT} {' >> /etc/caddy/Caddyfile && \
+    echo ':{$PORT}, :80 {' >> /etc/caddy/Caddyfile && \
     echo '    # Router: сначала API, потом SPA' >> /etc/caddy/Caddyfile && \
     echo '    route {' >> /etc/caddy/Caddyfile && \
     echo '        # API → backend (сохраняем полный путь, не обрезаем /api)' >> /etc/caddy/Caddyfile && \
