@@ -115,3 +115,8 @@ coverage.xml
 *.ps1
 *.sh
 *.bat
+
+# Exclude legacy and tests
+apps/DXB-frontend-develop/**
+e2e/**
+
