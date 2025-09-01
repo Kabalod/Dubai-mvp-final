@@ -6,7 +6,7 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-09-01-02-10
+ENV CACHE_BUST=2025-09-01-02-40
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 ENV BACKEND_URL=http://backend:8000
@@ -59,8 +59,8 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo ':80 {' >> /etc/caddy/Caddyfile && \
     echo '    # Router: сначала API, потом SPA' >> /etc/caddy/Caddyfile && \
     echo '    route {' >> /etc/caddy/Caddyfile && \
-    echo '        # API → backend' >> /etc/caddy/Caddyfile && \
-    echo '        handle_path /api/* {' >> /etc/caddy/Caddyfile && \
+    echo '        # API → backend (сохраняем полный путь, не обрезаем /api)' >> /etc/caddy/Caddyfile && \
+    echo '        handle /api/* {' >> /etc/caddy/Caddyfile && \
     echo '            reverse_proxy {$BACKEND_URL} {' >> /etc/caddy/Caddyfile && \
     echo '                header_up Host {upstream_hostport}' >> /etc/caddy/Caddyfile && \
     echo '                header_up X-Real-IP {remote_host}' >> /etc/caddy/Caddyfile && \
