@@ -20,8 +20,12 @@ interface ApplicationHeaderProps {
 
 export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderProps) {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const navigationItems = ["Main", "Analytics", "Reports", "Pricing"]
+
+  // DEBUG: Log user state
+  console.log('👤 Header render - User:', user)
+  console.log('🔐 Header render - IsAuthenticated:', isAuthenticated)
 
   const handleLogout = () => {
     apiService.clearAuth();
