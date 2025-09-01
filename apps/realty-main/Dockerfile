@@ -1,14 +1,15 @@
 # Minimal Django Dockerfile - ТОЛЬКО для авторизации
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 # Системные зависимости (минимум)
 RUN apt-get update && apt-get install -y \
     gcc \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Минимальные Python зависимости
+# Мистнимальные Python зависимости
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt

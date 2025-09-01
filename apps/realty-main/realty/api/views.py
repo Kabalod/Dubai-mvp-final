@@ -15,6 +15,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.http import HttpResponseRedirect
@@ -43,23 +44,8 @@ from .serializers import (
     PropertySearchSerializer,
 )
 
-# Временно отключены импорты для стабильности Django
-# from realty.pfimport.models import PFListSale, PFListRent, Area, Building
-
-# Mock классы для временной стабильности
-class MockModel:
-    objects = type('MockManager', (), {
-        'all': lambda: type('MockQuerySet', (), {'order_by': lambda x: [], 'count': lambda: 0})(),
-        'filter': lambda **kwargs: type('MockQuerySet', (), {'exists': lambda: False, 'select_related': lambda *args: []})(),
-        'count': lambda: 0,
-        'aggregate': lambda **kwargs: {'avg_price': 0},
-        'select_related': lambda *args: [],
-    })()
-
-Area = MockModel
-Building = MockModel  
-PFListSale = MockModel
-PFListRent = MockModel
+# Импорт реальных моделей
+from realty.pfimport.models import PFListSale, PFListRent, Area, Building
 
 User = get_user_model()
 
@@ -83,11 +69,11 @@ def health_check(request):
         }, status=500)
 
 # --- CSRF Token View ---
+@method_decorator(ensure_csrf_cookie, name="get")
 class CSRFTokenView(APIView):
     """Получение CSRF токена для frontend"""
     permission_classes = (permissions.AllowAny,)
-    
-    @ensure_csrf_cookie
+
     def get(self, request):
         csrf_token = get_token(request)
         return Response({

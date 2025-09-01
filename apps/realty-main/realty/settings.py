@@ -85,6 +85,18 @@ if PROD:
 # Полностью отключено роутирование через falco для MVP
 DATABASE_ROUTERS = []
 
+# Django Tasks настройки
+TASKS = {
+    "default": {
+        "BACKEND": "django_tasks.backends.database.DatabaseBackend",
+        "QUEUES": {
+            "default": {
+                "timeout": 300,
+            }
+        }
+    }
+}
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DEFAULT_FROM_EMAIL = env.str(
@@ -118,6 +130,9 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     # Django REST Framework for MVP API
     "rest_framework",
+    # Django Tasks для асинхронных задач
+    "django_tasks",
+    "django_tasks.backends.database", # <-- Добавлено для поддержки DatabaseBackend
     # Temporarily disabled for Railway MVP
     # "rest_framework_simplejwt",
     # "rest_framework_simplejwt.token_blacklist",
@@ -125,8 +140,12 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    # Только API для OTP системы
-    "realty.api",  # MVP REST API
+    # Все необходимые приложения
+    "realty.api",      # MVP REST API
+    "realty.main",     # Основные модели (Building, MasterProject)
+    "realty.pfimport", # Property Finder модели (Area, Building, PFListSale, PFListRent)
+    "realty.building_reports", # Отчеты по зданиям
+    "realty.reports",  # Система отчетов
 ]
 
 if DEBUG:
@@ -326,37 +345,29 @@ STATICFILES_FINDERS = (
 # -------------------------------------------------------------------------------------------------
 
 # django-allauth
-ACCOUNT_LOGIN_METHODS = {"email"}
-
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
-
-# Frontend URL for OAuth redirects
-FRONTEND_URL = env.str("FRONTEND_URL", default="https://frontend-production-261c.up.railway.app")
+# ACCOUNT_LOGIN_METHODS = {"email"}
+# ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+# Frontend URL for OAuth redirects (берём из ENV; без хардкодов старых доменов)
+FRONTEND_URL = env.str("FRONTEND_URL", default=None) or ""
 
 # Google OAuth settings - теперь из переменных окружения
 GOOGLE_OAUTH_CLIENT_ID = env.str("GOOGLE_CLIENT_ID", default="test-client-id-12345")
 GOOGLE_OAUTH_CLIENT_SECRET = env.str("GOOGLE_CLIENT_SECRET", default="test-secret-12345")
 GOOGLE_OAUTH_REDIRECT_URI = env.str("GOOGLE_OAUTH_REDIRECT_URI", default="https://dubai.up.railway.app/api/auth/google/callback/")
 
-ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*"]
-
-ACCOUNT_LOGOUT_REDIRECT_URL = "account_login"
-
-ACCOUNT_SESSION_REMEMBER = True
-
-ACCOUNT_UNIQUE_EMAIL = True
-
-LOGIN_REDIRECT_URL = "home"
-
-# Отключаем проверку sites для allauth
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "AUTH_PARAMS": {"access_type": "online"},
-        "EMAIL_AUTHENTICATION": True,
-        "OAUTH_PKCE_ENABLED": True,
-        "SCOPE": ["profile", "email"],
-    }
-}
+# ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*"]
+# ACCOUNT_LOGOUT_REDIRECT_URL = "account_login"
+# ACCOUNT_SESSION_REMEMBER = True
+# ACCOUNT_UNIQUE_EMAIL = True
+# LOGIN_REDIRECT_URL = "home"
+# SOCIALACCOUNT_PROVIDERS = {
+#     "google": {
+#         "AUTH_PARAMS": {"access_type": "online"},
+#         "EMAIL_AUTHENTICATION": True,
+#         "OAUTH_PKCE_ENABLED": True,
+#         "SCOPE": ["profile", "email"],
+#     }
+# }
 
 # Email configuration simplified for Railway deployment
 # SendGrid integration removed for MVP
@@ -385,7 +396,7 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 # django-corsheaders
-# Prefer explicit origins via env; fall back to a safe local set
+# Prefer explicit origins via env; otherwise используем FRONTEND_URL и локальные адреса
 _cors_env = env.list("CORS_ALLOWED_ORIGINS", default=None)
 if _cors_env is not None:
     CORS_ALLOWED_ORIGINS = _cors_env
@@ -394,20 +405,21 @@ else:
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost",
-        "https://frontend-production-5c48.up.railway.app",
     ]
+    if FRONTEND_URL:
+        CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
-# Allow all only during development; restrict in production
-# Временно разрешить все origins для тестирования
-CORS_ALLOW_ALL_ORIGINS = True
+# Allow all only during development
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 
-# CSRF trusted origins для Railway
-CSRF_TRUSTED_ORIGINS = [
-    "https://frontend-production-261c.up.railway.app",
-    "https://frontend-production-fa38.up.railway.app", 
-    "https://workerproject-production.up.railway.app",
-    "https://dubai.up.railway.app",
-]
+# CSRF trusted origins — из ENV или из FRONTEND_URL
+_csrf_env = env.list("CSRF_TRUSTED_ORIGINS", default=None)
+if _csrf_env is not None:
+    CSRF_TRUSTED_ORIGINS = _csrf_env
+else:
+    CSRF_TRUSTED_ORIGINS = []
+    if FRONTEND_URL:
+        CSRF_TRUSTED_ORIGINS.append(FRONTEND_URL)
 
 # django-litestream
 LITESTREAM = {
@@ -417,8 +429,7 @@ LITESTREAM = {
 # django-tasks
 TASKS = {
     "default": {
-        # Отключаем django_tasks для MVP, чтобы не тянуть лишние зависимости
-        # "BACKEND": "django_tasks.backends.database.DatabaseBackend",
+        "BACKEND": "django_tasks.backends.database.DatabaseBackend",
         "OPTIONS": {"database": "tasks_db"},
     }
 }

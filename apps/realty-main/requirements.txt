@@ -1,6 +1,5 @@
-# Railway requirements for Dubai MVP v4.0 - FIXED
-# Version: 4.0 - Added missing dependencies for settings_railway.py
-# Build: 2025-08-28 - Fixed dj_database_url and other missing deps
+# Railway requirements for Dubai MVP v4.1 - COMPREHENSIVE FIX
+# Version: 4.1 - Added all missing dependencies found by comprehensive-check.ps1
 django>=4.2
 djangorestframework>=3.15
 django-cors-headers>=4.7
@@ -13,3 +12,9 @@ prometheus-client>=0.21
 dj-database-url>=2.1.0
 python-decouple>=3.8
 requests>=2.31.0
+# Added based on comprehensive-check.ps1 results
+django-allauth>=0.61.1
+django-lifecycle>=1.0.1
+django-tasks>=0.8.1
+strawberry-graphql-django>=0.9.3
+python-dateutil>=2.8.2

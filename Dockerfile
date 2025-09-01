@@ -6,9 +6,10 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-01-29-19-30
+ENV CACHE_BUST=2025-09-01-02-10
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
+ENV BACKEND_URL=http://backend:8000
 
 # Метки для идентификации
 LABEL cache-bust="2025-01-29-19-30"
@@ -51,44 +52,37 @@ RUN apt-get update && apt-get install -y curl && \
     apt-get update && apt-get install -y caddy && \
     rm -rf /var/lib/apt/lists/*
 
-# Создание Caddyfile конфигурации
+# Создание Caddyfile конфигурации (использует переменную окружения BACKEND_URL)
 RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyfile && \
     echo '# Простая и надежная замена nginx' >> /etc/caddy/Caddyfile && \
     echo '' >> /etc/caddy/Caddyfile && \
     echo ':80 {' >> /etc/caddy/Caddyfile && \
-    echo '    # Корневая директория для React приложения' >> /etc/caddy/Caddyfile && \
-    echo '    root * /app/dist' >> /etc/caddy/Caddyfile && \
-    echo '    file_server' >> /etc/caddy/Caddyfile && \
-    echo '    ' >> /etc/caddy/Caddyfile && \
-    echo '    # React SPA маршрутизация' >> /etc/caddy/Caddyfile && \
-    echo '    try_files {path} /index.html' >> /etc/caddy/Caddyfile && \
-    echo '    ' >> /etc/caddy/Caddyfile && \
-    echo '    # API endpoints - проксирование к backend' >> /etc/caddy/Caddyfile && \
-    echo '    reverse_proxy /api/* https://workerproject-production.up.railway.app {' >> /etc/caddy/Caddyfile && \
-    echo '        # Передаем заголовки' >> /etc/caddy/Caddyfile && \
-    echo '        header_up Host {upstream_hostport}' >> /etc/caddy/Caddyfile && \
-    echo '        header_up X-Real-IP {remote_host}' >> /etc/caddy/Caddyfile && \
-    echo '        header_up X-Forwarded-For {remote_host}' >> /etc/caddy/Caddyfile && \
-    echo '        header_up X-Forwarded-Proto {scheme}' >> /etc/caddy/Caddyfile && \
-    echo '        ' >> /etc/caddy/Caddyfile && \
-    echo '        # CORS заголовки' >> /etc/caddy/Caddyfile && \
-    echo '        header_down Access-Control-Allow-Origin *' >> /etc/caddy/Caddyfile && \
-    echo '        header_down Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"' >> /etc/caddy/Caddyfile && \
-    echo '        header_down Access-Control-Allow-Headers "Origin, X-Requested-With, Content-Type, Accept, Authorization"' >> /etc/caddy/Caddyfile && \
-    echo '        ' >> /etc/caddy/Caddyfile && \
-    echo '        # Настройки транспорта' >> /etc/caddy/Caddyfile && \
-    echo '        transport http {' >> /etc/caddy/Caddyfile && \
-    echo '            tls_insecure_skip_verify' >> /etc/caddy/Caddyfile && \
+    echo '    # Router: сначала API, потом SPA' >> /etc/caddy/Caddyfile && \
+    echo '    route {' >> /etc/caddy/Caddyfile && \
+    echo '        # API → backend' >> /etc/caddy/Caddyfile && \
+    echo '        handle_path /api/* {' >> /etc/caddy/Caddyfile && \
+    echo '            reverse_proxy {$BACKEND_URL} {' >> /etc/caddy/Caddyfile && \
+    echo '                header_up Host {upstream_hostport}' >> /etc/caddy/Caddyfile && \
+    echo '                header_up X-Real-IP {remote_host}' >> /etc/caddy/Caddyfile && \
+    echo '                header_up X-Forwarded-For {remote_host}' >> /etc/caddy/Caddyfile && \
+    echo '                header_up X-Forwarded-Proto {scheme}' >> /etc/caddy/Caddyfile && \
+    echo '                transport http {' >> /etc/caddy/Caddyfile && \
+    echo '                    tls_insecure_skip_verify' >> /etc/caddy/Caddyfile && \
+    echo '                }' >> /etc/caddy/Caddyfile && \
+    echo '            }' >> /etc/caddy/Caddyfile && \
+    echo '        }' >> /etc/caddy/Caddyfile && \
+    echo '        # SPA статика' >> /etc/caddy/Caddyfile && \
+    echo '        handle {' >> /etc/caddy/Caddyfile && \
+    echo '            root * /app/dist' >> /etc/caddy/Caddyfile && \
+    echo '            try_files {path} /index.html' >> /etc/caddy/Caddyfile && \
+    echo '            file_server' >> /etc/caddy/Caddyfile && \
+    echo '            @static {' >> /etc/caddy/Caddyfile && \
+    echo '                file' >> /etc/caddy/Caddyfile && \
+    echo '                path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot' >> /etc/caddy/Caddyfile && \
+    echo '            }' >> /etc/caddy/Caddyfile && \
+    echo '            header @static Cache-Control "public, max-age=31536000, immutable"' >> /etc/caddy/Caddyfile && \
     echo '        }' >> /etc/caddy/Caddyfile && \
     echo '    }' >> /etc/caddy/Caddyfile && \
-    echo '    ' >> /etc/caddy/Caddyfile && \
-    echo '    # Статические файлы с кешированием' >> /etc/caddy/Caddyfile && \
-    echo '    @static {' >> /etc/caddy/Caddyfile && \
-    echo '        file' >> /etc/caddy/Caddyfile && \
-    echo '        path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot' >> /etc/caddy/Caddyfile && \
-    echo '    }' >> /etc/caddy/Caddyfile && \
-    echo '    header @static Cache-Control "public, max-age=31536000, immutable"' >> /etc/caddy/Caddyfile && \
-    echo '    ' >> /etc/caddy/Caddyfile && \
     echo '    # Health check endpoint' >> /etc/caddy/Caddyfile && \
     echo '    respond /health "healthy" 200' >> /etc/caddy/Caddyfile && \
     echo '}' >> /etc/caddy/Caddyfile
