@@ -6,16 +6,16 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=125
+ENV CACHE_BUST=126
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
-ENV BACKEND_URL=http://backend:8000
+ENV BACKEND_URL=https://dubai.up.railway.app
 
 # Метки для идентификации
-LABEL cache-bust="2025-01-29-19-30"
+LABEL cache-bust="2025-09-01-14-00"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
-LABEL version="0.1.4"
+LABEL version="0.1.5"
 LABEL single-stage="true"
 
 # Системные зависимости
