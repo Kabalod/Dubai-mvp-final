@@ -19,6 +19,7 @@ urlpatterns = [
     path("auth/send-otp/", views.SendOTPView.as_view(), name="send_otp"),  # Отправка OTP кода
     path("auth/verify-otp/", views.VerifyOTPView.as_view(), name="verify_otp"),  # Верификация OTP кода
     path("auth/otp-login/", views.OTPLoginView.as_view(), name="otp_login"),  # Legacy OTP логин
+    path("auth/check-user/", views.CheckUserView.as_view(), name="check_user"),
     
     # Google OAuth
     path("auth/google/login/", views.GoogleAuthInitView.as_view(), name="google_auth_init"),

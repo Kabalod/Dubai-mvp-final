@@ -106,12 +106,22 @@ DEFAULT_FROM_EMAIL = env.str(
 )
 
 # Email backend can be overridden via env. Default:
-EMAIL_BACKEND = env.str(
-    "EMAIL_BACKEND",
-    default=(
-        "anymail.backends.sendgrid.EmailBackend" if PROD else "django.core.mail.backends.console.EmailBackend"
-    ),
-)
+# Email backend: приоритет SendGrid через Anymail → SMTP → console
+_smtp_host = env.str("EMAIL_HOST", default=None)
+_smtp_user = env.str("EMAIL_HOST_USER", default=None)
+_smtp_pass = env.str("EMAIL_HOST_PASSWORD", default=None)
+_sendgrid_key = env.str("SENDGRID_API_KEY", default=None)
+
+if _sendgrid_key:
+    INSTALLED_APPS = [*DJANGO_APPS, *THIRD_PARTY_APPS, "anymail", *LOCAL_APPS]
+    EMAIL_BACKEND = "anymail.backends.sendgrid.EmailBackend"
+else:
+    EMAIL_BACKEND = env.str(
+        "EMAIL_BACKEND",
+        default=(
+            "django.core.mail.backends.smtp.EmailBackend" if all([_smtp_host, _smtp_user, _smtp_pass]) else "django.core.mail.backends.console.EmailBackend"
+        ),
+    )
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
@@ -375,13 +385,13 @@ GOOGLE_OAUTH_REDIRECT_URI = env.str("GOOGLE_OAUTH_REDIRECT_URI", default="https:
 # SMTP (например, Яндекс/Почта.ру). Активируется, если EMAIL_BACKEND =
 # "django.core.mail.backends.smtp.EmailBackend"
 if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
-    EMAIL_HOST = env.str("EMAIL_HOST", default="smtp.yandex.ru")
-    EMAIL_PORT = env.int("EMAIL_PORT", default=465)
-    EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", default=None)
-    EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", default=None)
-    # Для 587 используйте TLS, для 465 — SSL
-    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
-    EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=True)
+    EMAIL_HOST = _smtp_host or env.str("EMAIL_HOST", default="smtp.yandex.ru")
+    EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+    EMAIL_HOST_USER = _smtp_user or env.str("EMAIL_HOST_USER", default=None)
+    EMAIL_HOST_PASSWORD = _smtp_pass or env.str("EMAIL_HOST_PASSWORD", default=None)
+    # По умолчанию 587/TLS, можно переключить на 465/SSL через переменные
+    EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+    EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
 
 # django-debug-toolbar
 DEBUG_TOOLBAR_CONFIG = {
