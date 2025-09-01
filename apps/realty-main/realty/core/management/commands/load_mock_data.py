@@ -36,6 +36,19 @@ class Command(BaseCommand):
                     self.stdout.write(
                         self.style.SUCCESS('Test user created: testuser/test123')
                     )
+
+                # Create DEMO user for frontend
+                if not User.objects.filter(email='demo@premium.user').exists():
+                    User.objects.create_user(
+                        username='demo_premium_user',
+                        email='demo@premium.user',
+                        password='demo123',
+                        first_name='Demo',
+                        last_name='Premium'
+                    )
+                    self.stdout.write(
+                        self.style.SUCCESS('Demo user created: demo@premium.user / demo123')
+                    )
                 
                 self.stdout.write(
                     self.style.SUCCESS('Mock data loaded successfully!')

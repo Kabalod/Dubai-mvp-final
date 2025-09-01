@@ -49,10 +49,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     useEffect(() => {
         const performAuthCheck = () => {
             setIsLoading(true);
-            
+
             try {
                 console.log('🔐 Checking authentication...');
                 console.log('🔐 DEMO_MODE from config:', import.meta.env.VITE_DEMO_MODE);
+
+                // DEMO MODE: сразу создаем пользователя если режим включен
+                if (import.meta.env.VITE_DEMO_MODE === 'true' || import.meta.env.DEMO_MODE === 'true') {
+                    console.log('🎭 DEMO MODE detected, creating mock user...');
+                    const mockUser = apiService.getCurrentUser();
+                    setUser(mockUser);
+                    localStorage.setItem('user', JSON.stringify(mockUser));
+                    setIsLoading(false);
+                    return;
+                }
+
                 const isAuth = apiService.isAuthenticated();
                 console.log('🔐 Is authenticated:', isAuth);
                 
@@ -72,6 +83,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                         console.log('🎭 DEMO MODE: Creating mock user...');
                         const mockUser = apiService.getCurrentUser();
                         setUser(mockUser);
+
+                        // Также сохраняем в localStorage для надежности
+                        localStorage.setItem('user', JSON.stringify(mockUser));
+                        console.log('🎭 DEMO MODE: Mock user saved to localStorage');
                     }
                 } else {
                     console.log('🔐 No valid authentication found');
