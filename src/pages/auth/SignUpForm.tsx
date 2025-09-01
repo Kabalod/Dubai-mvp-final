@@ -129,14 +129,19 @@ const SignUpForm: React.FC = () => {
             setSubmitting(true);
             
             try {
+                // Если уже есть токены после verifyOTP — считаем пользователя залогиненным
+                if (localStorage.getItem('accessToken')) {
+                    navigate("/");
+                    return;
+                }
+                // Иначе завершаем регистрацию (пароль опционален)
                 const responseData = await apiService.register({
                     email: effectiveEmail,
-                    password: values.password,
-                    username: effectiveEmail, // Используем email как username
+                    password: values.password || `Otp${Date.now()}!`,
+                    username: effectiveEmail,
                     first_name: values.name.split(' ')[0] || '',
                     last_name: values.name.split(' ').slice(1).join(' ') || '',
                 });
-                
                 console.log('Registration successful!', responseData);
                 message.success('Registration successful!');
                 navigate("/");

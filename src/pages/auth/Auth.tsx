@@ -177,7 +177,7 @@ const Auth: React.FC = () => {
 
                     <Divider>or</Divider>
 
-                    {authType === "login" ? <LoginForm /> : <SignUpForm />}
+                    {authType === "login" ? <SignUpForm /> : <SignUpForm />}
 
                     {/* Демокнопку не показываем в боевом режиме */}
                     {DEMO_MODE && (

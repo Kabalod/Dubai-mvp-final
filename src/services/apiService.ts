@@ -328,29 +328,38 @@ class ApiService {
     // Utility Methods
     // ========================================
 
+    private decodeJwtPayload(token: string): any | null {
+        try {
+            const part = token.split('.')[1];
+            if (!part) return null;
+            let base64 = part.replace(/-/g, '+').replace(/_/g, '/');
+            const pad = base64.length % 4;
+            if (pad === 2) base64 += '==';
+            else if (pad === 3) base64 += '=';
+            const json = atob(base64);
+            return JSON.parse(json);
+        } catch {
+            return null;
+        }
+    }
+
     isAuthenticated(): boolean {
         const token = localStorage.getItem('accessToken');
         if (!token) return false;
-        
         try {
-            // Проверяем что токен не пустой и корректный
             if (token.length < 10) return false;
-            
-            // Проверяем срок действия токена (JWT)
-            const payload = JSON.parse(atob(token.split('.')[1]));
+            const payload = this.decodeJwtPayload(token);
+            if (!payload) return true; // дадим шанс интерсептору/refresh
             const currentTime = Math.floor(Date.now() / 1000);
-            
             if (payload.exp && payload.exp < currentTime) {
                 console.log('Token expired, clearing auth');
                 this.clearAuth();
                 return false;
             }
-            
             return true;
         } catch (error) {
             console.error('Token validation error:', error);
-            this.clearAuth();
-            return false;
+            return true;
         }
     }
 
