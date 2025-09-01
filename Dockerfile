@@ -6,7 +6,7 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=124
+ENV CACHE_BUST=125
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 ENV BACKEND_URL=http://backend:8000
@@ -76,6 +76,10 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo '            root * /app/dist' >> /etc/caddy/Caddyfile && \
     echo '            try_files {path} /index.html' >> /etc/caddy/Caddyfile && \
     echo '            file_server' >> /etc/caddy/Caddyfile && \
+    echo '            @html {' >> /etc/caddy/Caddyfile && \
+    echo '                path /index.html' >> /etc/caddy/Caddyfile && \
+    echo '            }' >> /etc/caddy/Caddyfile && \
+    echo '            header @html Cache-Control "no-cache, no-store, must-revalidate"' >> /etc/caddy/Caddyfile && \
     echo '            @static {' >> /etc/caddy/Caddyfile && \
     echo '                file' >> /etc/caddy/Caddyfile && \
     echo '                path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot' >> /etc/caddy/Caddyfile && \
