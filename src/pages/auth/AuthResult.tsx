@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import apiService from '@/services/apiService';
 
 export default function AuthResult() {
     const [message, setMessage] = useState('Processing authentication…');
@@ -19,12 +20,20 @@ export default function AuthResult() {
             if (access && refresh) {
                 localStorage.setItem('accessToken', access);
                 localStorage.setItem('refreshToken', refresh);
-                // Минимальные пользовательские данные — будут подтянуты позже из /profile
-                if (!localStorage.getItem('user')) {
-                    localStorage.setItem('user', JSON.stringify({ email: '', username: '' }));
-                }
-                setMessage('Authenticated. Redirecting…');
-                setTimeout(() => window.location.replace('/'), 500);
+                (async () => {
+                    try {
+                        const profile = await apiService.getProfile();
+                        localStorage.setItem('user', JSON.stringify(profile));
+                    } catch {
+                        // fallback: минимальный объект, чтобы хедер показал состояние
+                        if (!localStorage.getItem('user')) {
+                            localStorage.setItem('user', JSON.stringify({ email: '', username: '' }));
+                        }
+                    } finally {
+                        setMessage('Authenticated. Redirecting…');
+                        setTimeout(() => window.location.replace('/'), 300);
+                    }
+                })();
             } else {
                 setMessage('No tokens found in callback.');
             }
