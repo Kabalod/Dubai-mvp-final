@@ -1,7 +1,8 @@
-# 🔥 Railway Frontend Dockerfile - УПРОЩЕННАЯ ВЕРСИЯ v0.1.4
+# 🔥 Railway Frontend Dockerfile - УПРОЩЕННАЯ ВЕРСИЯ v0.1.5
 # Одноэтапная сборка для избежания проблем с копированием между stages
 # Apollo Client ПОЛНОСТЬЮ УДАЛЕН - только REST API
 # ЗАМЕНЕН nginx на Caddy для простоты
+# MVP-127: Force rebuild with CACHE_BUST=126
 
 FROM node:20-bullseye-slim
 
