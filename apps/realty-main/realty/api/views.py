@@ -515,7 +515,15 @@ class GoogleAuthInitView(APIView):
         }
         
         auth_url = f"{base_url}?{urlencode(params)}"
-        
+
+        # Если запрошен прямой переход (браузер/ручной вызов), делаем редирект на Google.
+        redirect_flag = request.query_params.get("redirect", "").lower() in {"1", "true", "yes"}
+        accept_header = request.META.get("HTTP_ACCEPT", "")
+        is_browser_html = ("text/html" in accept_header) and request.headers.get("X-Requested-With") is None
+        if redirect_flag or is_browser_html:
+            return HttpResponseRedirect(auth_url)
+
+        # По умолчанию (UI через fetch) возвращаем JSON
         return Response({
             'auth_url': auth_url,
             'state': state,
