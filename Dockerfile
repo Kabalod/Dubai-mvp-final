@@ -2,18 +2,18 @@
 # Одноэтапная сборка для избежания проблем с копированием между stages
 # Apollo Client ПОЛНОСТЬЮ УДАЛЕН - только REST API
 # ЗАМЕНЕН nginx на Caddy для простоты
-# MVP-137: Force rebuild with CACHE_BUST=128 - RESTORE GOOGLE AUTH NOW
+# MVP-138: Force rebuild with CACHE_BUST=129 - GOOGLE AUTH EMERGENCY
 
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=128
+ENV CACHE_BUST=129
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 ENV BACKEND_URL=https://dubai.up.railway.app
 
 # Метки для идентификации
-LABEL cache-bust="2025-09-01-19-55"
+LABEL cache-bust="2025-09-01-20-20-emergency"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
 LABEL version="0.1.5"
