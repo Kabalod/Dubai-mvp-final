@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { API_BASE_URL } from '../config';
+import { API_BASE_URL, DEMO_MODE } from '../config';
 
 // ========================================
 // API Configuration (base comes from env via src/config.ts)
@@ -344,6 +344,12 @@ class ApiService {
     }
 
     isAuthenticated(): boolean {
+        // DEMO MODE: всегда возвращаем true
+        if (DEMO_MODE) {
+            console.log('🎭 DEMO MODE: Always authenticated');
+            return true;
+        }
+
         const token = localStorage.getItem('accessToken');
         if (!token) return false;
         try {
@@ -364,6 +370,23 @@ class ApiService {
     }
 
     getCurrentUser() {
+        // DEMO MODE: возвращаем фейкового премиум пользователя
+        if (DEMO_MODE) {
+            console.log('🎭 DEMO MODE: Returning mock premium user');
+            return {
+                id: 999,
+                username: 'demo_premium_user',
+                email: 'demo@premium.user',
+                first_name: 'Demo',
+                last_name: 'Premium',
+                is_premium: true,
+                subscription_status: 'active',
+                subscription_end_date: '2026-12-31',
+                properties_count: 25,
+                reports_count: 15
+            };
+        }
+
         const userStr = localStorage.getItem('user');
         return userStr ? JSON.parse(userStr) : null;
     }

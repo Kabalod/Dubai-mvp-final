@@ -11,6 +11,7 @@ ENV CACHE_BUST=129
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 ENV BACKEND_URL=https://dubai.up.railway.app
+ENV VITE_DEMO_MODE=true
 
 # Метки для идентификации
 LABEL cache-bust="2025-09-01-20-20-emergency"
