@@ -23,9 +23,7 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
   const { user, isAuthenticated } = useAuth()
   const navigationItems = ["Main", "Analytics", "Reports", "Pricing"]
 
-  // DEBUG: Log user state
-  console.log('👤 Header render - User:', user)
-  console.log('🔐 Header render - IsAuthenticated:', isAuthenticated)
+
 
   const handleLogout = () => {
     apiService.clearAuth();
@@ -89,8 +87,7 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="flex items-center space-x-2 p-2 border-2 border-green-500 debug-button"
-                              onClick={() => console.log('🎯 Dropdown trigger clicked!')}
+                              className="flex items-center space-x-2 p-2 hover:bg-gray-100"
                             >
                               <Avatar className="h-8 w-8">
                                 <AvatarImage src={user.avatar_url || "/placeholder.svg?height=32&width=32"} />
@@ -103,16 +100,11 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
-                            className="w-56 border-4 border-purple-500 bg-pink-100 debug-dropdown"
-                            onOpenAutoFocus={() => console.log('📂 Dropdown content opened!')}
+                            className="w-56"
                           >
                             <DropdownMenuItem
-                              onClick={() => {
-                                console.log('🖱️ Profile button clicked!');
-                                console.log('🔗 Navigating to /profile...');
-                                navigate('/profile');
-                              }}
-                              className="cursor-pointer hover:bg-gray-100 debug-menu-item"
+                              onClick={() => navigate('/profile')}
+                              className="cursor-pointer"
                             >
                               <span className="flex flex-col">
                                 <span>Profile Settings</span>
@@ -126,21 +118,11 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                               </span>
                             </DropdownMenuItem>
 
-                            {/* Debug button for testing */}
-                            <DropdownMenuItem
-                              onClick={() => {
-                                console.log('🐛 Debug button clicked!');
-                                navigate('/debug');
-                              }}
-                              className="cursor-pointer hover:bg-yellow-100"
-                            >
-                              <span className="flex flex-col">
-                                <span>🔧 Debug</span>
-                                <span className="text-xs text-gray-500">Test navigation & environment</span>
-                              </span>
-                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
+                            <DropdownMenuItem
+                              className="text-red-600 hover:bg-red-50"
+                              onClick={handleLogout}
+                            >
                               <LogOut className="h-4 w-4 mr-2" />
                               <span className="flex flex-col">
                                 <span>Logout</span>

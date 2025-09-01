@@ -48,6 +48,9 @@ urlpatterns = [
     path("admin/users/", views.UserProfileAdminView.as_view(), name="admin_users"),
     path("admin/payments/", views.PaymentAdminView.as_view(), name="admin_payments"),
     
+    # Payment Intent
+    path("create-payment-intent/", views.CreatePaymentIntentView.as_view(), name="create_payment_intent"),
+
     # Webhooks
     path("webhooks/stripe/", views.StripeWebhookView.as_view(), name="stripe_webhook"),
 ]

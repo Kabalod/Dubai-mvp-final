@@ -323,13 +323,20 @@ interface ProtectedRouteProps {
     fallback?: ReactNode;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-    children, 
-    fallback 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+    children,
+    fallback
 }) => {
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isAuthenticated, isLoading, user } = useAuth();
+
+    console.log('🔒 ProtectedRoute check:', {
+        isAuthenticated,
+        isLoading,
+        user: user ? { email: user.email, id: user.id } : null
+    });
 
     if (isLoading) {
+        console.log('⏳ ProtectedRoute: Loading...');
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
@@ -338,13 +345,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
 
     if (!isAuthenticated) {
+        console.log('❌ ProtectedRoute: User not authenticated, showing fallback');
         return fallback || (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Access Denied</h2>
                     <p className="text-gray-600 mb-6">Please log in to access this page.</p>
-                    <a 
-                        href="/auth" 
+                    <a
+                        href="/auth"
                         className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
                     >
                         Go to Login
@@ -354,5 +362,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         );
     }
 
+    console.log('✅ ProtectedRoute: Access granted');
     return <>{children}</>;
 };

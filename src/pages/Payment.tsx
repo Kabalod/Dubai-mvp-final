@@ -5,8 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CreditCard, Calendar, DollarSign, Download, Search, Check, Star, Zap } from 'lucide-react';
+import { CreditCard, Calendar, DollarSign, Download, Search, Check, Star, Zap, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext'; // ✅ ДОБАВЛЕН ИМПОРТ
+import { StripeCheckout } from '@/components/payment/StripeCheckout';
 
 // Payment Plans Configuration
 const PAYMENT_PLANS = [
@@ -134,16 +135,44 @@ const Payment: React.FC = () => {
   const [testPaymentLoading, setTestPaymentLoading] = useState<string>('');
   const [testPaymentSuccess, setTestPaymentSuccess] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState<any>(null);
+  const [showStripeCheckout, setShowStripeCheckout] = useState(false);
+  const [paymentError, setPaymentError] = useState<string>('');
+
+  const handlePlanSelect = (plan: any) => {
+    setSelectedPlan(plan);
+    setShowStripeCheckout(true);
+    setPaymentError('');
+  };
+
+  const handleStripeSuccess = (paymentIntent: any) => {
+    console.log('Payment successful:', paymentIntent);
+    setShowStripeCheckout(false);
+    setTestPaymentSuccess(selectedPlan?.id || '');
+    setSelectedPlan(null);
+
+    // Сброс сообщения через 5 секунд
+    setTimeout(() => {
+      setTestPaymentSuccess('');
+    }, 5000);
+  };
+
+  const handleStripeError = (error: string) => {
+    console.error('Payment error:', error);
+    setPaymentError(error);
+    setShowStripeCheckout(false);
+  };
 
   const handleTestPayment = async (planId: string) => {
     setTestPaymentLoading(planId);
     setTestPaymentSuccess('');
-    
-    // Симуляция тестового платежа
+
+    // Для демонстрации оставляем старую симуляцию
+    // В продакшене здесь будет реальный Stripe платеж
     setTimeout(() => {
       setTestPaymentLoading('');
       setTestPaymentSuccess(planId);
-      
+
       // Сброс сообщения через 3 секунды
       setTimeout(() => {
         setTestPaymentSuccess('');
@@ -176,9 +205,44 @@ const Payment: React.FC = () => {
         <Alert className="border-green-200 bg-green-50">
           <Check className="h-4 w-4 text-green-600" />
           <AlertDescription className="text-green-800">
-            ✅ Test payment successful! Upgraded to {PAYMENT_PLANS.find(p => p.id === testPaymentSuccess)?.name} plan
+            ✅ Payment successful! Upgraded to {PAYMENT_PLANS.find(p => p.id === testPaymentSuccess)?.name} plan
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* Payment Error Message */}
+      {paymentError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Payment failed: {paymentError}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Stripe Checkout Modal */}
+      {showStripeCheckout && selectedPlan && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Complete Payment</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowStripeCheckout(false)}
+              >
+                ×
+              </Button>
+            </div>
+            <StripeCheckout
+              amount={selectedPlan.price}
+              currency="usd"
+              planName={selectedPlan.name}
+              onSuccess={handleStripeSuccess}
+              onError={handleStripeError}
+            />
+          </div>
+        </div>
       )}
 
       <Tabs defaultValue="overview" className="space-y-6">
@@ -255,14 +319,14 @@ const Payment: React.FC = () => {
 
         {/* Plans & Pricing Tab */}
         <TabsContent value="plans" className="space-y-6">
-          {/* Test Payment Notice */}
-          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center gap-2 text-yellow-800">
-              <Zap className="h-4 w-4" />
-              <strong>Test Mode</strong>
+          {/* Payment Notice */}
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-2 text-blue-800">
+              <CreditCard className="h-4 w-4" />
+              <strong>Secure Payment</strong>
             </div>
-            <p className="text-sm text-yellow-700 mt-1">
-              All payments are simulated for testing purposes. No real charges will be made.
+            <p className="text-sm text-blue-700 mt-1">
+              All payments are processed securely through Stripe. Use test card: 4242 4242 4242 4242
             </p>
           </div>
 
@@ -313,7 +377,7 @@ const Payment: React.FC = () => {
                     className={`w-full ${plan.popular ? 'bg-blue-500 hover:bg-blue-600' : ''}`}
                     variant={plan.current ? 'outline' : plan.popular ? 'default' : 'outline'}
                     disabled={plan.current || testPaymentLoading === plan.id}
-                    onClick={() => handleTestPayment(plan.id)}
+                    onClick={() => plan.name === 'Free' ? handleTestPayment(plan.id) : handlePlanSelect(plan)}
                   >
                     {testPaymentLoading === plan.id ? (
                       <>
@@ -325,7 +389,7 @@ const Payment: React.FC = () => {
                     ) : plan.name === 'Free' ? (
                       'Get Started'
                     ) : (
-                      'Test Upgrade'
+                      'Upgrade Now'
                     )}
                   </Button>
                 </CardContent>

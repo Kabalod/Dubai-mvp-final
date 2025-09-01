@@ -736,3 +736,51 @@ class ReportsView(APIView):
             'status': 'generating'
         }
         return Response(new_report, status=status.HTTP_201_CREATED)
+
+
+class CreatePaymentIntentView(APIView):
+    """API для создания Stripe Payment Intent"""
+    permission_classes = (permissions.AllowAny,)  # Для MVP - без аутентификации
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            amount = data.get('amount', 0)  # В центах
+            currency = data.get('currency', 'usd')
+            plan_name = data.get('plan_name', 'Unknown Plan')
+
+            if not stripe:
+                # Fallback для случаев когда stripe не установлен
+                return Response({
+                    'clientSecret': f'test_secret_{secrets.token_hex(16)}',
+                    'test_mode': True
+                })
+
+            # Установка Stripe ключа
+            stripe.api_key = getattr(settings, 'STRIPE_SECRET_KEY', 'sk_test_...')
+
+            # Создание PaymentIntent
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency=currency,
+                metadata={
+                    'plan_name': plan_name,
+                    'integration_check': 'accept_a_payment',
+                },
+                automatic_payment_methods={
+                    'enabled': True,
+                },
+            )
+
+            return Response({
+                'clientSecret': intent.client_secret,
+                'paymentIntentId': intent.id,
+                'test_mode': False
+            })
+
+        except Exception as e:
+            print(f"Stripe error: {e}")
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )

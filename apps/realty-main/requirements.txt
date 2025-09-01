@@ -18,3 +18,4 @@ django-lifecycle>=1.0.1
 django-tasks>=0.8.1
 strawberry-graphql-django>=0.9.3
 python-dateutil>=2.8.2
+stripe>=7.0.0
