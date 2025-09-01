@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { apiService } from "@/services/apiService"
-import { DEMO_MODE } from "@/config"
 import { useAuth } from "@/contexts/AuthContext"
 
 interface ApplicationHeaderProps {
@@ -121,11 +120,6 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                     ) : (
                       // Неавторизованный пользователь - показываем кнопки входа
                       <>
-                        {DEMO_MODE && (
-                          <span className="text-sm text-gray-500 hidden md:inline">
-                            Demo Mode - Register to save data
-                          </span>
-                        )}
                         <Button
                           variant="ghost"
                           onClick={() => navigate('/auth')}
