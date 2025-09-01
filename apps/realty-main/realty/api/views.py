@@ -594,8 +594,8 @@ class GoogleAuthCallbackView(APIView):
             refresh = RefreshToken.for_user(user)
             access_token = refresh.access_token
             
-            # Редирект с токенами в hash для frontend
-            redirect_url = f"{settings.FRONTEND_URL}/auth#access={access_token}&refresh={refresh}"
+            # Редирект с токенами в hash для frontend (современный callback-роут)
+            redirect_url = f"{settings.FRONTEND_URL}/auth/callback#access={access_token}&refresh={refresh}"
             return HttpResponseRedirect(redirect_url)
             
         except Exception as e:

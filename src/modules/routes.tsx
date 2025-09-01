@@ -11,6 +11,7 @@ import Payment from "@/pages/Payment";
 import PricingPage from "@/pages/PricingPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import GoogleRedirect from "@/pages/auth/GoogleRedirect";
+import AuthResult from "@/pages/auth/AuthResult";
 
 export default function AppRoutes() {
     return (
@@ -20,6 +21,7 @@ export default function AppRoutes() {
             <Route path="/dashboard" element={<MainDashboard />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/auth/google" element={<GoogleRedirect />} />
+            <Route path="/auth/callback" element={<AuthResult />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/payment" element={<Payment />} />
