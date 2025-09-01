@@ -183,12 +183,33 @@ class SendOTPView(APIView):
             cache.set(f"otp:{email}", otp_code, timeout=600)
         
         # Для MVP возвращаем код в ответе (в продакшн отправлять на email)
+        # Попытаемся отправить письмо, если SMTP настроен
+        email_sent = False
+        email_error = None
+        try:
+            subject = "Your OTP code"
+            message = f"Your OTP code is: {otp_code}\nThis code will expire in 10 minutes."
+            html_message = None  # шаблон опционален
+            sent = send_mail(
+                subject,
+                message,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+            email_sent = sent > 0
+        except Exception as exc:
+            email_error = str(exc)
+
         return Response({
             'message': 'OTP code sent successfully',
             'otp_code': otp_code,  # ТОЛЬКО ДЛЯ MVP! Убрать в продакшн
             'expires_in': 600,  # 10 minutes
             'email': email,
             'persisted': stored,
+            'email_sent': email_sent,
+            'email_error': email_error,
             'note': 'MVP: OTP code provided in response. In production, will be sent via email.'
         })
 
@@ -290,6 +311,18 @@ class VerifyOTPView(APIView):
             return Response({
                 'error': 'Invalid or expired OTP code'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CheckUserView(APIView):
+    """Проверка: существует ли пользователь с данным email"""
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        email = request.query_params.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        exists = User.objects.filter(email=email).exists()
+        return Response({'email': email, 'exists': exists})
 
 
 class OTPLoginView(APIView):
