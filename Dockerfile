@@ -6,7 +6,7 @@
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ENV CACHE_BUST=2025-09-01-02-40
+ENV CACHE_BUST=2025-09-01-03-20
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 ENV BACKEND_URL=http://backend:8000
