@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { apiService, User } from '../services/apiService';
+import { apiService, User } from '../services/apiService'
+import { DEMO_MODE } from '../config';
 
 // ========================================
 // Auth Context Types
@@ -57,14 +58,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 if (isAuth) {
                     const userData = apiService.getCurrentUser();
                     console.log('🔐 User data from storage:', userData);
-                    
-                    // ✅ ИСПРАВЛЕНО: если токен есть, но пользователя нет - очищаем все
-                    if (!userData) {
+
+                    // ✅ ИСПРАВЛЕНО: если токен есть, но пользователя нет - очищаем все (кроме демо режима)
+                    if (!userData && !DEMO_MODE) {
                         console.log('⚠️ Valid token but no user data - clearing auth');
                         apiService.clearAuth();
                         setUser(null);
-                    } else {
+                    } else if (userData) {
                         setUser(userData);
+                    } else if (DEMO_MODE) {
+                        // DEMO MODE: пользователь должен быть, но его нет - создаем фейкового
+                        console.log('🎭 DEMO MODE: Creating mock user...');
+                        const mockUser = apiService.getCurrentUser();
+                        setUser(mockUser);
                     }
                 } else {
                     console.log('🔐 No valid authentication found');
@@ -72,9 +78,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 }
             } catch (error) {
                 console.error('❌ Auth check error:', error);
-                // Очищаем авторизацию при ошибке
-                apiService.clearAuth();
-                setUser(null);
+                // Очищаем авторизацию при ошибке (кроме демо режима)
+                if (!DEMO_MODE) {
+                    apiService.clearAuth();
+                    setUser(null);
+                } else {
+                    // DEMO MODE: при ошибке создаем фейкового пользователя
+                    console.log('🎭 DEMO MODE: Auth check error, creating mock user...');
+                    const mockUser = apiService.getCurrentUser();
+                    setUser(mockUser);
+                }
             } finally {
                 setIsLoading(false);
             }

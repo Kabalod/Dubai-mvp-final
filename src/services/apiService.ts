@@ -369,6 +369,10 @@ class ApiService {
         }
     }
 
+    isDemoMode(): boolean {
+        return DEMO_MODE;
+    }
+
     getCurrentUser() {
         // DEMO MODE: возвращаем фейкового премиум пользователя
         if (DEMO_MODE) {
@@ -380,6 +384,7 @@ class ApiService {
                 first_name: 'Demo',
                 last_name: 'Premium',
                 is_premium: true,
+                subscription_type: 'premium',
                 subscription_status: 'active',
                 subscription_end_date: '2026-12-31',
                 properties_count: 25,
