@@ -11,6 +11,7 @@ ENV CACHE_BUST=126
 ENV NODE_ENV=production
 ENV APOLLO_REMOVED=true
 ENV BACKEND_URL=https://dubai.up.railway.app
+ENV PORT=80
 
 # Метки для идентификации
 LABEL cache-bust="2025-09-01-14-00"
@@ -57,7 +58,7 @@ RUN apt-get update && apt-get install -y curl && \
 RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyfile && \
     echo '# Простая и надежная замена nginx' >> /etc/caddy/Caddyfile && \
     echo '' >> /etc/caddy/Caddyfile && \
-    echo ':80 {' >> /etc/caddy/Caddyfile && \
+    echo ':{$PORT} {' >> /etc/caddy/Caddyfile && \
     echo '    # Router: сначала API, потом SPA' >> /etc/caddy/Caddyfile && \
     echo '    route {' >> /etc/caddy/Caddyfile && \
     echo '        # API → backend (сохраняем полный путь, не обрезаем /api)' >> /etc/caddy/Caddyfile && \
