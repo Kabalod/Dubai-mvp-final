@@ -2,12 +2,12 @@
 # Одноэтапная сборка для избежания проблем с копированием между stages
 # Apollo Client ПОЛНОСТЬЮ УДАЛЕН - только REST API
 # ЗАМЕНЕН nginx на Caddy для простоты
-# MVP-145: FORCE REBUILD NOW - CACHE_BUST=133
+# MVP-146: FINAL FORCE REBUILD - CACHE_BUST=134
 
 FROM node:20-bullseye-slim
 
 # Принудительная очистка кеша
-ARG CACHE_BUST=133
+ARG CACHE_BUST=134
 ENV CACHE_BUST=${CACHE_BUST}
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
@@ -19,7 +19,7 @@ ARG VITE_DEMO_MODE=true
 ENV VITE_DEMO_MODE=${VITE_DEMO_MODE}
 
 # Метки для идентификации
-LABEL cache-bust="2025-09-01-21-00-force-rebuild"
+LABEL cache-bust="2025-09-01-21-15-final-force"
 LABEL apollo-removed="true"
 LABEL caddy-replaced-nginx="true"
 LABEL version="0.1.5"
