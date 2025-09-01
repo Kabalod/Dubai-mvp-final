@@ -34,6 +34,52 @@ export default function AppRoutes() {
                     <Profile />
                 </ProtectedRoute>
             } />
+
+            {/* Тестовый маршрут для отладки */}
+            <Route path="/debug" element={
+                <div className="p-6 max-w-4xl mx-auto">
+                    <h1 className="text-3xl font-bold mb-6">🔧 Debug Page</h1>
+
+                    <div className="space-y-4">
+                        <div className="p-4 bg-blue-50 border rounded-lg">
+                            <h2 className="font-semibold mb-2">Navigation Test</h2>
+                            <button
+                                onClick={() => window.location.href = '/profile'}
+                                className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+                            >
+                                Go to Profile (window.location)
+                            </button>
+                            <button
+                                onClick={() => window.history.pushState(null, '', '/profile')}
+                                className="bg-green-500 text-white px-4 py-2 rounded mr-2"
+                            >
+                                Go to Profile (pushState)
+                            </button>
+                        </div>
+
+                        <div className="p-4 bg-yellow-50 border rounded-lg">
+                            <h2 className="font-semibold mb-2">Environment Check</h2>
+                            <p><strong>DEMO_MODE:</strong> {import.meta.env.VITE_DEMO_MODE || 'undefined'}</p>
+                            <p><strong>Mode:</strong> {import.meta.env.MODE}</p>
+                            <p><strong>User Agent:</strong> {navigator.userAgent}</p>
+                        </div>
+
+                        <div className="p-4 bg-red-50 border rounded-lg">
+                            <h2 className="font-semibold mb-2">Console Logs</h2>
+                            <p>Open browser console (F12) to see debug messages</p>
+                            <button
+                                onClick={() => {
+                                    console.log('🧪 Debug test - Current location:', window.location.href);
+                                    console.log('🧪 Debug test - DEMO_MODE:', import.meta.env.VITE_DEMO_MODE);
+                                }}
+                                className="bg-red-500 text-white px-4 py-2 rounded"
+                            >
+                                Log to Console
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            } />
             
             {/* 404 страница */}
             <Route path="*" element={<NotFound />} />

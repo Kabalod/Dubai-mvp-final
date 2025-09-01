@@ -94,7 +94,14 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuItem onClick={() => navigate('/profile')}>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                console.log('🖱️ Profile button clicked!');
+                                console.log('🔗 Navigating to /profile...');
+                                navigate('/profile');
+                              }}
+                              className="cursor-pointer hover:bg-gray-100"
+                            >
                               <span className="flex flex-col">
                                 <span>Profile Settings</span>
                                 <span className="text-xs text-gray-500">View current plan & settings</span>
@@ -104,6 +111,20 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                               <span className="flex flex-col">
                                 <span>Billing</span>
                                 <span className="text-xs text-gray-500">Manage subscription & payments</span>
+                              </span>
+                            </DropdownMenuItem>
+
+                            {/* Debug button for testing */}
+                            <DropdownMenuItem
+                              onClick={() => {
+                                console.log('🐛 Debug button clicked!');
+                                navigate('/debug');
+                              }}
+                              className="cursor-pointer hover:bg-yellow-100"
+                            >
+                              <span className="flex flex-col">
+                                <span>🔧 Debug</span>
+                                <span className="text-xs text-gray-500">Test navigation & environment</span>
                               </span>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
