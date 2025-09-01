@@ -89,7 +89,7 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              className="flex items-center space-x-2 p-2 border-2 border-green-500"
+                              className="flex items-center space-x-2 p-2 border-2 border-green-500 debug-button"
                               onClick={() => console.log('🎯 Dropdown trigger clicked!')}
                             >
                               <Avatar className="h-8 w-8">
@@ -103,7 +103,7 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
-                            className="w-56 border-4 border-purple-500 bg-pink-100"
+                            className="w-56 border-4 border-purple-500 bg-pink-100 debug-dropdown"
                             onOpenAutoFocus={() => console.log('📂 Dropdown content opened!')}
                           >
                             <DropdownMenuItem
@@ -112,7 +112,7 @@ export function ApplicationHeader({ activeRoute = "Main" }: ApplicationHeaderPro
                                 console.log('🔗 Navigating to /profile...');
                                 navigate('/profile');
                               }}
-                              className="cursor-pointer hover:bg-gray-100"
+                              className="cursor-pointer hover:bg-gray-100 debug-menu-item"
                             >
                               <span className="flex flex-col">
                                 <span>Profile Settings</span>

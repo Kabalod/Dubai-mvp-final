@@ -5,6 +5,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* DEBUG: Add global debug styles */
+.debug-dropdown {
+  border: 3px solid red !important;
+  background: yellow !important;
+}
+
+.debug-menu-item {
+  border: 2px solid blue !important;
+  background: lightblue !important;
+  margin: 2px !important;
+}
+
+.debug-button {
+  border: 2px solid green !important;
+}
+
+/* Ensure dropdown content is visible */
+[data-slot="dropdown-menu-content"] {
+  z-index: 9999 !important;
+  position: fixed !important;
+  background: white !important;
+  border: 2px solid purple !important;
+}
+
+/* Force visibility of dropdown items */
+[data-slot="dropdown-menu-item"] {
+  background: lightyellow !important;
+  border: 1px solid orange !important;
+  padding: 8px !important;
+  margin: 2px !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
 /* Apply spacing utilities */
 @layer utilities {
   .m-0 { margin: 0 !important; }
