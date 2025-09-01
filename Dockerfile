@@ -71,6 +71,13 @@ RUN echo '# 🚀 Caddy Configuration for Dubai MVP Frontend' > /etc/caddy/Caddyf
     echo '                }' >> /etc/caddy/Caddyfile && \
     echo '            }' >> /etc/caddy/Caddyfile && \
     echo '        }' >> /etc/caddy/Caddyfile && \
+    echo '        # STATIC & MEDIA → backend (DRF browsable API, admin assets)' >> /etc/caddy/Caddyfile && \
+    echo '        handle /static/* {' >> /etc/caddy/Caddyfile && \
+    echo '            reverse_proxy {$BACKEND_URL}' >> /etc/caddy/Caddyfile && \
+    echo '        }' >> /etc/caddy/Caddyfile && \
+    echo '        handle /media/* {' >> /etc/caddy/Caddyfile && \
+    echo '            reverse_proxy {$BACKEND_URL}' >> /etc/caddy/Caddyfile && \
+    echo '        }' >> /etc/caddy/Caddyfile && \
     echo '        # SPA статика' >> /etc/caddy/Caddyfile && \
     echo '        handle {' >> /etc/caddy/Caddyfile && \
     echo '            root * /app/dist' >> /etc/caddy/Caddyfile && \
