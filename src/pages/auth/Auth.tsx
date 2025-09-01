@@ -4,7 +4,7 @@ import { GoogleOutlined } from "@ant-design/icons";
 import styles from "./Auth.module.scss";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
-import { API_BASE_URL } from "@/config";
+import { DEMO_MODE } from "@/config";
 import CustomButton from "@/components/CustomButton/CustomButton";
 import LogoImage from "@/assets/Logo.png";
 
@@ -108,6 +108,9 @@ const Auth: React.FC = () => {
     };
 
     const handleForceLogin = () => {
+        if (!DEMO_MODE) {
+            return; // боевой режим: отключаем демологин
+        }
         console.log('🔐 Force login - creating mock session...');
         
         // Создаем mock токены для тестирования
@@ -175,6 +178,13 @@ const Auth: React.FC = () => {
                     <Divider>or</Divider>
 
                     {authType === "login" ? <LoginForm /> : <SignUpForm />}
+
+                    {/* Демокнопку не показываем в боевом режиме */}
+                    {DEMO_MODE && (
+                        <div style={{ marginTop: 12 }}>
+                            <CustomButton onClick={handleForceLogin}>Demo Login</CustomButton>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

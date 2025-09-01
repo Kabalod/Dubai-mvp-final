@@ -19,6 +19,10 @@ export const FRONTEND_URL: string = import.meta.env.VITE_FRONTEND_URL ||
                                    import.meta.env.FRONTEND_URL || 
                                    window.location.origin;
 
+// Feature flags
+const flag = (v: any): boolean => String(v).toLowerCase() === 'true' || v === true || v === '1';
+export const DEMO_MODE: boolean = flag((import.meta.env as any).VITE_DEMO_MODE || (import.meta.env as any).DEMO_MODE || false);
+
 console.log('🔧 Environment:', import.meta.env.MODE);
 console.log('🔧 API_BASE_URL:', API_BASE_URL);
 console.log('🔧 GOOGLE_CLIENT_ID:', GOOGLE_CLIENT_ID ? 'configured' : 'missing');
