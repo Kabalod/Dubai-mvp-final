@@ -1,0 +1,173 @@
+diff --git a/.gitignore b/.gitignore
+index 3f5243c..a6e6a1d 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -67,3 +67,29 @@
+ .cursor/rules/nx-rules.mdc
+ .github/instructions/nx.instructions.md
+ .vercel
++/TRASH/
++/.nx/
++
++# Игнорируем старые файлы в корне проекта
++/-COMPLETE-CHANGELOG-MVP.md
++/-MVP-LAUNCH-GUIDE.md
++/1 for proper character display
++/all_components.txt
++/APOLLO_CLEANUP_PROGRESS_REPORT.md
++/BACKEND_API_COMPLETION_REPORT.md
++/Caddyfile
++/CHANGELOG.md
++/COMPONENT_CHECK_COMPLETION_REPORT.md
++/CURRENT_STATUS_SUMMARY.md
++/dashboard.html
++/deploy-production.sh
++/deploy-railway-manual.ps1
++/deploy-railway.ps1
++/DEPLOYMENT_SUCCESS_REPORT.md
++/DESIGN_COMPONENTS_DOCUMENTATION.md
++/DESIGN_INTEGRATION_AND_GOOGLE_AUTH_REPORT.md
++/DESIGN_UNIFICATION_COMPLETION_REPORT.md
++/DOCKER_AND_RAILWAY_GUIDE.md
++/FRONTEND_REDESIGN_COMPLETION_REPORT.md
++/FRONTEND_REDESIGN_TASK.md
++/index.html
++/install_cloudflared.ps1
++/lingui.config.js
++/LOGO_AND_OAUTH_FIXES_REPORT.md
+diff --git a/Dockerfile b/Dockerfile
+index 287f289..1d7c390 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -82,4 +82,4 @@
+     CMD curl -f http://localhost:8000/api/health/ || exit 1
+ 
+ # Команда запуска для Railway: миграции + сбор статики + gunicorn
+-CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py collectstatic --noinput && gunicorn realty.wsgi:application --bind 0.0.0.0:8000 --workers 2 --timeout 120"]
++CMD ["sh", "-c", "python manage.py migrate --run-syncdb && python manage.py collectstatic --noinput && gunicorn --env DJANGO_SETTINGS_MODULE=realty.settings realty.wsgi:application --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 120"]
+diff --git a/apps/realty-main/realty/api/urls.py b/apps/realty-main/realty/api/urls.py
+index a1f3b01..5e8b1b3 100644
+--- a/apps/realty-main/realty/api/urls.py
++++ b/apps/realty-main/realty/api/urls.py
+@@ -2,7 +2,7 @@
+ from rest_framework_simplejwt.views import TokenRefreshView
+ from . import views
+ 
+-app_name = 'api'
++app_name = "api"
+ 
+ urlpatterns = [
+     # Health check
+@@ -23,6 +23,9 @@
+     path('auth/upgrade/', views.upgrade_plan, name='upgrade_plan'),
+     path('billing/subscription/', views.my_subscription, name='my_subscription'),
+     path('billing/mock-pay/', views.mock_pay, name='mock_pay'),
++    # Investor features
++    path("investor/selection/", views.get_investor_selection, name="investor_selection"),
++    path("reports/order-single/", views.order_single_report, name="order_single_report"),
+     path('billing/webhook/<str:provider>/', views.billing_webhook, name='billing_webhook'),
+     path('billing/create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
+     # Profile
+diff --git a/apps/realty-main/realty/api/views.py b/apps/realty-main/realty/api/views.py
+index a0c641f..b609e25 100644
+--- a/apps/realty-main/realty/api/views.py
++++ b/apps/realty-main/realty/api/views.py
+@@ -10,6 +10,8 @@
+ from django.utils import timezone
+ from django.utils.dateparse import parse_datetime
+ from django.conf import settings
++from django.db.models import Avg
++from django.template.loader import render_to_string
+ import datetime
+ import json
+ import urllib.parse
+@@ -19,6 +21,12 @@
+ import os
+ import base64
+ 
++# Stripe
++try:
++    import stripe
++except ImportError:
++    stripe = None
++
+ # Импорты только для OTP системы (MVP)
+ from .models import OTPCode, UserProfile, SubscriptionPlan, UserSubscription, Payment, Report, PaymentEventAudit
+ from .providers import get_provider
+@@ -73,6 +81,49 @@
+     }
+     return Response(SubscriptionSerializer(payload).data)
+ 
++@api_view(['POST'])
++@permission_classes([IsAuthenticated])
++def get_investor_selection(request):
++    budget = request.data.get('budget')
++    locations = request.data.get('locations', [])
++    strategy = request.data.get('strategy')
++
++    queryset = PFListSale.objects.filter(price__lte=budget)
++    if locations:
++        queryset = queryset.filter(area_id__in=locations) # Фильтруем по ID, а не по имени
++
++    if strategy == 'max_roi':
++        queryset = queryset.order_by('-roi_gross_year')
++    elif strategy == 'stable_rent':
++        avg_price = queryset.aggregate(Avg('price'))['price__avg'] or 0
++        queryset = queryset.filter(price__gte=avg_price * 0.8, price__lte=avg_price * 1.2).order_by('-roi_gross_year')
++    elif strategy == 'capital_growth':
++        queryset = queryset.order_by('avg_market_price_comparison')
++
++    serializer = PropertySerializer(queryset[:10], many=True)
++    return Response(serializer.data)
++
++@api_view(['POST'])
++@permission_classes([IsAuthenticated])
++def order_single_report(request):
++    url = request.data.get('url')
++    # Здесь будет логика:
++    # 1. Запустить парсер для одного URL
++    # 2. Рассчитать метрики для полученного объекта
++    # 3. Сгенерировать PDF-отчет
++    # 4. Вернуть ссылку на скачивание
++    
++    # Mock-реализация
++    # html_string = render_to_string('reports/custom_report.html', {'property_url': url})
++    # pdf_file = HTML(string=html_string).write_pdf()
++    # response = HttpResponse(pdf_file, content_type='application/pdf')
++    # response['Content-Disposition'] = 'attachment; filename="report.pdf"'
++    # return response
++    return Response({'report_url': '/media/mock_report.pdf'})
++
++
++
+ 
+ @api_view(['POST'])
+ @permission_classes([IsAuthenticated])
+diff --git a/apps/realty-main/realty/settings.py b/apps/realty-main/realty/settings.py
+index 03683a6..920e408 100644
+--- a/apps/realty-main/realty/settings.py
++++ b/apps/realty-main/realty/settings.py
+@@ -456,6 +456,9 @@
+ 
+ ADMIN_URL = env.str("ADMIN_URL", default="admin/")
+ 
++# Stripe
++STRIPE_SECRET_KEY = env.str("STRIPE_SECRET_KEY", default="")
++
+ 
+ # ========================================
+ # Django REST Framework Settings for MVP
+diff --git a/apps/realty-main/requirements.txt b/apps/realty-main/requirements.txt
+index e9d2b2c..8b33538 100644
+--- a/apps/realty-main/requirements.txt
++++ b/apps/realty-main/requirements.txt
+@@ -16,8 +16,7 @@
+ requests>=2.31.0
+ # Added based on comprehensive-check.ps1 results
+ django-allauth>=0.61.1
+-django-lifecycle>=1.0.1
+-django-tasks>=0.8.1
+-strawberry-graphql-django>=0.9.3
+ python-dateutil>=2.8.2
+ stripe>=7.0.0
++django-anymail[sendgrid]
