@@ -10,7 +10,6 @@ ansible/
 *.md
 *.yml
 manage.py
-setup_google_oauth.py
 fujin.toml
 justfile
 project.json

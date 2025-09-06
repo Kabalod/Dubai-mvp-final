@@ -1,38 +1,27 @@
 """
-Упрощенные URLs для Railway - ТОЛЬКО авторизация
+Упрощенные URLs для Railway - ТОЛЬКО авторизация (Усиленная безопасность)
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 from django.http import JsonResponse
 from . import auth_views
 
-# Простой корневой view
+# Упрощенный корневой view, не раскрывающий внутренние эндпоинты
 def root_view(request):
     return JsonResponse({
         "service": "dubai-auth-backend",
         "status": "ok",
-        "version": "mvp-updated",
-        "cache_bust": "2025-01-30-01-30",
-        "endpoints": {
-            "health": "/api/health/",
-            "csrf": "/api/csrf/",
-            "send_otp": "/api/auth/send-otp/",
-            "verify_otp": "/api/auth/verify-otp/",
-            "google_auth": "/api/auth/google/login/",
-            "simple_auth": "/api/auth/login/",
-            "stats": "/api/stats/",
-            "properties": "/api/properties/"
-        }
+        "version": "mvp-secure"
     })
 
 urlpatterns = [
-    # Корневая страница
-    path("", root_view),
+    # Корневая страница для health check
+    path("", root_view, name="root"),
     
-    # Health check
-    path("healthz/", lambda request: JsonResponse({"status": "ok", "service": "auth-only"})),
+    # Стандартный health check
+    path("healthz/", lambda request: JsonResponse({"status": "ok"}), name="healthz"),
     
-    # API - прямые endpoints без модулей
+    # Основные API эндпоинты для аутентификации
     path("api/health/", auth_views.health_check, name="health_check"),
     path("api/csrf/", auth_views.csrf_token_view, name="csrf_token"),
     path("api/auth/register/", auth_views.register_user, name="register"),
@@ -41,10 +30,10 @@ urlpatterns = [
     path("api/auth/google/login/", auth_views.google_auth_init, name="google_init"),
     path("api/auth/google/callback/", auth_views.google_auth_callback, name="google_callback"),
     path("api/auth/login/", auth_views.simple_login, name="simple_login"),
-    path("api/auth/force-login/", auth_views.force_login, name="force_login"),
-    path("api/stats/", auth_views.mock_stats, name="stats"),
-    path("api/properties/", auth_views.mock_properties, name="properties"),
     
-    # Admin (опционально)
+    # Удалены эндпоинты: /api/auth/force-login/, /api/stats/, /api/properties/
+    # для повышения безопасности в продакшене.
+    
+    # Доступ к админ-панели Django
     path("admin/", admin.site.urls),
 ]
